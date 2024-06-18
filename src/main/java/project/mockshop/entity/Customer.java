@@ -15,14 +15,16 @@ public class Customer {
     private int point;
     private boolean isDeleted;
 
-    public Customer() {}
+    public Customer() {
+        this("loginid");
+    }
 
     public Customer(Long id) {
         this.id = id;
     }
 
     public Customer(String loginId) {
-        this(loginId, "이름");
+        this(loginId, "구매자");
     }
 
     public Customer(String loginId, String name) {
@@ -215,5 +217,37 @@ public class Customer {
         if (!email.matches(EMAIL_PATTERN)) {
             throw new IllegalArgumentException("이메일 형식을 다시 확인해주세요.");
         }
+    }
+
+    public void changeId(Long id) {
+        this.id = id;
+    }
+
+    public void changeName(String name) {
+        validateName(name);
+        this.name = name;
+    }
+
+    public void changeIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public void changePassword(String password) {
+        validatePassword(password);
+        this.password = password;
+    }
+
+    public void changePhoneNumber(String phoneNumber) {
+        validatePhoneNumber(phoneNumber);
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void changeEmail(String email) {
+        validateEmail(email);
+        this.email = email;
+    }
+
+    public void changeAddress(Address address) {
+        this.address = address;
     }
 }
