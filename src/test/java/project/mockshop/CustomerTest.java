@@ -315,6 +315,6 @@ public class CustomerTest {
         Customer customer = new Customer("loginid", "이름", "Password1!",
                 "01011111111", "email@email.com", address, 100, false);
 
-        assertThat(customer.getIsDeleted()).isFalse();
+        assertThat(customer.isDeleted()).isFalse();
     }
 }

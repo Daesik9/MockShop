@@ -1,7 +1,8 @@
 package project.mockshop;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import project.mockshop.entity.Address;
 import project.mockshop.entity.Customer;
 import project.mockshop.repository.CustomerRepository;
@@ -10,14 +11,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
+@DataJpaTest
 public class CustomerRepositoryTest {
 
-    private CustomerRepository customerRepository;
-
-    @BeforeEach
-    void setUp() {
-        customerRepository = new CustomerRepository();
-    }
+    @Autowired
+    CustomerRepository customerRepository;
 
     @Test
     void repositoryIsNotNull() {
@@ -103,7 +101,7 @@ public class CustomerRepositoryTest {
         customerRepository.save(customer2);
 
         //when
-        customerRepository.delete(customer1.getId());
+        customerRepository.delete(customer1);
 
         //then
         List<Customer> customers = customerRepository.findAll();

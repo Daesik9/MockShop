@@ -1,27 +1,22 @@
 package project.mockshop.entity;
 
+import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Embeddable
+@NoArgsConstructor
+@Getter
 public class Address {
-    private final String city;
-    private final String street;
-    private final String zipcode;
+    private String city;
+    private String street;
+    private String zipcode;
 
     public Address(String city, String street, String zipcode) {
         validateZipcode(zipcode);
         this.city = city;
         this.street = street;
         this.zipcode = zipcode;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public String getZipcode() {
-        return zipcode;
     }
 
     private void validateZipcode(String zipcode) {
