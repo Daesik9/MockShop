@@ -19,7 +19,7 @@ public class CustomerRepository {
 
     public Optional<Customer> findById(Long id) {
         Customer findCustomer = store.get(id);
-        if (findCustomer.getIsDeleted()) {
+        if (findCustomer == null || findCustomer.getIsDeleted()) {
             return Optional.empty();
         }
         return Optional.of(findCustomer);
@@ -32,5 +32,15 @@ public class CustomerRepository {
     public void delete(Long id) {
         Optional<Customer> findCustomer = findById(id);
         findCustomer.ifPresent(customer -> customer.changeIsDeleted(true));
+    }
+
+    public Optional<Customer> findByLoginId(String loginId) {
+        return store.values().stream().filter(c -> c.getLoginId().equals(loginId))
+                .findAny();
+    }
+
+    public Optional<Customer> findLoginIdByPhoneNumber(String phoneNumber) {
+        return store.values().stream().filter(c -> c.getPhoneNumber().equals(phoneNumber))
+                .findAny();
     }
 }

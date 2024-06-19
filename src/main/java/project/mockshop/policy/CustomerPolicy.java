@@ -41,4 +41,6 @@ public class CustomerPolicy {
     public static final String ZIPCODE_POLICY_STRING = "우편번호는 숫자로만 구성되어야 합니다.";
 
     public static final String POINT_POLICY_STRING = "포인트는 음수일 수 없습니다.";
+
+    public static final String DUPLICATE_LOGIN_ID_STRING = "이미 중복된 로그인 아이디가 있습니다.";
 }
