@@ -1,5 +1,8 @@
 package project.mockshop.service;
 
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import project.mockshop.dto.LoginRequestDto;
 import project.mockshop.entity.Customer;
 import project.mockshop.policy.CustomerPolicy;
@@ -7,12 +10,11 @@ import project.mockshop.repository.CustomerRepository;
 
 import java.util.Optional;
 
+@Service
+@Transactional
+@RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
-
-    public CustomerService(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
-    }
 
     public void createAccount(Customer customer) {
         validateDuplicateLoginId(customer);
@@ -21,6 +23,7 @@ public class CustomerService {
 
     private void validateDuplicateLoginId(Customer customer) {
         Optional<Customer> findCustomer = customerRepository.findByLoginId(customer.getLoginId());
+//        System.out.println("findCustomer = " + findCustomer.get().getLoginId());
         if (findCustomer.isPresent()) {
             throw new IllegalStateException(CustomerPolicy.DUPLICATE_LOGIN_ID_STRING);
         }

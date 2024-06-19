@@ -1,16 +1,24 @@
 package project.mockshop.entity;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import project.mockshop.policy.CustomerPolicy;
 import project.mockshop.policy.MockShopPolicy;
 
+@Entity
+@Getter
 public class Customer {
+
+    @Id @GeneratedValue
     private Long id;
     private String email;
     private String loginId;
     private String password;
     private String name;
     private String phoneNumber;
+    @Embedded
     private Address address;
     private int point;
     private boolean isDeleted;
@@ -53,11 +61,6 @@ public class Customer {
 
     public Customer(String loginId, String name, String password, String phoneNumber,
                     String email, Address address, int point, boolean isDeleted) {
-        this(0L, loginId, name, password, phoneNumber, email, address, point, isDeleted);
-    }
-
-    public Customer(Long id, String loginId, String name, String password, String phoneNumber,
-                    String email, Address address, int point, boolean isDeleted) {
         validateLoginId(loginId);
         validatePassword(password);
         validateName(name);
@@ -65,7 +68,6 @@ public class Customer {
         validateEmail(email);
         validatePoint(point);
 
-        this.id = id;
         this.loginId = loginId;
         this.name = name;
         this.password = password;
@@ -74,42 +76,6 @@ public class Customer {
         this.address = address;
         this.point = point;
         this.isDeleted = isDeleted;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getLoginId() {
-        return loginId;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public int getPoint() {
-        return point;
-    }
-
-    public boolean getIsDeleted() {
-        return isDeleted;
     }
 
     private void validateLoginId(String loginId) {
