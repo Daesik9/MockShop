@@ -25,7 +25,7 @@ public class CustomerRepositoryTest {
     @Test
     void create() {
         //given
-        Customer customer = new Customer("customer");
+        Customer customer = Customer.builder().loginId("customer").build();
 
         //when
         customerRepository.save(customer);
@@ -38,8 +38,8 @@ public class CustomerRepositoryTest {
     @Test
     void listRead() {
         //given
-        Customer customer1 = new Customer("customer1");
-        Customer customer2 = new Customer("customer2");
+        Customer customer1 = Customer.builder().loginId("customer1").build();
+        Customer customer2 = Customer.builder().loginId("customer2").build();
 
         customerRepository.save(customer1);
         customerRepository.save(customer2);
@@ -60,9 +60,14 @@ public class CustomerRepositoryTest {
     void update() {
         //given
         Address address = new Address("city", "street", "12345");
-        Customer customer = new Customer("customer", "이름", "Password1!",
-                "01011111111", "email@email.com", address);
-
+        Customer customer = Customer.builder()
+                .loginId("customer")
+                .name("이름")
+                .password("Password1!")
+                .phoneNumber("01011111111")
+                .email("email@email.com")
+                .address(address)
+                .build();
         customerRepository.save(customer);
 
         //when
@@ -94,8 +99,8 @@ public class CustomerRepositoryTest {
     @Test
     void delete() {
         //given
-        Customer customer1 = new Customer("customer1");
-        Customer customer2 = new Customer("customer2");
+        Customer customer1 = Customer.builder().loginId("customer1").build();
+        Customer customer2 = Customer.builder().loginId("customer2").build();
 
         customerRepository.save(customer1);
         customerRepository.save(customer2);
