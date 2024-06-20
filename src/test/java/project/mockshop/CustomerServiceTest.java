@@ -28,7 +28,7 @@ public class CustomerServiceTest {
     @Test
     void createAccount() {
         //given
-        Customer customer = new Customer();
+        Customer customer = Customer.builder().name("구매자").build();
         when(customerRepository.findByLoginId(customer.getLoginId())).thenReturn(Optional.empty());
         when(customerRepository.save(any(Customer.class))).thenAnswer(invocation -> {
             Customer savedCustomer = invocation.getArgument(0);
@@ -53,8 +53,8 @@ public class CustomerServiceTest {
     @Test
     void noDuplicateLoginId() {
         //given
-        Customer customer = new Customer();
-        Customer duplicateCustomer = new Customer();
+        Customer customer = Customer.builder().build();
+        Customer duplicateCustomer = Customer.builder().build();
 
         //when
         customerService.createAccount(customer);
@@ -70,9 +70,11 @@ public class CustomerServiceTest {
     @Test
     void login() {
         //given
-        customerService.createAccount(new Customer());
+        Customer customer = Customer.builder().loginId("loginid").password("Password1!").build();
+        customerService.createAccount(customer);
         LoginRequestDto loginRequestDto = new LoginRequestDto("loginid", "Password1!");
-        when(customerRepository.findByLoginId(loginRequestDto.getLoginId())).thenReturn(Optional.of(new Customer()));
+        when(customerRepository.findByLoginId(loginRequestDto.getLoginId()))
+                .thenReturn(Optional.of(customer));
 
 
         //when
@@ -86,7 +88,7 @@ public class CustomerServiceTest {
     @Test
     void loginFail_wrongLoginId() {
         //given
-        customerService.createAccount(new Customer());
+        customerService.createAccount(Customer.builder().loginId("loginid").password("Password1!").build());
         LoginRequestDto loginRequestDto = new LoginRequestDto("wrongLoginId", "Password1!");
         doThrow(new NullPointerException("아이디나 비밀번호가 일치하지 않습니다."))
                 .when(customerRepository).findByLoginId(loginRequestDto.getLoginId());
@@ -103,9 +105,10 @@ public class CustomerServiceTest {
     @Test
     void loginFail_wrongPassword() {
         //given
-        customerService.createAccount(new Customer());
+        Customer customer = Customer.builder().loginId("loginid").password("Password1!").build();
+        customerService.createAccount(customer);
         LoginRequestDto loginRequestDto = new LoginRequestDto("loginid", "password!");
-        when(customerRepository.findByLoginId(loginRequestDto.getLoginId())).thenReturn(Optional.of(new Customer()));
+        when(customerRepository.findByLoginId(loginRequestDto.getLoginId())).thenReturn(Optional.of(customer));
 
         //when
 
@@ -119,7 +122,8 @@ public class CustomerServiceTest {
     @Test
     void findLoginIdByPhoneNumber() {
         //given
-        Customer customer = new Customer();
+        Customer customer = Customer.builder().loginId("loginid").password("Password1!")
+                .phoneNumber("01088888888").build();
         customerService.createAccount(customer);
         when(customerRepository.findLoginIdByPhoneNumber(customer.getPhoneNumber())).thenReturn(Optional.of(customer));
 
@@ -134,7 +138,8 @@ public class CustomerServiceTest {
     @Test
     void findLoginIdByPhoneNumber_fail() {
         //given
-        Customer customer = new Customer();
+        Customer customer = Customer.builder().loginId("loginid").password("Password1!")
+                .phoneNumber("01088888888").build();
         customerService.createAccount(customer);
         doThrow(new NullPointerException("입력한 핸드폰 번호와 일치하는 아이디가 없습니다.")).when(customerRepository)
                 .findLoginIdByPhoneNumber("01011111111");
@@ -149,7 +154,8 @@ public class CustomerServiceTest {
     @Test
     void findPassword() {
         //given
-        Customer customer = new Customer();
+        Customer customer = Customer.builder().loginId("loginid").password("Password1!")
+                .phoneNumber("01088888888").build();
         customerService.createAccount(customer);
         when(customerRepository.findByLoginId(customer.getLoginId())).thenReturn(Optional.of(customer));
 
@@ -164,7 +170,8 @@ public class CustomerServiceTest {
     @Test
     void findPassword_fail_loginId() {
         //given
-        Customer customer = new Customer();
+        Customer customer = Customer.builder().loginId("loginid").password("Password1!")
+                .phoneNumber("01088888888").build();
         customerService.createAccount(customer);
         doThrow(new NullPointerException("해당 로그인 아이디와 일치하는 정보가 없습니다.")).when(customerRepository)
                 .findByLoginId("nologinid");
@@ -179,7 +186,8 @@ public class CustomerServiceTest {
     @Test
     void findPassword_fail_phoneNumber() {
         //given
-        Customer customer = new Customer();
+        Customer customer = Customer.builder().loginId("loginid").password("Password1!")
+                .phoneNumber("01088888888").build();
         customerService.createAccount(customer);
         when(customerRepository.findByLoginId(customer.getLoginId())).thenReturn(Optional.of(customer));
 
@@ -193,7 +201,7 @@ public class CustomerServiceTest {
     @Test
     void findOne() {
         //given
-        Customer customer = new Customer();
+        Customer customer = Customer.builder().build();
         customerService.createAccount(customer);
         when(customerRepository.findById(customer.getId())).thenReturn(Optional.of(customer));
 
@@ -208,7 +216,7 @@ public class CustomerServiceTest {
     @Test
     void resetPassword() {
         //given
-        Customer customer = new Customer();
+        Customer customer = Customer.builder().loginId("loginid").password("Password1!").build();
         customerService.createAccount(customer);
 
         //when

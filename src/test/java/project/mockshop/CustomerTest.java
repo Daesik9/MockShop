@@ -16,23 +16,23 @@ public class CustomerTest {
 
     @Test
     void customerIsNotNull() {
-        Customer customer = new Customer();
+        Customer customer = Customer.builder().build();
         assertThat(customer).isNotNull();
     }
 
     @Test
     void hasId() {
-        Customer customer2 = new Customer(0L);
+        Customer customer2 = Customer.builder().id(0L).build();
         assertThat(customer2.getId()).isEqualTo(0L);
     }
 
     @Test
     void hasLoginId() {
-        assertThatThrownBy(() -> new Customer(""))
+        assertThatThrownBy(() -> Customer.builder().loginId("  ").build())
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(MockShopPolicy.INPUT_STRING_METHOD("로그인 id"));
 
-        Customer customer = new Customer("loginid");
+        Customer customer = Customer.builder().loginId("loginid").build();
         assertThat(customer.getLoginId()).isEqualTo("loginid");
     }
 
@@ -42,15 +42,15 @@ public class CustomerTest {
      */
     @Test
     void loginIdLength3to15() {
-        assertThatThrownBy(() -> new Customer("12"))
+        assertThatThrownBy(() -> Customer.builder().loginId("12").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.LOGIN_ID_LENGTH_STRING);
 
-        assertThatThrownBy(() -> new Customer("1234567890123456"))
+        assertThatThrownBy(() -> Customer.builder().loginId("1234567890123456").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.LOGIN_ID_LENGTH_STRING);
 
-        assertThatCode(() -> new Customer("12345")).doesNotThrowAnyException();
+        assertThatCode(() -> Customer.builder().loginId("12345").build()).doesNotThrowAnyException();
     }
 
     /**
@@ -59,31 +59,31 @@ public class CustomerTest {
      */
     @Test
     void loginOnlyLetterNumberDashUnderscore() {
-        assertThatThrownBy(() -> new Customer("  a  "))
+        assertThatThrownBy(() -> Customer.builder().loginId("  a  ").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.LOGIN_ID_POLICY_STRING);
 
-        assertThatThrownBy(() -> new Customer("!@#$!#%"))
+        assertThatThrownBy(() -> Customer.builder().loginId("!@#$!#%").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.LOGIN_ID_POLICY_STRING);
 
-        assertThatThrownBy(() -> new Customer("ASDF"))
+        assertThatThrownBy(() -> Customer.builder().loginId("ASDF").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.LOGIN_ID_POLICY_STRING);
 
-        assertThatCode(() -> new Customer("asdf123-_")).doesNotThrowAnyException();
+        assertThatCode(() -> Customer.builder().loginId("asdf123-_").build()).doesNotThrowAnyException();
     }
 
     @Test
     void hasPassword() {
-        assertThatThrownBy(() -> new Customer("loginid", "이름", ""))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(MockShopPolicy.INPUT_STRING_METHOD("비밀번호"));
 
-        assertThatCode(() -> new Customer("loginid", "이름", "Password1!"))
+        assertThatCode(() -> Customer.builder().loginId("loginid").name("이름").password("Password1!").build())
                 .doesNotThrowAnyException();
 
-        Customer customer = new Customer("loginid", "이름", "Password1!");
+        Customer customer = Customer.builder().loginId("loginid").name("이름").password("Password1!").build();
         assertThat(customer.getPassword()).isEqualTo("Password1!");
     }
 
@@ -93,7 +93,7 @@ public class CustomerTest {
      */
     @Test
     void passwordLengthMinimum8() {
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "pass"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("pass").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.MIN_PASSWORD_STRING);
     }
@@ -106,7 +106,7 @@ public class CustomerTest {
     void passwordLengthMaximum128() {
         String password = "passwordpasswordpasswordpasswordpasswordpasswordpasswordpassword" +
                 "passwordpasswordpasswordpasswordpasswordpasswordpasswordpasswordpassword";
-        assertThatThrownBy(() -> new Customer("loginid", "이름", password))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password(password).build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.MAX_PASSWORD_STRING);
     }
@@ -118,93 +118,93 @@ public class CustomerTest {
     @Test
     void passwordPolicy() {
         //소문자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "password"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("password").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //대문자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "PASSWORD"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("PASSWORD").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //숫자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "12345678"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("12345678").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //특수문자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "!@#$%^&*"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("!@#$%^&*").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //소문자, 대문자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "passWORD"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("passWORD").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //소문자, 숫자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "pass1111"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("pass1111").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //소문자, 특수문자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "pass!@#$"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("pass!@#$").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //대문자, 숫자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "PASS1234"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("PASS1234").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //대문자, 특수문자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "PASS!@#$"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("PASS!@#$").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //숫자, 특수문자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "1234!@#$"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("1234!@#$").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //소문자, 대문자, 숫자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "paSS1234"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("paSS1234").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //소문자, 대문자, 특수문자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "paSS!@#$"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("paSS!@#$").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //소문자, 숫자, 특수문자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "pa11!@#$"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("pa11!@#$").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //대문자, 숫자, 특수문자
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "PASS12!@#$"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("PASS12!@#$").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PASSWORD_POLICY_STRING);
 
         //소문자, 대문자, 숫자, 특수문자 -> 오류 X
-        assertThatCode(() -> new Customer("loginid", "이름", "paSS12!@#$"))
+        assertThatCode(() -> Customer.builder().loginId("loginid").name("이름").password("paSS12!@#$").build())
                 .doesNotThrowAnyException();
 
-        Customer customer = new Customer("loginid", "이름", "paSS12!@#$");
+        Customer customer = Customer.builder().loginId("loginid").name("이름").password("paSS12!@#$").build();
         assertThat(customer.getPassword()).isEqualTo("paSS12!@#$");
     }
 
     @Test
     void hasName() {
-        assertThatThrownBy(() -> new Customer("loginid", ""))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(MockShopPolicy.INPUT_STRING_METHOD("이름"));
 
-        assertThatCode(() -> new Customer("loginid", "이름"))
+        assertThatCode(() -> Customer.builder().loginId("loginid").name("이름").build())
                 .doesNotThrowAnyException();
 
-        Customer customer = new Customer("loginid", "이름");
+        Customer customer = Customer.builder().loginId("loginid").name("이름").build();
         assertThat(customer.getName()).isEqualTo("이름");
     }
 
@@ -214,15 +214,15 @@ public class CustomerTest {
      */
     @Test
     void nameLength2to15() {
-        assertThatThrownBy(() -> new Customer("loginid", "이"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.NAME_LENGTH_STRING);
 
-        assertThatThrownBy(() -> new Customer("loginid", "이름이름이름이름이름이름이름이름"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름이름이름이름이름이름이름이름").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.NAME_LENGTH_STRING);
 
-        assertThatCode(() -> new Customer("loginid", "이름"))
+        assertThatCode(() -> Customer.builder().loginId("loginid").name("이름").build())
                 .doesNotThrowAnyException();
     }
 
@@ -232,11 +232,11 @@ public class CustomerTest {
      */
     @Test
     void nameOnlyKorean() {
-        assertThatThrownBy(() -> new Customer("loginid", "name"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("name"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.NAME_POLICY_STRING);
 
-        assertThatCode(() -> new Customer("loginid", "이름"))
+        assertThatCode(() -> Customer.builder().loginId("loginid").name("이름").build())
                 .doesNotThrowAnyException();
     }
 
@@ -245,15 +245,18 @@ public class CustomerTest {
      */
     @Test
     void phoneNumberOnlyDigitAndFormat() {
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "Password1!", "asdfasdf"))
+        assertThatThrownBy(() ->
+                Customer.builder().loginId("loginid").name("이름").password("Password1!").phoneNumber("asdfasdf").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PHONENUMBER_POLICY_STRING);
 
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "Password1!", "010777"))
+        assertThatThrownBy(() ->
+                Customer.builder().loginId("loginid").name("이름").password("Password1!").phoneNumber("010777").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.PHONENUMBER_POLICY_STRING);
 
-        Customer customer = new Customer("loginid", "이름", "Password1!", "01077777777");
+        Customer customer = Customer.builder().loginId("loginid").name("이름")
+                .password("Password1!").phoneNumber("01077777777").build();
         assertThat(customer.getPhoneNumber()).isEqualTo("01077777777");
     }
 
@@ -262,13 +265,13 @@ public class CustomerTest {
      */
     @Test
     void emailFormat() {
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "Password1!",
-                "01011111111", "email"))
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("Password1!")
+                .phoneNumber("01011111111").email("email").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.EMAIL_POLICY_STRING);
 
-        Customer customer = new Customer("loginid", "이름", "Password1!",
-                "01011111111", "email@email.com");
+        Customer customer = Customer.builder().loginId("loginid").name("이름").password("Password1!")
+                .phoneNumber("01011111111").email("email@email.com").build();
         assertThat(customer.getEmail()).isEqualTo("email@email.com");
     }
 
@@ -276,7 +279,6 @@ public class CustomerTest {
      * Address는 city, street, zipcode로 구성되어 있고,
      * zipcode는 숫자로만 구성되어야 한다.
      */
-
     @Test
     void address() {
         assertThatThrownBy(() -> new Address("city", "street", "zipcode"))
@@ -284,8 +286,8 @@ public class CustomerTest {
                 .hasMessageContaining(CustomerPolicy.ZIPCODE_POLICY_STRING);
 
         Address address = new Address("city", "street", "88888");
-        Customer customer = new Customer("loginid", "이름", "Password1!",
-                "01011111111", "email@email.com", address);
+        Customer customer = Customer.builder().loginId("loginid").name("이름").password("Password1!")
+                .phoneNumber("01011111111").email("email@email.com").address(address).build();
         assertThat(customer.getAddress().getCity()).isEqualTo("city");
         assertThat(customer.getAddress().getStreet()).isEqualTo("street");
         assertThat(customer.getAddress().getZipcode()).isEqualTo("88888");
@@ -298,13 +300,14 @@ public class CustomerTest {
     void point() {
         Address address = new Address("city", "street", "88888");
 
-        assertThatThrownBy(() -> new Customer("loginid", "이름", "Password1!",
-                "01011111111", "email@email.com", address, -100))
+
+        assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("Password1!")
+                .phoneNumber("01011111111").email("email@email.com").address(address).point(-100).build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.POINT_POLICY_STRING);
 
-        Customer customer = new Customer("loginid", "이름", "Password1!",
-                "01011111111", "email@email.com", address, 100);
+        Customer customer = Customer.builder().loginId("loginid").name("이름").password("Password1!")
+                .phoneNumber("01011111111").email("email@email.com").address(address).point(100).build();
 
         assertThat(customer.getPoint()).isEqualTo(100);
     }
@@ -312,8 +315,8 @@ public class CustomerTest {
     @Test
     void isDeleted() {
         Address address = new Address("city", "street", "88888");
-        Customer customer = new Customer("loginid", "이름", "Password1!",
-                "01011111111", "email@email.com", address, 100, false);
+        Customer customer = Customer.builder().loginId("loginid").name("이름").password("Password1!")
+                .phoneNumber("01011111111").email("email@email.com").address(address).point(100).isDeleted(false).build();
 
         assertThat(customer.isDeleted()).isFalse();
     }
