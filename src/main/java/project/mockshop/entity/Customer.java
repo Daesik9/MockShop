@@ -98,6 +98,17 @@ public class Customer {
             return this;
         }
 
+//        public Customer build() {
+//            validateLoginId(loginId);
+//            validateName(name);
+//            validatePassword(password);
+//            validatePhoneNumber(phoneNumber);
+//            validateEmail(email);
+//            validatePoint(point);
+//
+//            return new Customer(id, loginId, name, password, phoneNumber, email, address, point, isDeleted);
+//        }
+
         private void validateLoginId(String loginId) {
             if (!StringUtils.hasText(loginId)) {
                 throw new IllegalArgumentException(MockShopPolicy.INPUT_STRING_METHOD("로그인 id"));
