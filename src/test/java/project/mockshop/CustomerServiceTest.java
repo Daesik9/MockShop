@@ -24,17 +24,17 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CustomerServiceUnitTest {
+public class CustomerServiceTest {
 
     @InjectMocks
     private CustomerService customerService;
     @Mock
     private CustomerRepository customerRepository;
 
-    private CustomerCreationDto creationDto;
+    private CustomerDto customerDto;
     @BeforeEach
     void beforeEach() {
-        creationDto = CustomerCreationDto.builder()
+        customerDto = CustomerDto.builder()
                 .loginId("loginid")
                 .name("구매자")
                 .password("Password1!")
@@ -48,7 +48,15 @@ public class CustomerServiceUnitTest {
     @Test
     void createAccount() {
         //given
-        Customer customer = CustomerMapper.toEntity(creationDto);
+        CustomerCreationDto creationDto = CustomerCreationDto.builder()
+                .loginId("loginid")
+                .name("구매자")
+                .password("Password1!")
+                .phoneNumber("01088888888")
+                .email("email@email.com")
+                .address(new Address("city", "street", "88888"))
+                .build();
+        Customer customer = CustomerMapper.toEntity(customerDto);
         given(customerRepository.findByLoginId(customer.getLoginId())).willReturn(Optional.empty());
         given(customerRepository.save(any(Customer.class))).willAnswer(invocation -> {
             Customer savedCustomer = invocation.getArgument(0);
@@ -77,7 +85,7 @@ public class CustomerServiceUnitTest {
 
         //when
         when(customerRepository.findByLoginId(duplicateLoginId))
-                .thenReturn(Optional.of(CustomerMapper.toEntity(creationDto)));
+                .thenReturn(Optional.of(CustomerMapper.toEntity(customerDto)));
 
         //then
         assertThatThrownBy(() -> customerService.validateDuplicateLoginId(duplicateLoginId))
@@ -90,8 +98,7 @@ public class CustomerServiceUnitTest {
         //given
         LoginRequestDto loginRequestDto = LoginRequestDto.builder().loginId("loginid").password("Password1!").build();
         given(customerRepository.findByLoginId(loginRequestDto.getLoginId()))
-                .willReturn(Optional.of(CustomerMapper.toEntity(creationDto)));
-
+                .willReturn(Optional.of(CustomerMapper.toEntity(customerDto)));
 
         //when
         CustomerDto loginCustomer = customerService.login(loginRequestDto);
@@ -104,8 +111,7 @@ public class CustomerServiceUnitTest {
     @Test
     void loginFail_wrongLoginId() {
         //given
-        customerService.createAccount(creationDto);
-        LoginRequestDto loginRequestDto = LoginRequestDto.builder().loginId("wrongLoginId").password("Password1!").build();
+        LoginRequestDto loginRequestDto = LoginRequestDto.builder().loginId("wrongloginid").password("Password1!").build();
         willThrow(new NullPointerException("아이디나 비밀번호가 일치하지 않습니다."))
                 .given(customerRepository).findByLoginId(loginRequestDto.getLoginId());
 
@@ -115,16 +121,15 @@ public class CustomerServiceUnitTest {
         assertThatThrownBy(() -> customerService.login(loginRequestDto))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("아이디나 비밀번호가 일치하지 않습니다.");
-        verify(customerRepository, times(1)).findByLoginId("wrongLoginId");
+        verify(customerRepository, times(1)).findByLoginId("wrongloginid");
     }
 
     @Test
     void loginFail_wrongPassword() {
         //given
-        customerService.createAccount(creationDto);
-        LoginRequestDto loginRequestDto = LoginRequestDto.builder().loginId("loginId").password("password!").build();
+        LoginRequestDto loginRequestDto = LoginRequestDto.builder().loginId("loginid").password("password!").build();
         given(customerRepository.findByLoginId(loginRequestDto.getLoginId()))
-                .willReturn(Optional.of(CustomerMapper.toEntity(creationDto)));
+                .willReturn(Optional.of(CustomerMapper.toEntity(customerDto)));
 
         //when
 
@@ -138,21 +143,20 @@ public class CustomerServiceUnitTest {
     @Test
     void findLoginIdByPhoneNumber() {
         //given
-        given(customerRepository.findLoginIdByPhoneNumber(creationDto.getPhoneNumber()))
-                .willReturn(Optional.of(CustomerMapper.toEntity(creationDto)));
+        given(customerRepository.findLoginIdByPhoneNumber(customerDto.getPhoneNumber()))
+                .willReturn(Optional.of(CustomerMapper.toEntity(customerDto)));
 
         //when
         CustomerDto findCustomer = customerService.findLoginId("01088888888");
 
         //then
-        assertThat(findCustomer.getLoginId()).isEqualTo(creationDto.getLoginId());
+        assertThat(findCustomer.getLoginId()).isEqualTo(customerDto.getLoginId());
         verify(customerRepository, times(1)).findLoginIdByPhoneNumber("01088888888");
     }
 
     @Test
     void findLoginIdByPhoneNumber_fail() {
         //given
-        customerService.createAccount(creationDto);
         willThrow(new NullPointerException("입력한 핸드폰 번호와 일치하는 아이디가 없습니다."))
                 .given(customerRepository).findLoginIdByPhoneNumber("01011111111");
 
@@ -166,22 +170,20 @@ public class CustomerServiceUnitTest {
     @Test
     void findPassword() {
         //given
-        customerService.createAccount(creationDto);
-        given(customerRepository.findByLoginId(creationDto.getLoginId()))
-                .willReturn(Optional.of(CustomerMapper.toEntity(creationDto)));
+        given(customerRepository.findByLoginId(customerDto.getLoginId()))
+                .willReturn(Optional.of(CustomerMapper.toEntity(customerDto)));
 
         //when
         CustomerDto findCustomer = customerService.findPassword("loginid", "01088888888");
 
         //then
-        assertThat(findCustomer.getLoginId()).isEqualTo(creationDto.getLoginId());
-        verify(customerRepository, times(2)).findByLoginId("loginid");
+        assertThat(findCustomer.getLoginId()).isEqualTo(customerDto.getLoginId());
+        verify(customerRepository, times(1)).findByLoginId("loginid");
     }
 
     @Test
     void findPassword_fail_loginId() {
         //given
-        customerService.createAccount(creationDto);
         willThrow(new NullPointerException("해당 로그인 아이디와 일치하는 정보가 없습니다."))
                 .given(customerRepository).findByLoginId("nologinid");
 
@@ -195,45 +197,43 @@ public class CustomerServiceUnitTest {
     @Test
     void findPassword_fail_phoneNumber() {
         //given
-        customerService.createAccount(creationDto);
-        given(customerRepository.findByLoginId(creationDto.getLoginId()))
-                .willReturn(Optional.of(CustomerMapper.toEntity(creationDto)));
+        given(customerRepository.findByLoginId(customerDto.getLoginId()))
+                .willReturn(Optional.of(CustomerMapper.toEntity(customerDto)));
 
         //then
         assertThatThrownBy(() -> customerService.findPassword("loginid", "01011111111"))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("해당 로그인 아이디와 입력하신 핸드폰 번호가 일치하지 않습니다.");
-        verify(customerRepository, times(2)).findByLoginId("loginid");
+        verify(customerRepository, times(1)).findByLoginId("loginid");
     }
 
     @Test
     void findOne() {
         //given
-        Customer customer = CustomerMapper.toEntity(creationDto);
-        Long id = customerService.createAccount(creationDto);
-        given(customerRepository.findById(id)).willReturn(Optional.of(customer));
+        Customer customer = CustomerMapper.toEntity(customerDto);
+        customer.changeId(1L);
+        given(customerRepository.findById(customer.getId())).willReturn(Optional.of(customer));
 
         //when
         CustomerDto findCustomer = customerService.findOne(customer.getId());
 
         //then
-        assertThat(findCustomer).isEqualTo(CustomerMapper.toDto(customer));
+        assertThat(findCustomer.getLoginId()).isEqualTo(customerDto.getLoginId());
         verify(customerRepository, times(1)).findById(customer.getId());
     }
 
-//    @Test
-//    void resetPassword() {
-//        //given
-//        Customer customer = CustomerMapper.toEntity(creationDto);
-//        customerService.createAccount(creationDto);
-//
-//        //when
-//        customerService.resetPassword(customer, "NewPassword!1");
-//
-//        //then
-//        when(customerRepository.findById(customer.getId())).thenReturn(Optional.of(customer));
-//        Customer findCustomer = customerService.findOne(customer.getId());
-//        assertThat(findCustomer.getPassword()).isEqualTo("NewPassword!1");
-//        verify(customerRepository, times(1)).findById(customer.getId());
-//    }
+    @Test
+    void resetPassword() {
+        //given
+        given(customerRepository.findById(customerDto.getId()))
+                .willReturn(Optional.of(CustomerMapper.toEntity(customerDto)));
+
+        //when
+        customerService.resetPassword(customerDto, "NewPassword!1");
+
+        //then
+        CustomerDto findCustomer = customerService.findOne(customerDto.getId());
+        assertThat(findCustomer.getPassword()).isEqualTo("NewPassword!1");
+        verify(customerRepository, times(2)).findById(customerDto.getId());
+    }
 }
