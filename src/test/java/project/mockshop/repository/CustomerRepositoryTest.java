@@ -1,11 +1,10 @@
-package project.mockshop;
+package project.mockshop.repository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import project.mockshop.entity.Address;
 import project.mockshop.entity.Customer;
-import project.mockshop.repository.CustomerRepository;
 
 import java.util.List;
 

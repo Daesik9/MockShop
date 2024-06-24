@@ -1,4 +1,4 @@
-package project.mockshop;
+package project.mockshop.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,6 @@ import project.mockshop.entity.Address;
 import project.mockshop.entity.Customer;
 import project.mockshop.mapper.CustomerMapper;
 import project.mockshop.repository.CustomerRepository;
-import project.mockshop.service.CustomerService;
 
 import java.util.Optional;
 
