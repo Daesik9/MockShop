@@ -1,8 +1,6 @@
-package project.mockshop;
+package project.mockshop.entity;
 
 import org.junit.jupiter.api.Test;
-import project.mockshop.entity.Address;
-import project.mockshop.entity.Customer;
 import project.mockshop.policy.CustomerPolicy;
 import project.mockshop.policy.MockShopPolicy;
 

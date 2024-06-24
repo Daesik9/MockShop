@@ -1,4 +1,4 @@
-package project.mockshop;
+package project.mockshop.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,13 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import project.mockshop.controller.CustomerController;
+import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.dto.CustomerCreationDto;
 import project.mockshop.dto.CustomerDto;
 import project.mockshop.dto.LoginRequestDto;
 import project.mockshop.entity.Address;
-import project.mockshop.entity.Customer;
-import project.mockshop.mapper.CustomerMapper;
 import project.mockshop.service.CustomerService;
 
 import java.util.List;
@@ -41,7 +39,8 @@ public class CustomerControllerTest {
 
     @BeforeEach
     void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(customerController)
+                .setControllerAdvice(new ExceptionAdvice()).build();
     }
 
     @Test
@@ -71,8 +70,7 @@ public class CustomerControllerTest {
         );
 
         //then
-        resultActions.andExpect(status().isCreated());
-//        Mockito.verify(customerService).createAccount(requestDto);
+        resultActions.andExpect(jsonPath("$.code").value(201));
     }
 
 
@@ -85,7 +83,8 @@ public class CustomerControllerTest {
                 .name("name")
                 .password("Password1!")
                 .build();
-        willThrow(IllegalArgumentException.class).given(customerService).createAccount(customerRequest);
+        willThrow(IllegalArgumentException.class).given(customerService)
+                .createAccount(any(CustomerCreationDto.class));
 
         //when
         ResultActions resultActions = mockMvc.perform(
@@ -95,7 +94,8 @@ public class CustomerControllerTest {
         );
 
         //then
-        resultActions.andExpect(status().isBadRequest());
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class CustomerControllerTest {
         );
 
         //then
-        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(jsonPath("$.code").value(200));
         verify(customerService).findOne(id);
     }
 
@@ -128,8 +128,9 @@ public class CustomerControllerTest {
 
         //then
         resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[0].name").value("김길동"));
+                .andExpect(jsonPath("$.result.data[0].name").value("김길동"));
         verify(customerService).findAll();
     }
 
@@ -148,8 +149,9 @@ public class CustomerControllerTest {
 
         //then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.loginId").value("loginid"))
-                .andExpect(jsonPath("$.phoneNumber").value(phoneNumber));
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.result.data.loginId").value("loginid"))
+                .andExpect(jsonPath("$.result.data.phoneNumber").value(phoneNumber));
     }
 
     @Test
@@ -169,8 +171,9 @@ public class CustomerControllerTest {
 
         //then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.loginId").value(loginId))
-                .andExpect(jsonPath("$.phoneNumber").value(phoneNumber));
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.result.data.loginId").value(loginId))
+                .andExpect(jsonPath("$.result.data.phoneNumber").value(phoneNumber));
         verify(customerService).findPassword(loginId, phoneNumber);
     }
 
@@ -191,7 +194,8 @@ public class CustomerControllerTest {
         );
 
         // Then
-        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
 //        verify(customerService).login(eq(loginRequestDto));
     }
 
@@ -215,7 +219,8 @@ public class CustomerControllerTest {
         );
 
         //then
-        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
     }
 
 }
