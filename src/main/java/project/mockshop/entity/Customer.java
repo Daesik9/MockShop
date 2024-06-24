@@ -2,9 +2,6 @@ package project.mockshop.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.util.StringUtils;
-import project.mockshop.policy.CustomerPolicy;
-import project.mockshop.policy.MockShopPolicy;
 import project.mockshop.validator.CustomerValidator;
 
 @Entity
