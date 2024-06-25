@@ -48,7 +48,7 @@ public class ItemTest {
         //when
 
         //then
-        assertThat(item.name).isEqualTo("name");
+        assertThat(item.getName()).isEqualTo("name");
     }
 
     @Test
@@ -108,46 +108,5 @@ public class ItemTest {
                 .hasMessageContaining(MockShopPolicy.INPUT_STRING_METHOD("상품 재고"));
 
         //then
-    }
-
-    @Builder
-    private static class Item {
-        private Long id;
-        private String name;
-        private String category;
-        private String thumbnail;
-        private int price;
-        private int quantity;
-        private String descriptionImg1;
-        private String descriptionImg2;
-        private String descriptionImg3;
-        private double percentOff;
-        private Long merchantId;
-
-        private static class ItemBuilder {
-            private ItemBuilder name(String name) {
-                if (!StringUtils.hasText(name)) {
-                    throw new IllegalArgumentException(MockShopPolicy.INPUT_STRING_METHOD("상품명"));
-                }
-                this.name = name;
-                return this;
-            }
-
-            private ItemBuilder price(int price) {
-                if (price <= 0) {
-                    throw new IllegalArgumentException(MockShopPolicy.INPUT_STRING_METHOD("상품 가격"));
-                }
-                this.price = price;
-                return this;
-            }
-
-            private ItemBuilder quantity(int quantity) {
-                if (quantity <= 0) {
-                    throw new IllegalArgumentException(MockShopPolicy.INPUT_STRING_METHOD("상품 재고"));
-                }
-                this.quantity = quantity;
-                return this;
-            }
-        }
     }
 }
