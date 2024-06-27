@@ -11,11 +11,8 @@ public class ItemValidator {
     }
 
     public static void validatePrice(int price) {
-        if (price == 0) {
+        if (price <= 0) {
             throw new IllegalArgumentException(MockShopPolicy.INPUT_STRING_METHOD("상품 가격"));
-        }
-        if (price < 0) {
-            throw new IllegalArgumentException("상품 가격은 양수만 가능합니다.");
         }
     }
 

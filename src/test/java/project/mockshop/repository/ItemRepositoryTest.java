@@ -3,6 +3,7 @@ package project.mockshop.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import project.mockshop.entity.Category;
 import project.mockshop.entity.Item;
 
 import java.util.List;
@@ -103,7 +104,8 @@ public class ItemRepositoryTest {
         //when
         assert findItem != null;
         findItem.changeName("newName");
-        findItem.changeCategory("newCategory");
+        Category category = new Category("newCategory");
+        findItem.changeCategory(category);
         findItem.changePrice(10000);
         findItem.changeQuantity(10000);
         findItem.changeThumbnail("new-thumbnail.png");
@@ -117,7 +119,7 @@ public class ItemRepositoryTest {
         assertThat(changedItemOptional).isNotEmpty();
         Item changedItem = changedItemOptional.get();
         assertThat(changedItem.getName()).isEqualTo("newName");
-        assertThat(changedItem.getCategory()).isEqualTo("newCategory");
+        assertThat(changedItem.getCategory()).isEqualTo(category);
         assertThat(changedItem.getPrice()).isEqualTo(10000);
         assertThat(changedItem.getQuantity()).isEqualTo(10000);
         assertThat(changedItem.getThumbnail()).isEqualTo("new-thumbnail.png");
