@@ -34,7 +34,7 @@ public class ItemTest {
         Item item = Item.builder()
                 .id(1L)
                 .name("name")
-                .category("Book")
+                .category(new Category("Book"))
                 .thumbnail("image.png")
                 .price(1000)
                 .quantity(100)
@@ -42,7 +42,7 @@ public class ItemTest {
                 .descriptionImg2("img2.png")
                 .descriptionImg3("img3.png")
                 .percentOff(5)
-                .merchantId(1L)
+//                .merchantId(1L)
                 .build();
 
         //when

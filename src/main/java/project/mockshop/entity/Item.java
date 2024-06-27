@@ -1,20 +1,23 @@
 package project.mockshop.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import lombok.Builder;
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.*;
 import project.mockshop.validator.ItemValidator;
 
-@Builder
+
 @Getter
 @Entity
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Item {
     @Id @GeneratedValue
     private Long id;
     private String name;
-    private String category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Category category;
+
     private String thumbnail;
     private int price;
     private int quantity;
@@ -22,14 +25,17 @@ public class Item {
     private String descriptionImg2;
     private String descriptionImg3;
     private double percentOff;
-    private Long merchantId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Merchant merchant;
+
 
     public void changeName(String name) {
         ItemValidator.validateName(name);
         this.name = name;
     }
 
-    public void changeCategory(String category) {
+    public void changeCategory(Category category) {
         this.category = category;
     }
 

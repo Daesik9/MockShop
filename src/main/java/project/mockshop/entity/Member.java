@@ -6,10 +6,13 @@ import project.mockshop.validator.CustomerValidator;
 
 @Entity
 @Getter
-@Builder
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
+//@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Customer {
+public class User {
 
     @Id
     @GeneratedValue
@@ -23,7 +26,6 @@ public class Customer {
 
     @Embedded
     private Address address;
-    private int point;
     private boolean isDeleted;
 
     public void changeId(Long id) {
@@ -56,44 +58,5 @@ public class Customer {
 
     public void changeAddress(Address address) {
         this.address = address;
-    }
-
-
-    public static class CustomerBuilder {
-        public CustomerBuilder loginId(String loginId) {
-            CustomerValidator.validateLoginId(loginId);
-            this.loginId = loginId;
-            return this;
-        }
-
-        public CustomerBuilder password(String password) {
-            CustomerValidator.validatePassword(password);
-            this.password = password;
-            return this;
-        }
-
-        public CustomerBuilder name(String name) {
-            CustomerValidator.validateName(name);
-            this.name = name;
-            return this;
-        }
-
-        public CustomerBuilder phoneNumber(String phoneNumber) {
-            CustomerValidator.validatePhoneNumber(phoneNumber);
-            this.phoneNumber = phoneNumber;
-            return this;
-        }
-
-        public CustomerBuilder email(String email) {
-            CustomerValidator.validateEmail(email);
-            this.email = email;
-            return this;
-        }
-
-        public CustomerBuilder point(int point) {
-            CustomerValidator.validatePoint(point);
-            this.point = point;
-            return this;
-        }
     }
 }
