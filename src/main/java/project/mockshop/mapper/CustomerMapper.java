@@ -2,11 +2,11 @@ package project.mockshop.mapper;
 
 import project.mockshop.dto.CustomerCreationDto;
 import project.mockshop.dto.CustomerDto;
-import project.mockshop.entity.User;
+import project.mockshop.entity.Customer;
 
 public class CustomerMapper {
-    public static User toEntity(CustomerCreationDto dto) {
-        return User.builder()
+    public static Customer toEntity(CustomerCreationDto dto) {
+        return Customer.builder()
                 .loginId(dto.getLoginId())
                 .name(dto.getName())
                 .password(dto.getPassword())
@@ -18,8 +18,8 @@ public class CustomerMapper {
                 .build();
     }
 
-    public static User toEntity(CustomerDto dto) {
-        return User.builder()
+    public static Customer toEntity(CustomerDto dto) {
+        return Customer.builder()
                 .id(dto.getId())
                 .loginId(dto.getLoginId())
                 .name(dto.getName())
@@ -32,7 +32,7 @@ public class CustomerMapper {
                 .build();
     }
 
-    public static CustomerDto toDto(User entity) {
+    public static CustomerDto toDto(Customer entity) {
         return CustomerDto.builder()
                 .id(entity.getId())
                 .loginId(entity.getLoginId())
@@ -46,7 +46,7 @@ public class CustomerMapper {
                 .build();
     }
 
-    public static CustomerCreationDto toCreationDto(User entity) {
+    public static CustomerCreationDto toCreationDto(Customer entity) {
         return CustomerCreationDto.builder()
                 .loginId(entity.getLoginId())
                 .name(entity.getName())

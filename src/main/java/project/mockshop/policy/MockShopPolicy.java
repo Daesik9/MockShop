@@ -14,6 +14,6 @@ public class MockShopPolicy {
      * @return ${input}을/를 입력해주세요.
      */
     public static String INPUT_STRING_METHOD(String input) {
-        return input + "을/를 입력해주세요.";
+        return input + " 입력을 다시 확인해주세요.";
     }
 }

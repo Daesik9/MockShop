@@ -6,13 +6,11 @@ import project.mockshop.validator.CustomerValidator;
 
 @Entity
 @Getter
-@Table(name = "users")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
-//@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class User {
+public class Member {
 
     @Id
     @GeneratedValue
