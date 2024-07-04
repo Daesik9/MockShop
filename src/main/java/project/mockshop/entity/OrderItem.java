@@ -18,9 +18,9 @@ public class OrderItem {
     private Item item;
 
     // OrderItem에서 order에 접근할 필요가 있나?
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "order_id")
-//    private Order order;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
 
     private int orderPrice;
     private int count;
@@ -51,7 +51,7 @@ public class OrderItem {
                 throw new IllegalArgumentException("주문 수량이 현재 재고보다 많습니다.");
             }
 //            return new OrderItem(id, item, order, orderPrice, count);
-            return new OrderItem(id, item, orderPrice, count);
+            return new OrderItem(id, item, order, orderPrice, count);
         }
     }
 
