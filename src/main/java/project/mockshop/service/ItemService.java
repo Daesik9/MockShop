@@ -1,5 +1,6 @@
 package project.mockshop.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.mockshop.dto.ItemDto;
@@ -9,6 +10,7 @@ import project.mockshop.mapper.ItemMapper;
 import project.mockshop.repository.ItemRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,20 @@ public class ItemService {
         itemRepository.save(item);
 
         return item.getId();
+    }
+
+    @PostConstruct
+    public void init() {
+        createItem(ItemDto.builder().name("사과").price(1000).quantity(100).build(), 1L);
+    }
+
+    public ItemDto findById(Long id) {
+        Optional<Item> itemOptional = itemRepository.findById(id);
+        if (itemOptional.isEmpty()) {
+            throw new NullPointerException("해당 상품이 없습니다.");
+        }
+
+        return ItemMapper.toDto(itemOptional.get());
     }
 
     public List<ItemDto> findItemsByNameLike(String name) {

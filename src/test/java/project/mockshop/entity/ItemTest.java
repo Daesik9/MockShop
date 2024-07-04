@@ -1,11 +1,10 @@
 package project.mockshop.entity;
 
-import lombok.*;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.StringUtils;
 import project.mockshop.policy.MockShopPolicy;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * 상품명, 카테고리, 상품 이미지, 가격, 총 재고, 상세 설명 이미지, 할인율을 첨부하면 상품을 등록할 수 있다.
