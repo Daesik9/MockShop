@@ -18,8 +18,7 @@ public class Cart {
     @OneToOne
     private Customer customer;
 
-    @OneToMany
-    @JoinColumn(name = "cart_item_id")
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
     private List<CartItem> cartItems;
 
     public void changeCartItems(List<CartItem> cartItems) {
