@@ -6,6 +6,7 @@ import project.mockshop.entity.Item;
 public class ItemMapper {
     public static Item toEntity(ItemDto dto) {
         return Item.builder()
+                .id(dto.getId())
                 .name(dto.getName())
                 .category(dto.getCategory())
                 .thumbnail(dto.getThumbnail())
@@ -21,6 +22,7 @@ public class ItemMapper {
 
     public static ItemDto toDto(Item item) {
         return ItemDto.builder()
+                .id(item.getId())
                 .name(item.getName())
                 .category(item.getCategory())
                 .thumbnail(item.getThumbnail())
