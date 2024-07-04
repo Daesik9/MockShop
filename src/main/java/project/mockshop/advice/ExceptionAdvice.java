@@ -24,4 +24,11 @@ public class ExceptionAdvice {
         log.error(e.getClass() + " " + e.getMessage());
         return Response.failure(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Response nullPointerException(NullPointerException e) {
+        log.error(e.getClass() + " " + e.getMessage());
+        return Response.failure(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+    }
 }
