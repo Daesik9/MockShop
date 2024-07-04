@@ -1,0 +1,225 @@
+package project.mockshop.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import project.mockshop.advice.ExceptionAdvice;
+import project.mockshop.dto.CustomerCreationDto;
+import project.mockshop.dto.CustomerDto;
+import project.mockshop.dto.LoginRequestDto;
+import project.mockshop.entity.Address;
+import project.mockshop.service.CustomerService;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringBootTest
+public class UserControllerSpringTest {
+    @Autowired
+    private CustomerController customerController;
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    @Test
+    void notNull() throws Exception {
+        //given
+
+        //when
+
+        //then
+        assertThat(customerController).isNotNull();
+    }
+
+    @Test
+    void createAccount_success() throws Exception {
+        //given
+        CustomerCreationDto requestDto = CustomerCreationDto.builder()
+                .loginId("loginid")
+                .name("테스트")
+                .password("Password1!")
+                .phoneNumber("01011111111")
+                .email("email@email.com")
+                .address(new Address("city", "street", "88888"))
+                .build();
+
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto))
+        );
+
+        //then
+        resultActions.andExpect(jsonPath("$.code").value(201));
+    }
+//
+//
+//
+//    @Test
+//    void createAccount_fail() throws Exception {
+//        //given
+//        CustomerCreationDto customerRequest = CustomerCreationDto.builder()
+//                .loginId("loginid")
+//                .name("name")
+//                .password("Password1!")
+//                .build();
+//        willThrow(IllegalArgumentException.class).given(customerService)
+//                .createAccount(any(CustomerCreationDto.class));
+//
+//        //when
+//        ResultActions resultActions = mockMvc.perform(
+//                MockMvcRequestBuilders.post("/api/users")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(customerRequest))
+//        );
+//
+//        //then
+//        resultActions.andExpect(status().isBadRequest())
+//                .andExpect(jsonPath("$.code").value(400));
+//    }
+//
+//    @Test
+//    void findOne() throws Exception {
+//        //given
+//        Long id = 1L;
+//        given(customerService.findOne(id)).willReturn(CustomerDto.builder().build());
+//
+//        //when
+//        ResultActions resultActions = mockMvc.perform(
+//                get("/api/users/{id}", id)
+//        );
+//
+//        //then
+//        resultActions.andExpect(jsonPath("$.code").value(200));
+//        verify(customerService).findOne(id);
+//    }
+//
+//    @Test
+//    void findAll() throws Exception {
+//        //given
+//        List<CustomerDto> customers =
+//                List.of(CustomerDto.builder().name("김길동").build());
+//        given(customerService.findAll()).willReturn(customers);
+//
+//        //when
+//        ResultActions resultActions = mockMvc.perform(
+//                get("/api/users")
+//        );
+//
+//        //then
+//        resultActions.andExpect(status().isOk())
+//                .andExpect(jsonPath("$.code").value(200))
+//                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+//                .andExpect(jsonPath("$.result.data[0].name").value("김길동"));
+//        verify(customerService).findAll();
+//    }
+//
+//    @Test
+//    void findLoginId() throws Exception {
+//        //given
+//        String phoneNumber = "01011111111";
+//        CustomerDto customer = CustomerDto.builder().loginId("loginid").phoneNumber(phoneNumber).build();
+//        given(customerService.findLoginId(phoneNumber)).willReturn(customer);
+//
+//        //when
+//        ResultActions resultActions = mockMvc.perform(
+//                get("/api/users/find/login-id")
+//                        .param("phoneNumber", phoneNumber)
+//        );
+//
+//        //then
+//        resultActions.andExpect(status().isOk())
+//                .andExpect(jsonPath("$.code").value(200))
+//                .andExpect(jsonPath("$.result.data.loginId").value("loginid"))
+//                .andExpect(jsonPath("$.result.data.phoneNumber").value(phoneNumber));
+//    }
+//
+//    @Test
+//    void findPassword() throws Exception {
+//        //given
+//        String loginId = "loginid";
+//        String phoneNumber = "01011111111";
+//        CustomerDto customer = CustomerDto.builder().loginId(loginId).phoneNumber(phoneNumber).build();
+//        given(customerService.findPassword(loginId, phoneNumber)).willReturn(customer);
+//
+//        //when
+//        ResultActions resultActions = mockMvc.perform(
+//                get("/api/users/find/password")
+//                        .param("loginId", loginId)
+//                        .param("phoneNumber", phoneNumber)
+//        );
+//
+//        //then
+//        resultActions.andExpect(status().isOk())
+//                .andExpect(jsonPath("$.code").value(200))
+//                .andExpect(jsonPath("$.result.data.loginId").value(loginId))
+//                .andExpect(jsonPath("$.result.data.phoneNumber").value(phoneNumber));
+//        verify(customerService).findPassword(loginId, phoneNumber);
+//    }
+//
+//    /// 이상하게 자꾸 LoginRequestDto가 다른 인스턴스라고 오류 뜸.
+//    @Test
+//    void login() throws Exception {
+//        // Given
+//        LoginRequestDto loginRequestDto = LoginRequestDto.builder()
+//                .loginId("loginid")
+//                .password("Password1!")
+//                .build();
+//
+//        // When
+//        ResultActions resultActions = mockMvc.perform(
+//                post("/api/users/login")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(loginRequestDto))
+//        );
+//
+//        // Then
+//        resultActions.andExpect(status().isOk())
+//                .andExpect(jsonPath("$.code").value(200));
+////        verify(customerService).login(eq(loginRequestDto));
+//    }
+//
+//    @Test
+//    void checkDuplicateLoginId() throws Exception {
+//        //given
+//        String loginId = "duplicate";
+//        CustomerCreationDto requestDto = CustomerCreationDto.builder()
+//                .loginId(loginId)
+//                .name("테스트")
+//                .password("Password1!")
+//                .phoneNumber("01011111111")
+//                .email("email@email.com")
+//                .address(new Address("city", "street", "88888"))
+//                .build();
+//        willThrow(IllegalStateException.class).given(customerService).validateDuplicateLoginId(loginId);
+//
+//        //when
+//        ResultActions resultActions = mockMvc.perform(
+//                get("/api/users/check-duplicate/{loginId}", loginId)
+//        );
+//
+//        //then
+//        resultActions.andExpect(status().isBadRequest())
+//                .andExpect(jsonPath("$.code").value(400));
+//    }
+}
+
+
+
+

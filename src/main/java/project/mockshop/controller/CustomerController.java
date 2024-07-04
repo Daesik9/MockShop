@@ -3,9 +3,7 @@ package project.mockshop.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import project.mockshop.dto.CustomerCreationDto;
-import project.mockshop.dto.CustomerDto;
-import project.mockshop.dto.LoginRequestDto;
+import project.mockshop.dto.*;
 import project.mockshop.response.Response;
 import project.mockshop.service.CustomerService;
 
@@ -36,17 +34,16 @@ public class CustomerController {
         return Response.success(customerService.findOne(id));
     }
 
-    @GetMapping("/users/find/login-id")
-    public Response findLoginId(@RequestParam String phoneNumber) {
-        CustomerDto customer = customerService.findLoginId(phoneNumber);
-        return Response.success(customer);
+    @PostMapping("/users/find/login-id")
+    public Response findLoginId(@RequestBody FindLoginIdRequestDto requestDto) {
+        CustomerDto customer = customerService.findLoginId(requestDto.getPhoneNumber());
+        return Response.success(customer.getLoginId());
     }
 
-    @GetMapping("/users/find/password")
-    public Response findPassword(@RequestParam String loginId,
-                                                    @RequestParam String phoneNumber) {
-        CustomerDto customer = customerService.findPassword(loginId, phoneNumber);
-        return Response.success(customer);
+    @PostMapping("/users/find/password")
+    public Response findPassword(@RequestBody FindPasswordRequestDto requestDto) {
+        CustomerDto customer = customerService.findPassword(requestDto.getLoginId(), requestDto.getPhoneNumber());
+        return Response.success(customer.getPassword());
     }
 
     @PostMapping("/users/login")
@@ -58,8 +55,15 @@ public class CustomerController {
 
     @GetMapping("/users/check-duplicate/{loginId}")
     public Response checkDuplicate(@PathVariable String loginId) {
-        customerService.validateDuplicateLoginId(loginId);
+        boolean isDuplicated = customerService.validateDuplicateLoginId(loginId);
 
-        return Response.success(false);
+        return Response.success(isDuplicated);
     }
+
+//    @PutMapping("/users")
+//    public Response updateUserProfile(@RequestBody UpdateProfileDto updateProfileDto) {
+//        customerService.updateProfile(updateProfileDto);
+//
+//        return Response.success();
+//    }
 }

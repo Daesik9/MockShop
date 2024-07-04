@@ -15,7 +15,7 @@ public class CustomerPolicy {
     public static final String LOGIN_ID_LENGTH_STRING = "로그인 아이디는 " + CustomerPolicy.MIN_LOGIN_ID_LENGTH + "-" +
             CustomerPolicy.MAX_LOGIN_ID_LENGTH + "자리로 구성되어야 합니다.";
 
-    public static final String LOGIN_ID_POLICY_STRING = "로그인 아이디는 소문자와 숫자, -, _로만 구성되어야 합니다.";
+    public static final String LOGIN_ID_POLICY_STRING = "로그인 아이디는 소문자와 숫자로만 구성되어야 합니다.";
 
     public static final int MIN_PASSWORD_LENGTH = 8;
 
