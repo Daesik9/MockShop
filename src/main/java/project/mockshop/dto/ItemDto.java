@@ -9,6 +9,7 @@ import project.mockshop.entity.Merchant;
 @Builder
 @Getter
 public class ItemDto {
+    private Long id;
     private String name;
     private Category category;
     private String thumbnail;
@@ -22,7 +23,8 @@ public class ItemDto {
     private Merchant merchant;
 
     @QueryProjection
-    public ItemDto(String name, Category category, String thumbnail, int price, int quantity, String descriptionImg1, String descriptionImg2, String descriptionImg3, double percentOff, Merchant merchant) {
+    public ItemDto(Long id, String name, Category category, String thumbnail, int price, int quantity, String descriptionImg1, String descriptionImg2, String descriptionImg3, double percentOff, Merchant merchant) {
+        this.id = id;
         this.name = name;
         this.category = category;
         this.thumbnail = thumbnail;
