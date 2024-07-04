@@ -30,7 +30,7 @@ public class Order {
     private LocalDateTime orderDate;
     private String status;
 
-    @OneToMany//(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 
     private String orderNumber;
