@@ -43,4 +43,6 @@ public class CustomerPolicy {
     public static final String POINT_POLICY_STRING = "포인트는 음수일 수 없습니다.";
 
     public static final String DUPLICATE_LOGIN_ID_STRING = "이미 중복된 로그인 아이디가 있습니다.";
+
+    public static final String SAME_PASSWORD_STRING = "기존과 동일한 비밀번호는 불가합니다.";
 }

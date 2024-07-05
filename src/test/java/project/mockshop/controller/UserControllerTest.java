@@ -15,9 +15,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.dto.*;
 import project.mockshop.entity.Address;
+import project.mockshop.mapper.CustomerMapper;
+import project.mockshop.policy.CustomerPolicy;
 import project.mockshop.service.CustomerService;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -205,26 +209,80 @@ public class UserControllerTest {
     @Test
     void checkDuplicateLoginId() throws Exception {
         //given
-        String loginId = "duplicate";
+        String duplicatedLoginId = "loginid";
+        given(customerService.validateDuplicateLoginId(duplicatedLoginId)).willReturn(true);
         CustomerCreationDto requestDto = CustomerCreationDto.builder()
-                .loginId(loginId)
+                .loginId(duplicatedLoginId)
                 .name("테스트")
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@email.com")
                 .address(new Address("city", "street", "88888"))
                 .build();
-        willThrow(IllegalStateException.class).given(customerService).validateDuplicateLoginId(loginId);
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/check-duplicate/{loginId}", loginId)
+                get("/api/users/check-duplicate/{loginId}", duplicatedLoginId)
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.result.data").value(true));
+    }
+
+    @Test
+    void updateProfile() throws Exception {
+        //given
+        UpdateProfileDto updateProfileDto = UpdateProfileDto.builder()
+                .userId(1L)
+                .name("새이름")
+                .password("Newpassword1!")
+                .email("newemail@gmail.com")
+                .phoneNumber("01022222222")
+                .address(new Address("new city", "new street", "99999"))
+                .build();
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateProfileDto))
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+        verify(customerService, times(1)).updateProfile(any(UpdateProfileDto.class));
+    }
+
+    @Test
+    void updateProfile_fail_samePassword() throws Exception {
+        //given
+        UpdateProfileDto updateProfileDto = UpdateProfileDto.builder()
+                .userId(1L)
+                .name("새이름")
+                .password("Password1!")
+                .email("newemail@gmail.com")
+                .phoneNumber("01022222222")
+                .address(new Address("new city", "new street", "99999"))
+                .build();
+        willThrow(IllegalArgumentException.class)
+                .given(customerService).updateProfile(argThat(dto -> dto.getPassword().equals("Password1!")));
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateProfileDto))
         );
 
         //then
         resultActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
     }
+
+
 
 }
 
