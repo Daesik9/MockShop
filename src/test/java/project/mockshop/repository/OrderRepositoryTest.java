@@ -155,12 +155,6 @@ public class OrderRepositoryTest {
         orders.add(order4);
         orders.add(order5);
 
-        orderItemRepository.save(orderItem1);
-        orderItemRepository.save(orderItem2);
-        orderItemRepository.save(orderItem3);
-        orderItemRepository.save(orderItem4);
-        orderItemRepository.save(orderItem5);
-
         orderRepository.save(order1);
         orderRepository.save(order2);
         orderRepository.save(order3);

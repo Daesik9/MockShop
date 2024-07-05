@@ -35,6 +35,10 @@ public class CartItem {
         this.count = count;
     }
 
+    public void changeCart(Cart cart) {
+        this.cart = cart;
+    }
+
     public static class CartItemBuilder {
         public CartItemBuilder cartPrice(int cartPrice) {
             if (cartPrice < 0) {
