@@ -1,12 +1,12 @@
 package project.mockshop.service;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.CustomerCreationDto;
 import project.mockshop.dto.CustomerDto;
 import project.mockshop.dto.LoginRequestDto;
+import project.mockshop.dto.UpdateProfileDto;
 import project.mockshop.entity.Customer;
 import project.mockshop.mapper.CustomerMapper;
 import project.mockshop.policy.CustomerPolicy;
@@ -17,17 +17,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
 
-    @PostConstruct
-    void init() {
-        Customer customer = Customer.builder().name("테스트").password("Password1!").email("test@gmail.com").loginId("test").phoneNumber("01011111111").build();
-        customerRepository.save(customer);
-    }
-
+    @Transactional
     public Long createAccount(CustomerCreationDto dto) {
         if (validateDuplicateLoginId(dto.getLoginId())) {
             throw new IllegalStateException(CustomerPolicy.DUPLICATE_LOGIN_ID_STRING);
@@ -95,6 +90,7 @@ public class CustomerService {
         return findCustomer.map(CustomerMapper::toDto).orElse(null);
     }
 
+    @Transactional
     public void resetPassword(CustomerDto customer, String password) {
         Optional<Customer> findCustomer = customerRepository.findById(customer.getId());
         findCustomer.ifPresent(value -> value.changePassword(password));
@@ -104,5 +100,20 @@ public class CustomerService {
         return customerRepository.findAll()
                 .stream().map(CustomerMapper::toDto)
                 .toList();
+    }
+
+    @Transactional
+    public void updateProfile(UpdateProfileDto updateProfileDto) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(updateProfileDto.getUserId());
+        if (optionalCustomer.isEmpty()) {
+            throw new NullPointerException("해당 유저가 없습니다.");
+        }
+
+        Customer customer = optionalCustomer.get();
+        customer.changeName(updateProfileDto.getName());
+        customer.changePassword(updateProfileDto.getPassword());
+        customer.changeEmail(updateProfileDto.getEmail());
+        customer.changePhoneNumber(updateProfileDto.getPhoneNumber());
+        customer.changeAddress(updateProfileDto.getAddress());
     }
 }
