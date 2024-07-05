@@ -25,9 +25,9 @@ public class OrderItem {
     private int orderPrice;
     private int count;
 
-//    public void changeOrder(Order order) {
-//        this.order = order;
-//    }
+    public void changeOrder(Order order) {
+        this.order = order;
+    }
 
     public static class OrderItemBuilder {
         public OrderItemBuilder orderPrice(int orderPrice) {

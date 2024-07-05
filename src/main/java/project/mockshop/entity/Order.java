@@ -30,13 +30,13 @@ public class Order {
     private LocalDateTime orderDate;
     private String status;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
     private String orderNumber;
 
     public static class OrderBuilder {
-        public OrderBuilder address(Address address) {
+            public OrderBuilder address(Address address) {
             if (address == null) {
                 throw new IllegalArgumentException(MockShopPolicy.INPUT_STRING_METHOD("배송지"));
             }
@@ -51,10 +51,16 @@ public class Order {
             }
             this.orderItems = new ArrayList<>();
             this.orderItems.addAll(Arrays.asList(orderItems));
-//            for (OrderItem orderItem : orderItems) {
-//                orderItem.changeOrder(this);
-//            }
             return this;
+        }
+
+        public Order build() {
+            Order order = new Order(id, customer, address, paymentMethod, orderDate, status, orderItems, orderNumber);
+
+            for (OrderItem orderItem : this.orderItems) {
+                orderItem.changeOrder(order);
+            }
+            return order;
         }
 
     }
