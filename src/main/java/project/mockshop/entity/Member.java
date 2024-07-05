@@ -26,10 +26,6 @@ public class Member {
     private Address address;
     private boolean isDeleted;
 
-    public void changeId(Long id) {
-        this.id = id;
-    }
-
     public void changeName(String name) {
         CustomerValidator.validateName(name);
         this.name = name;

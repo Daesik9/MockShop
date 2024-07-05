@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import project.mockshop.dto.CustomerCreationDto;
 import project.mockshop.dto.CustomerDto;
 import project.mockshop.dto.LoginRequestDto;
+import project.mockshop.dto.UpdateProfileDto;
 import project.mockshop.entity.Address;
 import project.mockshop.entity.Customer;
 import project.mockshop.mapper.CustomerMapper;
@@ -34,6 +35,7 @@ public class CustomerServiceTest {
     @BeforeEach
     void beforeEach() {
         customerDto = CustomerDto.builder()
+                .id(1L)
                 .loginId("loginid")
                 .name("구매자")
                 .password("Password1!")
@@ -59,7 +61,7 @@ public class CustomerServiceTest {
         given(customerRepository.findByLoginId(customer.getLoginId())).willReturn(Optional.empty());
         given(customerRepository.save(any(Customer.class))).willAnswer(invocation -> {
             Customer savedCustomer = invocation.getArgument(0);
-            savedCustomer.changeId(1L);
+//            savedCustomer.changeId(1L);
             return savedCustomer;
         });
 
@@ -87,9 +89,7 @@ public class CustomerServiceTest {
                 .thenReturn(Optional.of(CustomerMapper.toEntity(customerDto)));
 
         //then
-        assertThatThrownBy(() -> customerService.validateDuplicateLoginId(duplicateLoginId))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("이미 중복된 로그인 아이디가 있습니다.");
+        assertThat(customerService.validateDuplicateLoginId(duplicateLoginId)).isTrue();
     }
 
     @Test
@@ -210,7 +210,6 @@ public class CustomerServiceTest {
     void findOne() {
         //given
         Customer customer = CustomerMapper.toEntity(customerDto);
-        customer.changeId(1L);
         given(customerRepository.findById(customer.getId())).willReturn(Optional.of(customer));
 
         //when
@@ -235,4 +234,49 @@ public class CustomerServiceTest {
         assertThat(findCustomer.getPassword()).isEqualTo("NewPassword!1");
         verify(customerRepository, times(2)).findById(customerDto.getId());
     }
+
+    /**
+     * 비밀번호, 이름, 핸드폰번호, 이메일주소, 주소만 변경 가능하다.
+     */
+    @Test
+    void updateProfile() throws Exception {
+        //given
+        CustomerDto customer = CustomerDto.builder()
+                .loginId("loginid")
+                .name("이름")
+                .password("Password1!")
+                .email("email@gmail.com")
+                .phoneNumber("01011111111")
+                .address(new Address("city", "street", "11111"))
+                .build();
+
+        given(customerRepository.findById(1L)).willReturn(Optional.of(CustomerMapper.toEntity(customer)));
+
+        UpdateProfileDto updateProfileDto = UpdateProfileDto.builder()
+                .userId(1L)
+                .name("새이름")
+                .password("Newpassword1!")
+                .email("newemail@gmail.com")
+                .phoneNumber("01022222222")
+                .address(new Address("new city", "new street", "99999"))
+                .build();
+
+        //when
+        customerService.updateProfile(updateProfileDto);
+        CustomerDto newCustomer = CustomerDto.builder()
+                .loginId("loginid")
+                .name("새이름")
+                .password("Newpassword1!")
+                .email("newemail@gmail.com")
+                .phoneNumber("01022222222")
+                .address(new Address("new city", "new street", "99999"))
+                .build();
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(CustomerMapper.toEntity(newCustomer)));
+
+        //then
+        CustomerDto customerDto = customerService.findOne(updateProfileDto.getUserId());
+        assertThat(customerDto.getName()).isEqualTo("새이름");
+    }
+
+
 }

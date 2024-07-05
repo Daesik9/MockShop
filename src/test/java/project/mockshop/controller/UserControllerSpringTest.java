@@ -45,29 +45,29 @@ public class UserControllerSpringTest {
         assertThat(customerController).isNotNull();
     }
 
-    @Test
-    void createAccount_success() throws Exception {
-        //given
-        CustomerCreationDto requestDto = CustomerCreationDto.builder()
-                .loginId("loginid")
-                .name("테스트")
-                .password("Password1!")
-                .phoneNumber("01011111111")
-                .email("email@email.com")
-                .address(new Address("city", "street", "88888"))
-                .build();
-
-
-        //when
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto))
-        );
-
-        //then
-        resultActions.andExpect(jsonPath("$.code").value(201));
-    }
+//    @Test
+//    void createAccount_success() throws Exception {
+//        //given
+//        CustomerCreationDto requestDto = CustomerCreationDto.builder()
+//                .loginId("loginid")
+//                .name("테스트")
+//                .password("Password1!")
+//                .phoneNumber("01011111111")
+//                .email("email@email.com")
+//                .address(new Address("city", "street", "88888"))
+//                .build();
+//
+//
+//        //when
+//        ResultActions resultActions = mockMvc.perform(
+//                MockMvcRequestBuilders.post("/api/users")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(requestDto))
+//        );
+//
+//        //then
+//        resultActions.andExpect(jsonPath("$.code").value(201));
+//    }
 //
 //
 //

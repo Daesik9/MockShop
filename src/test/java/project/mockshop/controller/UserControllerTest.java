@@ -13,9 +13,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import project.mockshop.advice.ExceptionAdvice;
-import project.mockshop.dto.CustomerCreationDto;
-import project.mockshop.dto.CustomerDto;
-import project.mockshop.dto.LoginRequestDto;
+import project.mockshop.dto.*;
 import project.mockshop.entity.Address;
 import project.mockshop.service.CustomerService;
 
@@ -140,18 +138,19 @@ public class UserControllerTest {
         String phoneNumber = "01011111111";
         CustomerDto customer = CustomerDto.builder().loginId("loginid").phoneNumber(phoneNumber).build();
         given(customerService.findLoginId(phoneNumber)).willReturn(customer);
+        FindLoginIdRequestDto requestDto = FindLoginIdRequestDto.builder().phoneNumber(phoneNumber).build();
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/find/login-id")
-                        .param("phoneNumber", phoneNumber)
+                post("/api/users/find/login-id")
+                        .content(objectMapper.writeValueAsString(requestDto))
+                        .contentType(MediaType.APPLICATION_JSON)
         );
 
         //then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.result.data.loginId").value("loginid"))
-                .andExpect(jsonPath("$.result.data.phoneNumber").value(phoneNumber));
+                .andExpect(jsonPath("$.result.data").value("loginid"));
     }
 
     @Test
@@ -159,21 +158,25 @@ public class UserControllerTest {
         //given
         String loginId = "loginid";
         String phoneNumber = "01011111111";
-        CustomerDto customer = CustomerDto.builder().loginId(loginId).phoneNumber(phoneNumber).build();
+        CustomerDto customer = CustomerDto.builder().loginId(loginId).phoneNumber(phoneNumber)
+                .password("Password1!").build();
         given(customerService.findPassword(loginId, phoneNumber)).willReturn(customer);
+        FindPasswordRequestDto requestDto = FindPasswordRequestDto.builder()
+                .loginId(loginId)
+                .phoneNumber(phoneNumber)
+                .build();
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/find/password")
-                        .param("loginId", loginId)
-                        .param("phoneNumber", phoneNumber)
+                post("/api/users/find/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto))
         );
 
         //then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.result.data.loginId").value(loginId))
-                .andExpect(jsonPath("$.result.data.phoneNumber").value(phoneNumber));
+                .andExpect(jsonPath("$.result.data").value("Password1!"));
         verify(customerService).findPassword(loginId, phoneNumber);
     }
 
