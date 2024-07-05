@@ -60,10 +60,10 @@ public class CustomerController {
         return Response.success(isDuplicated);
     }
 
-//    @PutMapping("/users")
-//    public Response updateUserProfile(@RequestBody UpdateProfileDto updateProfileDto) {
-//        customerService.updateProfile(updateProfileDto);
-//
-//        return Response.success();
-//    }
+    @PutMapping("/users")
+    public Response updateUserProfile(@RequestBody UpdateProfileDto updateProfileDto) {
+        customerService.updateProfile(updateProfileDto);
+
+        return Response.success();
+    }
 }

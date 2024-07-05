@@ -10,6 +10,7 @@ import project.mockshop.dto.CustomerDto;
 import project.mockshop.dto.UpdateProfileDto;
 import project.mockshop.entity.Address;
 import project.mockshop.mapper.CustomerMapper;
+import project.mockshop.policy.CustomerPolicy;
 
 import java.util.Optional;
 
@@ -70,6 +71,36 @@ public class CustomerServiceSpringTest {
         //then
         CustomerDto customerDto = customerService.findOne(updateProfileDto.getUserId());
         assertThat(customerDto.getName()).isEqualTo("새이름");
+        assertThat(customerDto.getPassword()).isEqualTo("Newpassword1!");
+        assertThat(customerDto.getEmail()).isEqualTo("newemail@gmail.com");
+        assertThat(customerDto.getPhoneNumber()).isEqualTo("01022222222");
+        assertThat(customerDto.getAddress().getCity()).isEqualTo("new city");
+    }
+
+    @Test
+    void updateProfile_fail_samePassword() throws Exception {
+        //given
+        UpdateProfileDto updateProfileDto = UpdateProfileDto.builder()
+                .userId(userId)
+                .name("새이름")
+                .password("Password1!")
+                .email("newemail@gmail.com")
+                .phoneNumber("01022222222")
+                .address(new Address("new city", "new street", "99999"))
+                .build();
+
+        //when
+        assertThatThrownBy(() -> customerService.updateProfile(updateProfileDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining(CustomerPolicy.SAME_PASSWORD_STRING);
+
+        //then
+        CustomerDto customerDto = customerService.findOne(updateProfileDto.getUserId());
+        assertThat(customerDto.getName()).isEqualTo("구매자");
+        assertThat(customerDto.getPassword()).isEqualTo("Password1!");
+        assertThat(customerDto.getEmail()).isEqualTo("email@email.com");
+        assertThat(customerDto.getPhoneNumber()).isEqualTo("01088888888");
+        assertThat(customerDto.getAddress().getCity()).isEqualTo("city");
     }
 
 

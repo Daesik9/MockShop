@@ -2,6 +2,7 @@ package project.mockshop.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import project.mockshop.policy.CustomerPolicy;
 import project.mockshop.validator.CustomerValidator;
 
 @Entity

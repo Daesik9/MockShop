@@ -110,6 +110,11 @@ public class CustomerService {
         }
 
         Customer customer = optionalCustomer.get();
+
+        if (customer.getPassword().equals(updateProfileDto.getPassword())) {
+            throw new IllegalArgumentException(CustomerPolicy.SAME_PASSWORD_STRING);
+        }
+
         customer.changeName(updateProfileDto.getName());
         customer.changePassword(updateProfileDto.getPassword());
         customer.changeEmail(updateProfileDto.getEmail());
