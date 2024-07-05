@@ -1,6 +1,5 @@
 package project.mockshop.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.mockshop.dto.ItemDto;
@@ -22,11 +21,6 @@ public class ItemService {
         itemRepository.save(item);
 
         return item.getId();
-    }
-
-    @PostConstruct
-    public void init() {
-        createItem(ItemDto.builder().name("사과").price(1000).quantity(100).build(), 1L);
     }
 
     public ItemDto findById(Long id) {
