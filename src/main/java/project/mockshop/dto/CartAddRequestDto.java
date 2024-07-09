@@ -6,7 +6,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CartRequestDto {
+public class CartAddRequestDto {
     private Long itemId;
     private int count;
 }

@@ -1,7 +1,5 @@
 package project.mockshop.service;
 
-import lombok.Builder;
-import lombok.Getter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import project.mockshop.entity.Cart;
 import project.mockshop.entity.CartItem;
-import project.mockshop.entity.Customer;
 import project.mockshop.entity.Item;
 import project.mockshop.repository.CartRepository;
 
@@ -93,4 +90,19 @@ public class CartServiceTest {
         //then
         assertThat(cart.getCartItems().size()).isEqualTo(0);
     }
+
+    @Test
+    void getCartItems() throws Exception {
+        //given
+        Long customerId = 1L;
+        Cart cart = Cart.builder().cartItems(List.of(CartItem.builder().id(1L).count(1).build())).build();
+        given(cartRepository.findCartWithItems(customerId)).willReturn(cart);
+
+        //when
+        Cart findCart = cartRepository.findCartWithItems(customerId);
+
+        //then
+        assertThat(findCart.getCartItems().get(0).getCount()).isEqualTo(1);
+    }
+
 }

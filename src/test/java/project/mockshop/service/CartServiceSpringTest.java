@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import project.mockshop.entity.Cart;
 import project.mockshop.entity.CartItem;
+import project.mockshop.entity.Customer;
 import project.mockshop.entity.Item;
 import project.mockshop.repository.CartRepository;
+import project.mockshop.repository.CustomerRepository;
 
 import java.util.List;
 
@@ -21,12 +23,21 @@ public class CartServiceSpringTest {
     CartService cartService;
     @Autowired
     CartRepository cartRepository;
+    @Autowired
+    CustomerRepository customerRepository;
 
     Cart cart;
+    Customer customer;
 
     @BeforeEach
     void beforeEach() {
-        cart = Cart.builder().cartItems(List.of(CartItem.builder().count(1).build())).build();
+        customer = Customer.builder().build();
+        customerRepository.save(customer);
+
+        cart = Cart.builder()
+                .cartItems(List.of(CartItem.builder().count(1).build()))
+                .customer(customer)
+                .build();
 
         cartRepository.save(cart);
     }
@@ -80,5 +91,15 @@ public class CartServiceSpringTest {
         assertThat(cart.getCartItems().size()).isEqualTo(0);
     }
 
+    @Test
+    void getCartItems() throws Exception {
+        //given
+
+        //when
+        Cart findCart = cartRepository.findCartWithItems(customer.getId());
+
+        //then
+        assertThat(findCart.getCartItems().get(0).getCount()).isEqualTo(1);
+    }
 
 }

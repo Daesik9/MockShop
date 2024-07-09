@@ -20,6 +20,12 @@ public class InitConfig {
     @PostConstruct
     public void init() {
         itemService.createItem(ItemDto.builder().name("사과").price(1000).quantity(100).build(), 1L);
+        itemService.createItem(ItemDto.builder().name("사과").price(2000).quantity(100).build(), 1L);
+        itemService.createItem(ItemDto.builder().name("사과").price(3000).quantity(100).build(), 1L);
+        itemService.createItem(ItemDto.builder().name("사과").price(4000).quantity(100).build(), 1L);
+        itemService.createItem(ItemDto.builder().name("사과").price(5000).quantity(100).build(), 1L);
+        itemService.createItem(ItemDto.builder().name("사과").price(6000).quantity(100).build(), 1L);
+
         Customer customer = Customer.builder().name("테스트").password("Password1!").email("test@gmail.com").loginId("test").phoneNumber("01011111111").build();
         customerService.createAccount(CustomerMapper.toCreationDto(customer));
     }
