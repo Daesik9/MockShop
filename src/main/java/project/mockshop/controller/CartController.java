@@ -2,12 +2,9 @@ package project.mockshop.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import project.mockshop.dto.CartAddRequestDto;
-import project.mockshop.dto.CartItemDto;
+import project.mockshop.dto.*;
 import project.mockshop.response.Response;
 import project.mockshop.service.CartService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api")
@@ -17,14 +14,27 @@ public class CartController {
 
     @PostMapping("/cart")
     public Response addToCart(@RequestBody CartAddRequestDto cartRequest) {
-        cartService.addToCart(cartRequest.getItemId(), cartRequest.getCount(), 1L);
-        return Response.success(true);
+        Long cartId = cartService.addToCart(cartRequest.getItemId(), cartRequest.getCount(), 1L);
+        return Response.success(cartId);
     }
 
     @GetMapping("/cart")
-    public Response getCartItems(@RequestParam Long customerId) {
-        List<CartItemDto> cartItems = cartService.getCartItems(customerId);
-        return Response.success(cartItems);
+    public Response getCartWithItems(@RequestParam Long customerId) {
+        CartDto cartDto = cartService.getCartWithItems(customerId);
+        return Response.success(cartDto);
     }
 
+    @PutMapping("/cart")
+    public Response changeCartItemCount(@RequestBody CartChangeRequestDto changeRequestDto) {
+        cartService.changeCartItemCount(changeRequestDto.getCartId(),
+                changeRequestDto.getCartItemId(),
+                changeRequestDto.getCount());
+        return Response.success();
+    }
+
+    @DeleteMapping("/cart")
+    public Response removeCartItem(@RequestBody CartDeleteRequestDto deleteRequestDto) {
+        cartService.removeCartItem(deleteRequestDto.getCartId(), deleteRequestDto.getCartItemId());
+        return Response.success();
+    }
 }

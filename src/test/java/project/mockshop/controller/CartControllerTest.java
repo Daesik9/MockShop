@@ -13,17 +13,16 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import project.mockshop.advice.ExceptionAdvice;
-import project.mockshop.dto.CartAddRequestDto;
-import project.mockshop.dto.CartItemDto;
-import project.mockshop.dto.CustomerCreationDto;
-import project.mockshop.dto.CustomerDto;
-import project.mockshop.entity.Address;
+import project.mockshop.dto.*;
+import project.mockshop.entity.Cart;
+import project.mockshop.entity.CartItem;
+import project.mockshop.entity.Customer;
+import project.mockshop.entity.Item;
+import project.mockshop.mapper.CartMapper;
 import project.mockshop.service.CartService;
 
-import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -53,6 +52,47 @@ public class CartControllerTest {
     }
 
     @Test
+    void changeCartItemCount() throws Exception {
+        //given
+        CartChangeRequestDto changeRequestDto = CartChangeRequestDto.builder()
+                .cartId(1L)
+                .cartItemId(1L)
+                .count(4)
+                .build();
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/cart")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(changeRequestDto))
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                        .andExpect(jsonPath("$.code").value(200));
+    }
+
+    @Test
+    void removeCartItem() throws Exception {
+        //given
+        CartDeleteRequestDto deleteRequestDto = CartDeleteRequestDto.builder()
+                .cartId(1L)
+                .cartItemId(1L)
+                .build();
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/cart")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(deleteRequestDto))
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+    }
+
+    @Test
     void addToCart() throws Exception {
         //given
         CartAddRequestDto cartRequest = CartAddRequestDto.builder().itemId(1L).count(3).build();
@@ -71,8 +111,11 @@ public class CartControllerTest {
     @Test
     void getCartItems() throws Exception {
         //given
-        List<CartItemDto> cartItemDtos = List.of(CartItemDto.builder().count(3).cartPrice(3000).build());
-        given(cartService.getCartItems(1L)).willReturn(cartItemDtos);
+        Cart cart = Cart.builder()
+                .cartItems(List.of(CartItem.builder().item(Item.builder().build()).count(3).cartPrice(3000).build()))
+                .customer(Customer.builder().build())
+                .build();
+        given(cartService.getCartWithItems(1L)).willReturn(CartMapper.toDto(cart));
 
         //when
         ResultActions resultActions = mockMvc.perform(
@@ -84,8 +127,8 @@ public class CartControllerTest {
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.result.data[0].count").value(3))
-                .andExpect(jsonPath("$.result.data[0].cartPrice").value(3000));
+                .andExpect(jsonPath("$.result.data.cartItemDtos[0].count").value(3))
+                .andExpect(jsonPath("$.result.data.cartItemDtos[0].cartPrice").value(3000));
     }
 
 }

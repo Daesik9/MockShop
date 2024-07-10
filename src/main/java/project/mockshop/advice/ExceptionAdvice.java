@@ -31,4 +31,11 @@ public class ExceptionAdvice {
         log.error(e.getClass() + " " + e.getMessage());
         return Response.failure(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Response runtimeException(RuntimeException e) {
+        log.error(e.getClass() + " " + e.getMessage());
+        return Response.failure(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+    }
 }
