@@ -1,6 +1,7 @@
 package project.mockshop.service;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Null;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +101,18 @@ public class CartServiceSpringTest {
 
         //then
         assertThat(findCart.getCartItems().get(0).getCount()).isEqualTo(1);
+    }
+
+    @Test
+    void getCartItems_fail_cartNull() throws Exception {
+        //given
+
+        //when
+        Cart findCart = cartRepository.findCartWithItems(2L);
+
+        //then
+        assertThatThrownBy(() -> findCart.getCartItems())
+                .isInstanceOf(NullPointerException.class);
     }
 
 }

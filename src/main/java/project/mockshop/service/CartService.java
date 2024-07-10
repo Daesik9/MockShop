@@ -71,6 +71,9 @@ public class CartService {
 
     public List<CartItemDto> getCartItems(Long customerId) {
         Cart cart = cartRepository.findCartWithItems(customerId);
+        if (cart == null) {
+            return List.of();
+        }
 
         return cart.getCartItems().stream().map(CartItemMapper::toDto).toList();
     }
