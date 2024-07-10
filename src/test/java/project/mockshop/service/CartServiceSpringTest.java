@@ -86,7 +86,7 @@ public class CartServiceSpringTest {
         //given
 
         //when
-        cartService.removeCartItem(cart.getId(), 1L);
+        cartService.removeCartItem(cart.getId(), cart.getCartItems().get(0).getId());
 
         //then
         assertThat(cart.getCartItems().size()).isEqualTo(0);

@@ -26,6 +26,11 @@ public class Cart {
         this.cartItems = cartItems;
     }
 
+    public void removeCartItem(CartItem cartItem) {
+        this.cartItems.remove(cartItem);
+        cartItem.changeCart(null);
+    }
+
     public static class CartBuilder {
         public CartBuilder cartItems(List<CartItem> cartItems) {
             this.cartItems = new ArrayList<>();

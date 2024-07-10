@@ -35,6 +35,10 @@ public class CartItem {
         this.count = count;
     }
 
+    public void changeCartPrice(int cartPrice) {
+        this.cartPrice = cartPrice;
+    }
+
     public void changeCart(Cart cart) {
         this.cart = cart;
     }
