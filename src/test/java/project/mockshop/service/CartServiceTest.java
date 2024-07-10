@@ -105,4 +105,18 @@ public class CartServiceTest {
         assertThat(findCart.getCartItems().get(0).getCount()).isEqualTo(1);
     }
 
+    @Test
+    void getCartItems_fail_cartNull() throws Exception {
+        //given
+        Long customerId = 1L;
+        given(cartRepository.findCartWithItems(customerId)).willReturn(null);
+
+        //when
+        Cart findCart = cartRepository.findCartWithItems(customerId);
+
+        //then
+        assertThatThrownBy(() -> findCart.getCartItems())
+                .isInstanceOf(NullPointerException.class);
+    }
+
 }
