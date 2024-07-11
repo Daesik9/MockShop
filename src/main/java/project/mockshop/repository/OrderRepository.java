@@ -7,9 +7,10 @@ import project.mockshop.entity.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long>, OrderRepositoryCustom {
-    List<Order> findAllByCustomer(Customer customer);
+    List<Order> findAllByCustomerId(Long customerId);
 
     List<Order> findAllByCustomerName(String customerName);
 
@@ -17,7 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
 
     List<Order> findAllByCustomerPhoneNumber(String customerPhoneNumber);
 
-    Order findByOrderNumber(String orderNumber);
+    Optional<Order> findByOrderNumber(String orderNumber);
 
     List<Order> findAllByStatus(OrderStatus status);
 

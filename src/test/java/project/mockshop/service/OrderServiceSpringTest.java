@@ -49,11 +49,11 @@ public class OrderServiceSpringTest {
 
         //when
         String paymentMethod = "MOCK_PAY";
-        Long orderId = orderService.order(customer.getId(), paymentMethod);
+        String orderNumber = orderService.order(customer.getId(), paymentMethod);
 
 
         //then
-        Order foundOrder = orderRepository.findById(orderId).orElseThrow(() -> new NullPointerException("해당 주문이 없습니다."));
+        Order foundOrder = orderRepository.findByOrderNumber(orderNumber).orElseThrow(() -> new NullPointerException("해당 주문이 없습니다."));
         assertThat(foundOrder.getCustomer()).isEqualTo(customer);
         assertThat(foundOrder.getOrderItems().size()).isEqualTo(1);
         assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.ORDER);

@@ -13,8 +13,8 @@ import java.util.List;
 public class OrderDto {
     private Long id;
     private String orderNumber;
-    private CustomerDto customer;
-    private List<OrderItemDto> orderItems;
+    private CustomerDto customerDto;
+    private List<OrderItemDto> orderItemDtos;
     private OrderStatus status;
     private LocalDateTime orderDate;
     private String paymentMethod;

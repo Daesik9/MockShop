@@ -1,13 +1,13 @@
 package project.mockshop.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import project.mockshop.dto.OrderDto;
 import project.mockshop.dto.OrderRequestDto;
 import project.mockshop.response.Response;
 import project.mockshop.service.OrderService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api")
@@ -19,8 +19,24 @@ public class OrderController {
     @PostMapping("/orders")
     public Response order(@RequestBody OrderRequestDto requestDto) {
 
-        Long orderId = orderService.order(requestDto.getCustomerId(), requestDto.getPaymentMethod());
+        String orderNumber = orderService.order(requestDto.getCustomerId(), requestDto.getPaymentMethod());
 
-        return Response.success(orderId);
+        return Response.success(orderNumber);
+    }
+
+    @GetMapping("/orders/customer/{customerId}")
+    public Response getOrderHistory(@PathVariable Long customerId) {
+
+        List<OrderDto> orderDtos = orderService.findAllByCustomerId(customerId);
+
+        return Response.success(orderDtos);
+    }
+
+    @GetMapping("/orders/{orderNumber}")
+    public Response getOrderDetail(@PathVariable String orderNumber) {
+
+        OrderDto orderDto = orderService.findByOrderNumber(orderNumber);
+
+        return Response.success(orderDto);
     }
 }

@@ -3,6 +3,7 @@ package project.mockshop.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -22,8 +23,11 @@ import project.mockshop.service.OrderService;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @Transactional
@@ -96,12 +100,73 @@ public class OrderControllerSpringTest {
 
         List<OrderDto> orderDtos = orderService.findAll();
         assertThat(orderDtos).isNotEmpty();
-        assertThat(orderDtos.get(0).getCustomer().getId()).isEqualTo(customerId);
+        assertThat(orderDtos.get(0).getCustomerDto().getId()).isEqualTo(customerId);
         assertThat(orderDtos.get(0).getPaymentMethod()).isEqualTo("MOCK_PAY");
 
         // 장바구니가 비워졌는지 확인
         CartDto cartWithItems = cartService.getCartWithItems(customerId);
         assertThat(cartWithItems.getCartItemDtos()).isEmpty();
+    }
+
+    @Test
+    void getOrderHistory() throws Exception {
+        //given
+        ItemDto itemDto = ItemDto.builder().name("사과").quantity(100).price(1000).build();
+        Long itemId = itemService.createItem(itemDto, 1L);
+        CustomerCreationDto userCreationDto = CustomerCreationDto.builder()
+                .name("테스트")
+                .loginId("loginid")
+                .password("Password1!")
+                .phoneNumber("01011111111")
+                .email("email@gmail.com")
+                .address(new Address("city", "street", "11111"))
+                .build();
+        Long customerId = customerService.createAccount(userCreationDto);
+        Long cartId = cartService.addToCart(itemId, 10, customerId);
+        String orderNumber = orderService.order(customerId, "MOCK-PAY");
+
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/orders/customer/{customerId}", customerId)
+        );
+
+        //then
+        resultActions.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].customerDto.id").value(customerId));
+
+        List<OrderDto> orderDtos = orderService.findAllByCustomerId(customerId);
+        assertThat(orderDtos.size()).isEqualTo(1);
+        assertThat(orderDtos.get(0).getStatus()).isEqualTo(OrderStatus.ORDER);
+    }
+
+    @Test
+    void getOrderDetail() throws Exception {
+        //given
+        ItemDto itemDto = ItemDto.builder().name("사과").quantity(100).price(1000).build();
+        Long itemId = itemService.createItem(itemDto, 1L);
+        CustomerCreationDto userCreationDto = CustomerCreationDto.builder()
+                .name("테스트")
+                .loginId("loginid")
+                .password("Password1!")
+                .phoneNumber("01011111111")
+                .email("email@gmail.com")
+                .address(new Address("city", "street", "11111"))
+                .build();
+        Long customerId = customerService.createAccount(userCreationDto);
+        Long cartId = cartService.addToCart(itemId, 10, customerId);
+        String orderNumber = orderService.order(customerId, "MOCK-PAY");
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/orders/{orderNumber}", orderNumber)
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.result.data.orderNumber").value(orderNumber));
     }
 
 }
