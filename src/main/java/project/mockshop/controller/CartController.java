@@ -14,7 +14,7 @@ public class CartController {
 
     @PostMapping("/cart")
     public Response addToCart(@RequestBody CartAddRequestDto cartRequest) {
-        Long cartId = cartService.addToCart(cartRequest.getItemId(), cartRequest.getCount(), 1L);
+        Long cartId = cartService.addToCart(cartRequest.getItemId(), cartRequest.getCount(), cartRequest.getCustomerId());
         return Response.success(cartId);
     }
 

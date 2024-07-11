@@ -9,4 +9,5 @@ import lombok.*;
 public class CartAddRequestDto {
     private Long itemId;
     private int count;
+    private Long customerId;
 }

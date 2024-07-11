@@ -25,6 +25,14 @@ public class OrderItem {
     private int orderPrice;
     private int count;
 
+    public static OrderItem createOrderItem(Item item, int cartPrice, int count) {
+        return OrderItem.builder()
+                .item(item)
+                .orderPrice(cartPrice)
+                .count(count)
+                .build();
+    }
+
     public void changeOrder(Order order) {
         this.order = order;
     }

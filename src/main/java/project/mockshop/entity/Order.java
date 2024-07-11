@@ -3,6 +3,7 @@ package project.mockshop.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import project.mockshop.policy.MockShopPolicy;
+import project.mockshop.util.OrderNumberGenerator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,12 +29,26 @@ public class Order {
 
     private String paymentMethod;
     private LocalDateTime orderDate;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
     private String orderNumber;
+
+    public static Order createOrder(Customer customer, String paymentMethod, List<OrderItem> orderItems) {
+        return Order.builder()
+                .customer(customer)
+                .address(customer.getAddress())
+                .paymentMethod(paymentMethod)
+                .orderDate(LocalDateTime.now())
+                .status(OrderStatus.ORDER)
+                .orderItems(orderItems)
+                .orderNumber(OrderNumberGenerator.generateOrdeNumber())
+                .build();
+    }
 
     public static class OrderBuilder {
             public OrderBuilder address(Address address) {
@@ -45,12 +60,12 @@ public class Order {
             return this;
         }
 
-        public OrderBuilder orderItems(OrderItem... orderItems) {
-            if (orderItems.length == 0) {
+        public OrderBuilder orderItems(List<OrderItem> orderItems) {
+            if (orderItems.size() == 0) {
                 throw new IllegalStateException("주문 상품이 없습니다.");
             }
             this.orderItems = new ArrayList<>();
-            this.orderItems.addAll(Arrays.asList(orderItems));
+            this.orderItems.addAll(orderItems);
             return this;
         }
 
@@ -64,5 +79,7 @@ public class Order {
         }
 
     }
+    
+
 
 }

@@ -1,6 +1,7 @@
 package project.mockshop.service;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.mockshop.dto.CartDto;
@@ -49,6 +50,10 @@ public class CartService {
     }
 
     public Long addToCart(Long itemId, int count, Long userId) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(userId);
+        if (optionalCustomer.isEmpty()) {
+            throw new NullPointerException("해당 유저가 없습니다.");
+        }
         Optional<Cart> cartOptional = cartRepository.findByCustomerId(userId);
         Optional<Item> itemOptional = itemRepository.findById(itemId);
         if (itemOptional.isEmpty()) {
@@ -72,7 +77,7 @@ public class CartService {
             return cartOptional.get().getId();
         } else {
             CartItem cartItem = CartItem.createCartItem(itemOptional.get(), count);
-            Cart cart = Cart.builder().customer(Customer.builder().id(userId).build()).cartItems(List.of(cartItem)).build();
+            Cart cart = Cart.builder().customer(optionalCustomer.get()).cartItems(List.of(cartItem)).build();
             cartRepository.save(cart);
 
             return cart.getId();

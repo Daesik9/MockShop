@@ -64,7 +64,7 @@ public class CartControllerSpringTest {
     @Test
     void addToCart() throws Exception {
         //given
-        CartAddRequestDto cartRequest = CartAddRequestDto.builder().itemId(itemId).count(3).build();
+        CartAddRequestDto cartRequest = CartAddRequestDto.builder().itemId(itemId).count(3).customerId(customerId).build();
 
         //when
         ResultActions resultActions = mockMvc.perform(
