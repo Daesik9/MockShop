@@ -24,8 +24,8 @@ public class OrderService {
 //        return orders.stream().map(OrderMapper::toDto).toList();
 //    }
 
-    public List<OrderDto> findAllByCustomer(Customer customer) {
-        List<Order> orders = orderRepository.findAllByCustomer(customer);
+    public List<OrderDto> findAllByCustomerId(Long customerId) {
+        List<Order> orders = orderRepository.findAllByCustomerId(customerId);
 
         return orders.stream().map(OrderMapper::toDto).toList();
     }
@@ -65,7 +65,9 @@ public class OrderService {
     }
 
     public OrderDto findByOrderNumber(String orderNumber) {
-        return OrderMapper.toDto(orderRepository.findByOrderNumber(orderNumber));
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new NullPointerException("해당 주문 번호와 일치하는 주문이 없습니다."));
+        return OrderMapper.toDto(order);
     }
 
     public List<OrderDto> findAllByOrderDate(LocalDateTime from, LocalDateTime to) {
@@ -80,7 +82,7 @@ public class OrderService {
         return orderRepository.findAll().stream().map(OrderMapper::toDto).toList();
     }
 
-    public Long order(Long customerId, String paymentMethod) {
+    public String order(Long customerId, String paymentMethod) {
         //장바구니에서 상품 가져오기
         Cart cart = cartRepository.findCartWithItems(customerId);
 
@@ -92,10 +94,9 @@ public class OrderService {
         //Order 만들기
         Order newOrder = Order.createOrder(cart.getCustomer(), paymentMethod, orderItems);
 
+        cart.removeAllCartItems();
         orderRepository.save(newOrder);
 
-        cart.removeAllCartItems();
-
-        return newOrder.getId();
+        return newOrder.getOrderNumber();
     }
 }

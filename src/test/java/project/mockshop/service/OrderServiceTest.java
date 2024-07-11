@@ -1,6 +1,5 @@
 package project.mockshop.service;
 
-import jakarta.persistence.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -173,12 +172,12 @@ public class OrderServiceTest {
 
         //when
         String paymentMethod = "MOCK_PAY";
-        Long orderId = orderService.order(customer.getId(), paymentMethod);
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        String orderNumber = orderService.order(customer.getId(), paymentMethod);
+        when(orderRepository.findByOrderNumber(orderNumber)).thenReturn(Optional.of(order));
 
         //then
-        Order foundOrder = orderRepository.findById(orderId).orElseThrow(() -> new NullPointerException("해당 주문이 없습니다."));
-        assertThat(foundOrder.getCustomer()).isEqualTo(customer);
+        Optional<Order> optionalOrder = orderRepository.findByOrderNumber(orderNumber);
+        assertThat(optionalOrder.get().getCustomer()).isEqualTo(customer);
     }
 
 
@@ -213,11 +212,11 @@ public class OrderServiceTest {
     @Test
     void findAllByCustomer() throws Exception {
         //given
-        given(orderRepository.findAllByCustomer(customer1))
+        given(orderRepository.findAllByCustomerId(customer1.getId()))
                 .willReturn(List.of(orders.get(0), orders.get(2), orders.get(4)));
 
         //when
-        List<OrderDto> orders = orderService.findAllByCustomer(customer1);
+        List<OrderDto> orders = orderService.findAllByCustomerId(customer1.getId());
 
         //then
         assert orders != null;
@@ -257,7 +256,7 @@ public class OrderServiceTest {
     @Test
     void findByOrderNumber() throws Exception {
         //given
-        given(orderRepository.findByOrderNumber("12345")).willReturn(orders.get(1));
+        given(orderRepository.findByOrderNumber("12345")).willReturn(Optional.of(orders.get(1)));
 
         //when
         OrderDto order = orderService.findByOrderNumber("12345");

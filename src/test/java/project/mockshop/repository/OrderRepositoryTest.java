@@ -9,6 +9,7 @@ import project.mockshop.entity.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -186,11 +187,11 @@ public class OrderRepositoryTest {
     }
 
     @Test
-    void findAllByCustomer() throws Exception {
+    void findAllByCustomerId() throws Exception {
         //given
 
         //when
-        List<Order> orders = orderRepository.findAllByCustomer(customer1);
+        List<Order> orders = orderRepository.findAllByCustomerId(customer1.getId());
 
         //then
         assert orders != null;
@@ -226,10 +227,10 @@ public class OrderRepositoryTest {
         //given
 
         //when
-        Order order = orderRepository.findByOrderNumber("12345");
+        Optional<Order> order = orderRepository.findByOrderNumber("12345");
 
         //then
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+        assertThat(order.get().getStatus()).isEqualTo(OrderStatus.DELIVERED);
     }
 
     @Test

@@ -7,11 +7,14 @@ public class OrderItemMapper {
     public static OrderItemDto toDto(OrderItem orderItem) {
 //        System.out.println("orderItem.getOrder() = " + orderItem.getOrder());
         System.out.println("orderItem.getId() = " + orderItem.getId());
-        
+
         return OrderItemDto.builder()
                 .id(orderItem.getId())
 //                .order(OrderMapper.toDto(orderItem.getOrder()))
-                .item(ItemMapper.toDto(orderItem.getItem()))
+//                .item(ItemMapper.toDto(orderItem.getItem()))
+                .thumbnail(orderItem.getItem().getThumbnail())
+                .itemId(orderItem.getItem().getId())
+                .name(orderItem.getItem().getName())
                 .orderPrice(orderItem.getOrderPrice())
                 .count(orderItem.getCount())
                 .build();
