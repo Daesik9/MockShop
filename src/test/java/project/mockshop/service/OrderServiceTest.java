@@ -1,5 +1,6 @@
 package project.mockshop.service;
 
+import jakarta.persistence.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,11 +9,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import project.mockshop.dto.OrderDto;
 import project.mockshop.entity.*;
+import project.mockshop.repository.CartRepository;
 import project.mockshop.repository.OrderRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -25,6 +28,8 @@ public class OrderServiceTest {
 
     @Mock
     OrderRepository orderRepository;
+    @Mock
+    CartRepository cartRepository;
 
     List<Order> orders = new ArrayList<>();
     Merchant merchant1;
@@ -79,8 +84,8 @@ public class OrderServiceTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("order")
-                .orderItems(OrderItem.builder().id(1L).item(item1Merchant1).build())
+                .status(OrderStatus.ORDER)
+                .orderItems(List.of(OrderItem.builder().id(1L).item(item1Merchant1).build()))
                 .orderDate(LocalDateTime.now().minusDays(5))
                 .build();
 
@@ -90,9 +95,9 @@ public class OrderServiceTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("order")
+                .status(OrderStatus.ORDER)
                 .orderNumber("12345")
-                .orderItems(OrderItem.builder().id(2L).item(item2Merchant1).build())
+                .orderItems(List.of(OrderItem.builder().id(2L).item(item2Merchant1).build()))
                 .orderDate(LocalDateTime.now())
                 .build();
 
@@ -102,8 +107,8 @@ public class OrderServiceTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("order")
-                .orderItems(OrderItem.builder().id(3L).item(item3Merchant1).build())
+                .status(OrderStatus.ORDER)
+                .orderItems(List.of(OrderItem.builder().id(3L).item(item3Merchant1).build()))
                 .orderDate(LocalDateTime.now().minusDays(4))
                 .build();
 
@@ -113,9 +118,9 @@ public class OrderServiceTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("order")
+                .status(OrderStatus.ORDER)
                 .orderDate(LocalDateTime.now().minusDays(2))
-                .orderItems(OrderItem.builder().id(4L).item(item1Merchant2).build())
+                .orderItems(List.of(OrderItem.builder().id(4L).item(item1Merchant2).build()))
                 .build();
 
         Order order5 = Order.builder()
@@ -124,8 +129,8 @@ public class OrderServiceTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("order")
-                .orderItems(OrderItem.builder().id(5L).item(item2Merchant2).build())
+                .status(OrderStatus.ORDER)
+                .orderItems(List.of(OrderItem.builder().id(5L).item(item2Merchant2).build()))
                 .orderDate(LocalDateTime.now().plusDays(5))
                 .build();
 
@@ -151,6 +156,29 @@ public class OrderServiceTest {
         //then
         assertThat(orderService).isNotNull();
         assertThat(orderRepository).isNotNull();
+    }
+
+    @Test
+    void order() throws Exception {
+        //given
+        Customer customer = Customer.builder().name("테스트").address(new Address("city", "street", "11111")).build();
+        Item item = Item.builder().quantity(100).build();
+        OrderItem orderItem = OrderItem.builder().item(item).build();
+        Order order = Order.builder()
+                .customer(customer)
+                .orderItems(List.of(orderItem))
+                .build();
+        Cart cart = Cart.builder().customer(customer).cartItems(List.of(CartItem.builder().item(item).build())).build();
+        given(cartRepository.findCartWithItems(customer.getId())).willReturn(cart);
+
+        //when
+        String paymentMethod = "MOCK_PAY";
+        Long orderId = orderService.order(customer.getId(), paymentMethod);
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        //then
+        Order foundOrder = orderRepository.findById(orderId).orElseThrow(() -> new NullPointerException("해당 주문이 없습니다."));
+        assertThat(foundOrder.getCustomer()).isEqualTo(customer);
     }
 
 
@@ -199,11 +227,11 @@ public class OrderServiceTest {
     @Test
     void findAllByStatus() throws Exception {
         //given
-        given(orderRepository.findAllByStatus("order"))
+        given(orderRepository.findAllByStatus(OrderStatus.ORDER))
                 .willReturn(List.of(orders.get(0), orders.get(2), orders.get(3)));
 
         //when
-        List<OrderDto> orders = orderService.findAllByStatus("order");
+        List<OrderDto> orders = orderService.findAllByStatus(OrderStatus.ORDER);
 
         //then
         assert orders != null;
@@ -236,7 +264,7 @@ public class OrderServiceTest {
 
         //then
         assert order != null;
-        assertThat(order.getStatus()).isEqualTo("order");
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.ORDER);
     }
 
     @Test

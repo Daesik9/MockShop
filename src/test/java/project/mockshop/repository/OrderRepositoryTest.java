@@ -99,8 +99,8 @@ public class OrderRepositoryTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("order")
-                .orderItems(orderItem1)
+                .status(OrderStatus.ORDER)
+                .orderItems(List.of(orderItem1))
                 .orderDate(LocalDateTime.now().minusDays(5))
                 .build();
 
@@ -110,9 +110,9 @@ public class OrderRepositoryTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("delivered")
+                .status(OrderStatus.DELIVERED)
                 .orderNumber("12345")
-                .orderItems(orderItem2)
+                .orderItems(List.of(orderItem2))
                 .orderDate(LocalDateTime.now())
                 .build();
 
@@ -122,8 +122,8 @@ public class OrderRepositoryTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("order")
-                .orderItems(orderItem3)
+                .status(OrderStatus.ORDER)
+                .orderItems(List.of(orderItem3))
                 .orderDate(LocalDateTime.now().minusDays(4))
                 .build();
 
@@ -133,9 +133,9 @@ public class OrderRepositoryTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("delivered")
+                .status(OrderStatus.DELIVERED)
                 .orderDate(LocalDateTime.now().minusDays(2))
-                .orderItems(orderItem4)
+                .orderItems(List.of(orderItem4))
                 .build();
 
         OrderItem orderItem5 = OrderItem.builder().item(item2Merchant2).build();
@@ -144,8 +144,8 @@ public class OrderRepositoryTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("order")
-                .orderItems(orderItem5)
+                .status(OrderStatus.ORDER)
+                .orderItems(List.of(orderItem5))
                 .orderDate(LocalDateTime.now().plusDays(5))
                 .build();
 
@@ -202,7 +202,7 @@ public class OrderRepositoryTest {
         //given
 
         //when
-        List<Order> orders = orderRepository.findAllByStatus("order");
+        List<Order> orders = orderRepository.findAllByStatus(OrderStatus.ORDER);
 
         //then
         assertThat(orders.size()).isEqualTo(3);
@@ -229,7 +229,7 @@ public class OrderRepositoryTest {
         Order order = orderRepository.findByOrderNumber("12345");
 
         //then
-        assertThat(order.getStatus()).isEqualTo("delivered");
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     }
 
     @Test

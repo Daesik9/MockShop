@@ -107,7 +107,7 @@ public class CustomerValidator {
 
     public static void validateEmail(String email) {
         final String EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
-        if (!email.matches(EMAIL_PATTERN)) {
+        if (email == null || !email.matches(EMAIL_PATTERN)) {
             throw new IllegalArgumentException("이메일 형식을 다시 확인해주세요.");
         }
     }

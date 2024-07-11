@@ -15,6 +15,8 @@ public class OrderMapper {
                 .orderItems(order.getOrderItems().stream().map(OrderItemMapper::toDto).toList())
                 .status(order.getStatus())
                 .orderDate(order.getOrderDate())
+                .paymentMethod(order.getPaymentMethod())
+                .address(order.getAddress())
                 .build();
     }
 }

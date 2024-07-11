@@ -3,6 +3,7 @@ package project.mockshop.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import project.mockshop.entity.Customer;
 import project.mockshop.entity.Order;
+import project.mockshop.entity.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +19,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
 
     Order findByOrderNumber(String orderNumber);
 
-    List<Order> findAllByStatus(String status);
+    List<Order> findAllByStatus(OrderStatus status);
 
     List<Order> findAllByOrderDateBetween(LocalDateTime from, LocalDateTime to);
 }

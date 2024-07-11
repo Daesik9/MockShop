@@ -3,10 +3,12 @@ package project.mockshop.entity;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Embeddable
 @NoArgsConstructor
 @Getter
+@ToString(of = {"city", "street", "zipcode"})
 public class Address {
     private String city;
     private String street;

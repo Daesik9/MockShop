@@ -3,9 +3,9 @@ package project.mockshop.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.mockshop.dto.OrderDto;
-import project.mockshop.entity.Customer;
-import project.mockshop.entity.Order;
+import project.mockshop.entity.*;
 import project.mockshop.mapper.OrderMapper;
+import project.mockshop.repository.CartRepository;
 import project.mockshop.repository.OrderRepository;
 
 import java.time.LocalDateTime;
@@ -16,6 +16,7 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final CartRepository cartRepository;
 
 //    public List<OrderDto> findAllByMerchant(Merchant merchant) {
 //        List<Order> orders = orderRepository.findAllByMerchant(merchant);
@@ -71,11 +72,30 @@ public class OrderService {
         return orderRepository.findAllByOrderDateBetween(from, to).stream().map(OrderMapper::toDto).toList();
     }
 
-    public List<OrderDto> findAllByStatus(String status) {
+    public List<OrderDto> findAllByStatus(OrderStatus status) {
         return orderRepository.findAllByStatus(status).stream().map(OrderMapper::toDto).toList();
     }
 
     public List<OrderDto> findAll() {
         return orderRepository.findAll().stream().map(OrderMapper::toDto).toList();
+    }
+
+    public Long order(Long customerId, String paymentMethod) {
+        //장바구니에서 상품 가져오기
+        Cart cart = cartRepository.findCartWithItems(customerId);
+
+        //장바구니에 든 상품들로 OrderItem 만들기
+        List<OrderItem> orderItems = cart.getCartItems().stream()
+                .map(ci -> OrderItem.createOrderItem(ci.getItem(), ci.getCartPrice(), ci.getCount()))
+                .toList();
+
+        //Order 만들기
+        Order newOrder = Order.createOrder(cart.getCustomer(), paymentMethod, orderItems);
+
+        orderRepository.save(newOrder);
+
+        cart.removeAllCartItems();
+
+        return newOrder.getId();
     }
 }

@@ -22,8 +22,8 @@ public class OrderTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("order")
-                .orderItems(OrderItem.builder().item(item).build())
+                .status(OrderStatus.ORDER)
+                .orderItems(List.of(OrderItem.builder().item(item).build()))
                 .build();
 
         //when
@@ -44,8 +44,8 @@ public class OrderTest {
                 .address(new Address("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("order")
-                .orderItems()
+                .status(OrderStatus.ORDER)
+                .orderItems(List.of())
                 .build())
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("주문 상품이 없습니다.");
@@ -67,8 +67,8 @@ public class OrderTest {
                 .address(null)
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
-                .status("order")
-                .orderItems(OrderItem.builder().item(item).build())
+                .status(OrderStatus.ORDER)
+                .orderItems(List.of(OrderItem.builder().item(item).build()))
                 .build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(MockShopPolicy.INPUT_STRING_METHOD("배송지"));
