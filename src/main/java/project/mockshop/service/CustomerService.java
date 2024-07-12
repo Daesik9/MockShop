@@ -116,7 +116,9 @@ public class CustomerService {
         }
 
         customer.changeName(updateProfileDto.getName());
-        customer.changePassword(updateProfileDto.getPassword());
+        if (!updateProfileDto.getPassword().isEmpty()) { // 비밀번호를 변경 안 하는 경우에는 그냥 빈 칸으로 보냄.
+            customer.changePassword(updateProfileDto.getPassword());
+        }
         customer.changeEmail(updateProfileDto.getEmail());
         customer.changePhoneNumber(updateProfileDto.getPhoneNumber());
         customer.changeAddress(updateProfileDto.getAddress());
