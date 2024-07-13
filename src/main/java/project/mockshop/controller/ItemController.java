@@ -28,4 +28,11 @@ public class ItemController {
 
         return Response.success(HttpStatus.OK.value(), item);
     }
+
+    @GetMapping("/items/best-five")
+    public Response getBestFiveThisWeek() {
+        List<ItemDto> bestFiveThisWeek = itemService.findBestFiveThisWeek();
+
+        return Response.success(bestFiveThisWeek);
+    }
 }
