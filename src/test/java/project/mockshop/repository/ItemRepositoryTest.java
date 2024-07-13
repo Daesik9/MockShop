@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import project.mockshop.entity.Category;
 import project.mockshop.entity.Item;
+import project.mockshop.entity.Order;
+import project.mockshop.entity.OrderItem;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +18,8 @@ import static org.assertj.core.api.Assertions.*;
 public class ItemRepositoryTest {
     @Autowired
     ItemRepository itemRepository;
+    @Autowired
+    OrderRepository orderRepository;
 
     @Test
     void repositoryNotNull() throws Exception {
@@ -128,4 +133,57 @@ public class ItemRepositoryTest {
         assertThat(changedItem.getDescriptionImg3()).isEqualTo("new-image3.png");
         assertThat(changedItem.getPercentOff()).isEqualTo(0.7);
     }
+
+    @Test
+    void getBestFiveItemsThisWeek() throws Exception {
+        //given
+        Item item1 = Item.builder().name("1등").quantity(100).price(1000).build();
+        Item item2 = Item.builder().name("2등").quantity(100).price(1000).build();
+        Item item3 = Item.builder().name("3등").quantity(100).price(1000).build();
+        Item item4 = Item.builder().name("4등").quantity(100).price(1000).build();
+        Item item5 = Item.builder().name("5등").quantity(100).price(1000).build();
+        Item item6 = Item.builder().name("6등").quantity(100).price(1000).build();
+        Item item7 = Item.builder().name("7등").quantity(100).price(1000).build();
+        Item item8 = Item.builder().name("8등").quantity(100).price(1000).build();
+        Item item9 = Item.builder().name("9등").quantity(100).price(1000).build();
+        Item item10 = Item.builder().name("10등").quantity(100).price(1000).build();
+        itemRepository.saveAll(List.of(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10));
+
+        OrderItem orderItem1 = OrderItem.builder().item(item1).count(1).build();
+        OrderItem orderItem2 = OrderItem.builder().item(item2).count(4).build();
+        OrderItem orderItem3 = OrderItem.builder().item(item3).count(3).build();
+        OrderItem orderItem4 = OrderItem.builder().item(item4).count(2).build();
+        OrderItem orderItem5 = OrderItem.builder().item(item5).count(1).build();
+        Order order = Order.builder()
+                .orderItems(List.of(orderItem1, orderItem2, orderItem3, orderItem4, orderItem5))
+                .orderDate(LocalDateTime.now())
+                .build();
+
+        OrderItem orderItem6 = OrderItem.builder().item(item1).count(10).build();
+        Order order2 = Order.builder()
+                .orderItems(List.of(orderItem6))
+                .orderDate(LocalDateTime.now().minusDays(4))
+                .build();
+
+        OrderItem orderItem7 = OrderItem.builder().item(item7).count(50).build();
+        Order order3 = Order.builder()
+                .orderItems(List.of(orderItem7))
+                .orderDate(LocalDateTime.now().minusDays(10))
+                .build();
+
+        orderRepository.save(order);
+        orderRepository.save(order2);
+        orderRepository.save(order3);
+
+        //when
+        List<Item> items = itemRepository.findBestFiveThisWeek();
+
+        //then
+        assertThat(items.size()).isEqualTo(5);
+        assertThat(items.get(0).getName()).isEqualTo("1등");
+        assertThat(items.get(4).getName()).isEqualTo("5등");
+        assertThat(items).doesNotContain(item7);
+    }
+    
+    
 }

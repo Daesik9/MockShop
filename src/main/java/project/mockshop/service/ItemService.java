@@ -62,4 +62,8 @@ public class ItemService {
     public List<ItemDto> findDiscountItems() {
         return itemRepository.findAllByDiscount().stream().map(ItemMapper::toDto).toList();
     }
+
+    public List<ItemDto> findBestFiveThisWeek() {
+        return itemRepository.findBestFiveThisWeek().stream().map(ItemMapper::toDto).toList();
+    }
 }
