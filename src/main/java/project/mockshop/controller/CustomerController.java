@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import project.mockshop.dto.*;
 import project.mockshop.response.Response;
+import project.mockshop.service.CouponService;
 import project.mockshop.service.CustomerService;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomerController {
     private final CustomerService customerService;
+    private final CouponService couponService;
 
     @PostMapping("/users")
     public Response createAccount(@RequestBody CustomerCreationDto creationDto) {
@@ -65,5 +67,12 @@ public class CustomerController {
         customerService.updateProfile(updateProfileDto);
 
         return Response.success();
+    }
+
+    @GetMapping("/users/coupons/{customerId}")
+    public Response getAllCoupons(@PathVariable Long customerId) {
+        List<CouponItemDto> couponItemDtos = couponService.getAllCouponItemsByCustomerId(customerId);
+
+        return Response.success(couponItemDtos);
     }
 }

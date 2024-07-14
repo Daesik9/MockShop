@@ -15,13 +15,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.dto.*;
 import project.mockshop.entity.Address;
-import project.mockshop.mapper.CustomerMapper;
-import project.mockshop.policy.CustomerPolicy;
+import project.mockshop.service.CouponService;
 import project.mockshop.service.CustomerService;
 
-import javax.swing.text.html.Option;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -38,6 +35,8 @@ public class UserControllerTest {
 
     @Mock
     private CustomerService customerService;
+    @Mock
+    private CouponService couponService;
 
     @BeforeEach
     void init() {
@@ -282,6 +281,24 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.code").value(400));
     }
 
+    @Test
+    void getAllCouponItems() throws Exception {
+        //given
+
+        CustomerDto customer = CustomerDto.builder().id(1L).build();
+        CouponItemDto couponItemDto = CouponItemDto.builder().customerDto(customer).build();
+        given(couponService.getAllCouponItemsByCustomerId(customer.getId())).willReturn(List.of(couponItemDto));
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/users/coupons/{customerId}", customer.getId())
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.result.data[0].customerDto.id").value(1L));
+    }
 
 
 }

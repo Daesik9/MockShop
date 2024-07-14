@@ -14,10 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.dto.*;
 import project.mockshop.entity.Address;
+import project.mockshop.service.CouponService;
 import project.mockshop.service.CustomerService;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,6 +35,8 @@ public class UserControllerSpringTest {
     private CustomerController customerController;
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private CouponService couponService;
     private MockMvc mockMvc;
     private ObjectMapper objectMapper = new ObjectMapper();
     Long userId;
@@ -249,6 +255,33 @@ public class UserControllerSpringTest {
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
         assertThat(customerService.findOne(userId).getName()).isEqualTo("새이름");
+    }
+
+    @Test
+    void getAllCouponItems() throws Exception {
+        //given
+        CouponDto couponDto = CouponDto.builder().build();
+        CustomerCreationDto requestDto = CustomerCreationDto.builder()
+                .loginId("newloginid")
+                .name("테스트")
+                .password("Password1!")
+                .phoneNumber("01011111111")
+                .email("email@email.com")
+                .address(new Address("city", "street", "88888"))
+                .build();
+        Long customerId = customerService.createAccount(requestDto);
+        Long couponId = couponService.createCoupon(couponDto);
+        couponService.issueCoupon(couponId, customerId);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/users/coupons/{customerId}", customerId)
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.result.data[0].customerDto.id").value(customerId));
     }
 }
 

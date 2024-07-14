@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 public class CouponDto {
+    private Long id;
     private String name;
     private int priceOff;
     private double percentOff;
