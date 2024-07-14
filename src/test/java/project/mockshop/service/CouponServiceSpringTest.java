@@ -1,24 +1,14 @@
 package project.mockshop.service;
 
-import jakarta.transaction.Transactional;
-import lombok.Builder;
-import lombok.Getter;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.CouponDto;
 import project.mockshop.dto.CouponItemDto;
 import project.mockshop.entity.Coupon;
 import project.mockshop.entity.CouponItem;
 import project.mockshop.entity.Customer;
-import project.mockshop.entity.Item;
-import project.mockshop.mapper.CouponMapper;
 import project.mockshop.policy.MockShopPolicy;
 import project.mockshop.repository.CouponItemRepository;
 import project.mockshop.repository.CouponRepository;
@@ -26,36 +16,33 @@ import project.mockshop.repository.CustomerRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-public class CouponServiceTest {
-    @InjectMocks
-    CouponService couponService;
-
-    @Mock
-    CouponRepository couponRepository;
-    @Mock
-    CustomerRepository customerRepository;
-    @Mock
-    CouponItemRepository couponItemRepository;
+@SpringBootTest
+@Transactional
+public class CouponServiceSpringTest {
+    @Autowired
+    private CouponService couponService;
+    @Autowired
+    private CouponRepository couponRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
+    @Autowired
+    private CouponItemRepository couponItemRepository;
 
 
     @Test
-    void serviceRepositoryNotNull() throws Exception {
+    void notNull() throws Exception {
         //given
 
         //when
 
         //then
         assertThat(couponService).isNotNull();
-        assertThat(couponRepository).isNotNull();
     }
+
 
     @Test
     void createCoupon() throws Exception {
@@ -69,8 +56,6 @@ public class CouponServiceTest {
 
         //when
         Long couponId = couponService.createCoupon(couponDtoPriceOff);
-        when(couponRepository.findById(couponId))
-                .thenReturn(Optional.ofNullable(CouponMapper.toEntity(couponDtoPriceOff)));
 
         //then
         Coupon findCoupon = couponRepository.findById(couponId).orElse(null);
@@ -116,33 +101,37 @@ public class CouponServiceTest {
         Coupon coupon = Coupon.builder().build();
         Customer customer = Customer.builder().build();
         CouponItem couponItem = CouponItem.builder().customer(customer).coupon(coupon).build();
+        couponRepository.save(coupon);
+        customerRepository.save(customer);
+        couponItemRepository.save(couponItem);
+
 
         //when
-        when(couponItemRepository.findAllByCustomerId(customer.getId())).thenReturn(List.of(couponItem));
         List<CouponItemDto> couponItemDtos = couponService.getAllCouponItemsByCustomerId(customer.getId());
 
         //then
         assertThat(couponItemDtos.size()).isEqualTo(1);
     }
 
+
     @Test
     void issueCoupon() throws Exception {
         //given
         Coupon coupon = Coupon.builder().build();
         Customer customer = Customer.builder().build();
-        given(customerRepository.findById(customer.getId())).willReturn(Optional.of(customer));
-        given(couponRepository.findById(coupon.getId())).willReturn(Optional.of(coupon));
         CouponItem couponItem = CouponItem.builder().coupon(coupon).customer(customer).build();
+        couponRepository.save(coupon);
+        customerRepository.save(customer);
 
         //when
         Long couponItemId = couponService.issueCoupon(coupon.getId(), customer.getId());
-        given(couponItemRepository.findAllByCustomerId(customer.getId())).willReturn(List.of(couponItem));
-        
+        List<CouponItemDto> couponItemDtos = couponService.getAllCouponItemsByCustomerId(customer.getId());
+
         //then
-        List<CouponItem> couponItems = couponItemRepository.findAllByCustomerId(customer.getId());
-        assertThat(couponItems.size()).isEqualTo(1);
-        verify(couponItemRepository, times(1)).save(any(CouponItem.class));
+        assertThat(couponItemDtos.size()).isEqualTo(1);
     }
-    
-    
+
+
+
+
 }
