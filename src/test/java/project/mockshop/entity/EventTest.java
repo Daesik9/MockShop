@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import project.mockshop.policy.MockShopPolicy;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -24,6 +25,7 @@ public class EventTest {
                 .maxParticipants(100)
                 .startDate(startDate)
                 .endDate(endDate)
+                .eventRewards(List.of(EventReward.builder().build()))
                 .build();
 
         //then

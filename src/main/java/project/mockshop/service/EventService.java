@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.EventCreationDto;
+import project.mockshop.dto.EventDto;
 import project.mockshop.dto.EventRewardDto;
 import project.mockshop.entity.*;
+import project.mockshop.mapper.EventMapper;
 import project.mockshop.repository.CouponRepository;
 import project.mockshop.repository.CustomerRepository;
 import project.mockshop.repository.EventParticipantRepository;
@@ -87,5 +89,18 @@ public class EventService {
             }
         }
 
+    }
+
+    public List<EventDto> getOnGoingEvents() {
+        LocalDateTime dateTime = LocalDateTime.of(2024, 7, 16, 15, 49);
+        List<Event> onGoingEvents = eventRepository.findAllByDateTime(dateTime);
+        return onGoingEvents.stream().map(EventMapper::toDto).toList();
+    }
+
+    public EventDto getEventDetail(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("해당 이벤트가 없습니다."));
+
+        return EventMapper.toDto(event);
     }
 }
