@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import project.mockshop.dto.CouponItemDto;
 import project.mockshop.dto.EventCreationDto;
+import project.mockshop.dto.EventDto;
 import project.mockshop.dto.EventRewardDto;
 import project.mockshop.entity.*;
 import project.mockshop.repository.*;
@@ -212,5 +213,59 @@ public class EventServiceTest {
         List<CouponItemDto> couponItemDtos = couponService.getAllCouponItemsByCustomerId(customerId);
         assertThat(couponItemDtos.size()).isEqualTo(0);
     }
+    
+    @Test
+    void getOnGoingEvents() throws Exception {
+        //given
+        Event event1 = Event.builder()
+                .startDate(LocalDateTime.now().minusDays(3))
+                .endDate(LocalDateTime.now().plusDays(3))
+                .eventRewards(List.of(EventReward.builder().build()))
+                .build();
+        //이미 끝난 이벤트
+        Event event2 = Event.builder()
+                .startDate(LocalDateTime.now().minusDays(3))
+                .endDate(LocalDateTime.now().minusDays(1))
+                .eventRewards(List.of(EventReward.builder().build()))
+                .build();
+        //아직 시작 안 한 이벤트
+        Event event3 = Event.builder()
+                .startDate(LocalDateTime.now().plusDays(1))
+                .endDate(LocalDateTime.now().plusDays(3))
+                .eventRewards(List.of(EventReward.builder().build()))
+                .build();
+
+        LocalDateTime dateTime = LocalDateTime.of(2024, 7, 16, 15, 49);
+        given(eventRepository.findAllByDateTime(dateTime)).willReturn(List.of(event1));
+        
+        //when
+        List<EventDto> eventDtos = eventService.getOnGoingEvents();
+        
+        //then
+        assertThat(eventDtos.size()).isEqualTo(1);
+    }
+
+    @Test
+    void getEventDetail() throws Exception {
+        //given
+        Event event = Event.builder()
+                .id(1L)
+                .name("이벤트")
+                .startDate(LocalDateTime.now().minusDays(3))
+                .endDate(LocalDateTime.now().plusDays(3))
+                .eventRewards(List.of(EventReward.builder().build()))
+                .build();
+        given(eventRepository.findById(event.getId())).willReturn(Optional.of(event));
+
+        //when
+        EventDto eventDto = eventService.getEventDetail(event.getId());
+
+        //then
+        assertThat(eventDto.getName()).isEqualTo("이벤트");
+    }
+
+
+
+
 
 }

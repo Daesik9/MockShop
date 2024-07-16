@@ -569,7 +569,7 @@ public class ItemServiceSpringTest {
         OrderItem orderItem6 = OrderItem.builder().item(item1).count(10).build();
         Order order2 = Order.builder()
                 .orderItems(List.of(orderItem6))
-                .orderDate(LocalDateTime.now().minusDays(4))
+                .orderDate(LocalDateTime.now().minusDays(1))
                 .build();
 
         OrderItem orderItem7 = OrderItem.builder().item(item7).count(50).build();

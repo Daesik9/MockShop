@@ -27,6 +27,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -155,6 +157,73 @@ public class EventControllerSpringTest {
                 .andExpect(jsonPath("$.code").value(200));
 
         assertThat(couponService.getAllCouponItemsByCustomerId(customerId).size()).isEqualTo(10);
+    }
+
+    @Test
+    void getOnGoingEvents() throws Exception {
+        //given
+        CouponDto couponDtoPriceOff = CouponDto.builder()
+                .name("coupon")
+                .priceOff(1000)
+                .expiredDate(LocalDateTime.now().plusDays(30))
+                .minPriceRequired(1000)
+                .build();
+        Long couponId = couponService.createCoupon(couponDtoPriceOff);
+
+        EventCreationDto eventCreationDto = EventCreationDto.builder()
+                .name("이벤트")
+                .photo("event_banner.png")
+                .maxParticipationNumber(100)
+                .startDate(LocalDateTime.now().minusDays(1))
+                .endDate(LocalDateTime.now().plusDays(10))
+                .eventRewardDtos(List.of(EventRewardDto.builder().couponId(couponId).count(10).build()))
+                .build();
+        Long eventId = eventService.createEvent(eventCreationDto);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/events/ongoing")
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.result.data[0].name").value("이벤트"));
+    }
+
+    @Test
+    void getEventDetail() throws Exception {
+        //given
+        CouponDto couponDtoPriceOff = CouponDto.builder()
+                .name("coupon")
+                .priceOff(1000)
+                .expiredDate(LocalDateTime.now().plusDays(30))
+                .minPriceRequired(1000)
+                .build();
+        Long couponId = couponService.createCoupon(couponDtoPriceOff);
+
+        EventCreationDto eventCreationDto = EventCreationDto.builder()
+                .name("이벤트")
+                .photo("event_banner.png")
+                .maxParticipationNumber(100)
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now().plusDays(10))
+                .eventRewardDtos(List.of(EventRewardDto.builder().couponId(couponId).count(10).build()))
+                .build();
+        Long eventId = eventService.createEvent(eventCreationDto);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/events/{eventId}", eventId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.result.data.name").value("이벤트"))
+                .andExpect(jsonPath("$.result.data.photo").value("event_banner.png"));
     }
 
 }
