@@ -235,8 +235,8 @@ public class EventServiceTest {
                 .eventRewards(List.of(EventReward.builder().build()))
                 .build();
 
-        LocalDateTime dateTime = LocalDateTime.of(2024, 7, 16, 15, 49);
-        given(eventRepository.findAllByDateTime(dateTime)).willReturn(List.of(event1));
+        //파라미터로 LocalDateTime.now()를 넣으면 eventService에서 호출하는 now()랑 시간이 달라서 오류 발생.
+        given(eventRepository.findAllByDateTime(any(LocalDateTime.class))).willReturn(List.of(event1));
         
         //when
         List<EventDto> eventDtos = eventService.getOnGoingEvents();
