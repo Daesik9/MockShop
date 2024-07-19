@@ -1,8 +1,10 @@
 package project.mockshop.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import project.mockshop.policy.MockShopPolicy;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,8 @@ import java.util.List;
 @Builder
 @Getter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class Event {
     @Id @GeneratedValue
     private Long id;

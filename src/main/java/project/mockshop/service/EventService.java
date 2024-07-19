@@ -92,7 +92,7 @@ public class EventService {
     }
 
     public List<EventDto> getOnGoingEvents() {
-        LocalDateTime dateTime = LocalDateTime.of(2024, 7, 16, 15, 49);
+        LocalDateTime dateTime = LocalDateTime.now();
         List<Event> onGoingEvents = eventRepository.findAllByDateTime(dateTime);
         return onGoingEvents.stream().map(EventMapper::toDto).toList();
     }
