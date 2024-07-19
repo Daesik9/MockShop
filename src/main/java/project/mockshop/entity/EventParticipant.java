@@ -1,8 +1,10 @@
 package project.mockshop.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 //     * even_participant
 //     * id
@@ -12,6 +14,8 @@ import lombok.Getter;
 @Entity
 @Builder
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class EventParticipant {
     @Id @GeneratedValue
     private Long id;
