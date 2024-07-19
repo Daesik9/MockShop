@@ -275,7 +275,7 @@ public class UserControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/coupons/{customerId}", customerId)
+                get("/api/users/{customerId}/coupons", customerId)
         );
 
         //then

@@ -291,7 +291,7 @@ public class UserControllerTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/coupons/{customerId}", customer.getId())
+                get("/api/users/{customerId}/coupons", customer.getId())
         );
 
         //then

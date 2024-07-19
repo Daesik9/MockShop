@@ -69,7 +69,7 @@ public class CustomerController {
         return Response.success();
     }
 
-    @GetMapping("/users/coupons/{customerId}")
+    @GetMapping("/users/{customerId}/coupons")
     public Response getAllCoupons(@PathVariable Long customerId) {
         List<CouponItemDto> couponItemDtos = couponService.getAllCouponItemsByCustomerId(customerId);
 
