@@ -1,8 +1,12 @@
 package project.mockshop.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.mockshop.dto.ItemDto;
+import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.Category;
 import project.mockshop.entity.Item;
 import project.mockshop.mapper.ItemMapper;
@@ -13,6 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ItemService {
     private final ItemRepository itemRepository;
 
@@ -34,6 +39,10 @@ public class ItemService {
 
     public List<ItemDto> findItemsByNameLike(String name) {
         return itemRepository.findAllByNameLike("%" + name + "%").stream().map(ItemMapper::toDto).toList();
+    }
+
+    public Page<ItemDto> findItemsByNameLike(String name, Pageable pageable) {
+        return itemRepository.findAllByNameLike("%" + name + "%", pageable).map(ItemMapper::toDto);
     }
 
     public List<ItemDto> findAllByCategory(Category category) {
@@ -65,5 +74,15 @@ public class ItemService {
 
     public List<ItemDto> findBestFiveThisWeek() {
         return itemRepository.findBestFiveThisWeek().stream().map(ItemMapper::toDto).toList();
+    }
+
+//    public Page<ItemDto> search(ItemSearchCondition searchCond, Pageable pageable) {
+//        log.info("itemService search " + searchCond + " " + pageable);
+//        return itemRepository.search(searchCond, pageable).map(ItemMapper::toDto);
+//    }
+
+    public Page<ItemDto> search(ItemSearchCondition searchCond, Pageable pageable) {
+        log.info("itemService search " + searchCond + " " + pageable);
+        return itemRepository.search(searchCond, pageable).map(ItemMapper::toDto);
     }
 }

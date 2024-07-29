@@ -3,11 +3,13 @@ package project.mockshop.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import project.mockshop.entity.Category;
 import project.mockshop.entity.Merchant;
 
 @Builder
 @Getter
+@ToString(of = {"name", "price", "quantity"})
 public class ItemDto {
     private Long id;
     private String name;

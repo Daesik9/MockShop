@@ -5,6 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -12,10 +16,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.dto.ItemDto;
+import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.dto.OrderRequestDto;
-import project.mockshop.entity.Item;
-import project.mockshop.entity.Order;
-import project.mockshop.entity.OrderItem;
+import project.mockshop.entity.*;
 import project.mockshop.mapper.ItemMapper;
 import project.mockshop.repository.ItemRepository;
 import project.mockshop.repository.OrderRepository;
@@ -23,11 +26,13 @@ import project.mockshop.service.ItemService;
 import project.mockshop.service.OrderService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -112,6 +117,56 @@ public class ItemControllerSpringTest {
                 .andExpect(jsonPath("$.result.data[4].name").value("5등"));
     }
 
+    @Test
+    void search() throws Exception {
+        //given
+        Merchant merchant = Merchant.builder().name("merchant").build();
+        Category category = new Category("category");
+        List<Item> items = new ArrayList<>();
 
+        for (int i = 0; i < 100; i++) {
+            Item item = Item.builder()
+                    .name(i + "name" + i)
+//                    .category(category)
+                    .thumbnail("thumbnail.png")
+                    .price(1000 * (i + 1))
+                    .quantity(100)
+                    .descriptionImg1("img1.png")
+                    .descriptionImg2("img2.png")
+                    .descriptionImg3("img3.png")
+                    .percentOff((i + 1) % 2 == 0 ? 0 : 0.1) // 홀수번째 아이템만 할인.
+                    .build();
+
+            itemRepository.save(item);
+            items.add(item);
+        }
+
+        int page = 0;
+        int size = 8;
+        Pageable pageable = PageRequest.of(page, size);
+        ItemSearchCondition searchCond = ItemSearchCondition.builder()
+                .itemNameLike("name")
+                .priceGoe(3000)
+                .priceLoe(10000)
+                .isOnSale(true)
+                .sortBy("salesVolume")
+                .build();
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/items/search")
+                        .param("itemNameLike", searchCond.getItemNameLike())
+                        .param("priceGoe", searchCond.getPriceGoe().toString())
+                        .param("sortBy", searchCond.getSortBy())
+                        .param("page", String.valueOf(pageable.getPageNumber()))
+                        .param("size", String.valueOf(pageable.getPageSize()))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.data.content[0].name").value("2name2"))
+                .andExpect(jsonPath("$.result.data.content[0].price").value(3000));
+    }
 
 }

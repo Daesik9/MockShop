@@ -30,12 +30,10 @@ public class InitConfig {
 
     @PostConstruct
     public void init() {
-        itemService.createItem(ItemDto.builder().name("사과").price(1000).quantity(100).build(), 1L);
-        itemService.createItem(ItemDto.builder().name("사과").price(2000).quantity(100).build(), 1L);
-        itemService.createItem(ItemDto.builder().name("사과").price(3000).quantity(100).build(), 1L);
-        itemService.createItem(ItemDto.builder().name("사과").price(4000).quantity(100).build(), 1L);
-        itemService.createItem(ItemDto.builder().name("사과").price(5000).quantity(100).build(), 1L);
-        itemService.createItem(ItemDto.builder().name("사과").price(6000).quantity(100).build(), 1L);
+        for (int i = 0; i < 20; i++) {
+            ItemDto itemDto = ItemDto.builder().name("사과").price(1000 * (i + 1)).quantity(100).build();
+            itemService.createItem(itemDto, 1L);
+        }
 
         Customer customer = Customer.builder()
                 .name("테스트")

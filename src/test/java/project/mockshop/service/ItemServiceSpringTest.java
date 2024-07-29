@@ -5,7 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import project.mockshop.dto.ItemDto;
+import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.*;
 import project.mockshop.mapper.ItemMapper;
 import project.mockshop.repository.CategoryRepository;
@@ -14,10 +18,13 @@ import project.mockshop.repository.MerchantRepository;
 import project.mockshop.repository.OrderRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @Transactional
@@ -590,5 +597,64 @@ public class ItemServiceSpringTest {
         assertThat(items.get(0).getName()).isEqualTo("1등");
         assertThat(items.get(4).getName()).isEqualTo("5등");
         assertThat(items).doesNotContain(ItemMapper.toDto(item7));
+    }
+
+    @Test
+    void search() throws Exception {
+        //given
+        Merchant merchant = Merchant.builder().name("merchant").build();
+//        Category category = new Category("category");
+        List<Item> items = new ArrayList<>();
+
+        for (int i = 0; i < 100; i++) {
+            Item item = Item.builder()
+                    .name(i + "name" + i)
+//                    .category(category)
+                    .thumbnail("thumbnail.png")
+                    .price(1000 * (i + 1))
+                    .quantity(100)
+                    .descriptionImg1("img1.png")
+                    .descriptionImg2("img2.png")
+                    .descriptionImg3("img3.png")
+                    .percentOff((i + 1) % 2 == 0 ? 0 : 0.1) // 홀수번째 아이템만 할인.
+                    .build();
+
+            itemRepository.save(item);
+            items.add(item);
+        }
+
+        OrderItem orderItem5 = OrderItem.builder().item(items.get(4)).count(10).build();
+        OrderItem orderItem7 = OrderItem.builder().item(items.get(6)).count(5).build();
+
+        Order order = Order.builder()
+                .orderItems(List.of(orderItem5, orderItem7))
+                .orderDate(LocalDateTime.now())
+                .build();
+
+        orderRepository.save(order);
+
+        int page = 0;
+        int size = 8;
+        Pageable pageable = PageRequest.of(page, size);
+        ItemSearchCondition searchCond = ItemSearchCondition.builder()
+                .itemNameLike("name")
+                .priceGoe(1000)
+                .priceLoe(10000)
+                .isOnSale(true)
+                .sortBy("salesVolume")
+                .build();
+
+        //TODO: salesVolume으로 하는데 왜 63 얘가 제일 먼저 나오는거지?????
+        //판매량순으로 필터했을 때 null인 경우 때문에 순서가 꼬임.
+        //값이 같은 경우는 arbitrary하게 정렬이 됨.
+
+        //when
+        Page<ItemDto> findItems = itemService.search(searchCond, pageable);
+        System.out.println("findItems = " + findItems.getContent());
+
+        //then
+        assertThat(findItems.getNumberOfElements()).isEqualTo(5);
+        assertThat(findItems.getContent().get(0).getPrice()).isEqualTo(5000);
+        assertThat(findItems.getContent().get(1).getPrice()).isEqualTo(7000);
     }
 }
