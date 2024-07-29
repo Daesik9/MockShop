@@ -10,6 +10,7 @@ import project.mockshop.validator.ItemValidator;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@ToString(of = {"name", "price", "quantity"})
 public class Item {
     @Id @GeneratedValue
     private Long id;

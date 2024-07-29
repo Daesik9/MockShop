@@ -5,13 +5,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import project.mockshop.dto.ItemDto;
+import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.*;
 import project.mockshop.mapper.ItemMapper;
 import project.mockshop.repository.ItemRepository;
 import project.mockshop.repository.OrderRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -151,6 +157,49 @@ public class ItemServiceTest {
         //then
         assertThat(findItems.size()).isEqualTo(4);
         verify(itemRepository, times(1)).findAllByNameLike("%name%");
+    }
+
+    @Test
+    void search() throws Exception {
+        //given
+        Merchant merchant = Merchant.builder().name("merchant").build();
+        Category category = new Category("category");
+        List<ItemDto> itemDtos = new ArrayList<>();
+
+        for (int i = 0; i < 100; i++) {
+            ItemDto itemDto = ItemDto.builder()
+                    .name(i + "name" + i)
+                    .category(category)
+                    .thumbnail("thumbnail.png")
+                    .price(1000)
+                    .quantity(100)
+                    .descriptionImg1("img1.png")
+                    .descriptionImg2("img2.png")
+                    .descriptionImg3("img3.png")
+                    .percentOff(10)
+                    .build();
+
+            itemService.createItem(itemDto, merchant.getId());
+            itemDtos.add(itemDto);
+        }
+
+        Page<Item> pages = new PageImpl<>(itemDtos.subList(0, 8).stream().map(ItemMapper::toEntity).toList());
+
+        int page = 0;
+        int size = 8;
+        Pageable pageable = PageRequest.of(page, size);
+        ItemSearchCondition searchCond = ItemSearchCondition.builder()
+                .itemNameLike("name")
+                .build();
+
+        given(itemRepository.search(searchCond, pageable)).willReturn(pages);
+
+        //when
+        Page<ItemDto> findItems = itemService.search(searchCond, pageable);
+
+        //then
+        assertThat(findItems.getSize()).isEqualTo(8);
+        verify(itemRepository, times(1)).search(searchCond, pageable);
     }
 
     @Test
