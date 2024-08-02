@@ -85,7 +85,18 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-        return new PageImpl<>(content, pageable, content.size());
+
+        Long count = queryFactory
+                .select(item.count())
+                .from(item)
+                .leftJoin(orderItem).on(item.id.eq(orderItem.item.id))
+                .where(itemNameLike(searchCondition.getItemNameLike()),
+                        priceGoe(searchCondition.getPriceGoe()),
+                        priceLoe(searchCondition.getPriceLoe()),
+                        isOnSale(searchCondition.getIsOnSale()))
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, count);
     }
 
     private OrderSpecifier<?> getOrderSpecifier(String sortBy) {
@@ -114,6 +125,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     private BooleanExpression isOnSale(Boolean isOnSale) {
-        return isOnSale == null ? null : item.percentOff.gt(0);
+        return (isOnSale == null || !isOnSale) ? null : item.percentOff.gt(0);
     }
 }
