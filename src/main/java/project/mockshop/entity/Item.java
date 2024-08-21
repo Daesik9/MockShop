@@ -19,12 +19,37 @@ public class Item {
     @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 
-    private String thumbnail;
     private int price;
     private int quantity;
-    private String descriptionImg1;
-    private String descriptionImg2;
-    private String descriptionImg3;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "uploadFileName", column = @Column(name = "thumbnail_upload_file_name")),
+            @AttributeOverride(name = "storeFileName", column = @Column(name = "thumbnail_store_file_name"))
+    })
+    private UploadFile thumbnail;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "uploadFileName", column = @Column(name = "description_img1_upload_file_name")),
+            @AttributeOverride(name = "storeFileName", column = @Column(name = "description_img1_store_file_name"))
+    })
+    private UploadFile descriptionImg1;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "uploadFileName", column = @Column(name = "description_img2_upload_file_name")),
+            @AttributeOverride(name = "storeFileName", column = @Column(name = "description_img2_store_file_name"))
+    })
+    private UploadFile descriptionImg2;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "uploadFileName", column = @Column(name = "description_img3_upload_file_name")),
+            @AttributeOverride(name = "storeFileName", column = @Column(name = "description_img3_store_file_name"))
+    })
+    private UploadFile descriptionImg3;
+
     private double percentOff;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -50,19 +75,19 @@ public class Item {
         this.quantity = quantity;
     }
 
-    public void changeThumbnail(String thumbnail) {
+    public void changeThumbnail(UploadFile thumbnail) {
         this.thumbnail = thumbnail;
     }
 
-    public void changeDescriptionImg1(String descriptionImg1) {
+    public void changeDescriptionImg1(UploadFile descriptionImg1) {
         this.descriptionImg1 = descriptionImg1;
     }
 
-    public void changeDescriptionImg2(String descriptionImg2) {
+    public void changeDescriptionImg2(UploadFile descriptionImg2) {
         this.descriptionImg2 = descriptionImg2;
     }
 
-    public void changeDescriptionImg3(String descriptionImg3) {
+    public void changeDescriptionImg3(UploadFile descriptionImg3) {
         this.descriptionImg3 = descriptionImg3;
     }
 

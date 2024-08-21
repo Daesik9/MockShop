@@ -3,10 +3,7 @@ package project.mockshop.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import project.mockshop.entity.Category;
-import project.mockshop.entity.Item;
-import project.mockshop.entity.Order;
-import project.mockshop.entity.OrderItem;
+import project.mockshop.entity.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -113,10 +110,10 @@ public class ItemRepositoryTest {
         findItem.changeCategory(category);
         findItem.changePrice(10000);
         findItem.changeQuantity(10000);
-        findItem.changeThumbnail("new-thumbnail.png");
-        findItem.changeDescriptionImg1("new-image1.png");
-        findItem.changeDescriptionImg2("new-image2.png");
-        findItem.changeDescriptionImg3("new-image3.png");
+        findItem.changeThumbnail(UploadFile.builder().storeFileName("new-thumbnail.png").build());
+        findItem.changeDescriptionImg1(UploadFile.builder().storeFileName("new-image1.png").build());
+        findItem.changeDescriptionImg2(UploadFile.builder().storeFileName("new-image2.png").build());
+        findItem.changeDescriptionImg3(UploadFile.builder().storeFileName("new-image3.png").build());
         findItem.changePercentOff(0.7);
 
         //then
@@ -127,10 +124,10 @@ public class ItemRepositoryTest {
         assertThat(changedItem.getCategory()).isEqualTo(category);
         assertThat(changedItem.getPrice()).isEqualTo(10000);
         assertThat(changedItem.getQuantity()).isEqualTo(10000);
-        assertThat(changedItem.getThumbnail()).isEqualTo("new-thumbnail.png");
-        assertThat(changedItem.getDescriptionImg1()).isEqualTo("new-image1.png");
-        assertThat(changedItem.getDescriptionImg2()).isEqualTo("new-image2.png");
-        assertThat(changedItem.getDescriptionImg3()).isEqualTo("new-image3.png");
+        assertThat(changedItem.getThumbnail().getStoreFileName()).isEqualTo("new-thumbnail.png");
+        assertThat(changedItem.getDescriptionImg1().getStoreFileName()).isEqualTo("new-image1.png");
+        assertThat(changedItem.getDescriptionImg2().getStoreFileName()).isEqualTo("new-image2.png");
+        assertThat(changedItem.getDescriptionImg3().getStoreFileName()).isEqualTo("new-image3.png");
         assertThat(changedItem.getPercentOff()).isEqualTo(0.7);
     }
 

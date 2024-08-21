@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
+import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.*;
@@ -16,6 +18,7 @@ import project.mockshop.mapper.ItemMapper;
 import project.mockshop.repository.ItemRepository;
 import project.mockshop.repository.OrderRepository;
 
+import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,28 +59,38 @@ public class ItemServiceTest {
     @Test
     void createItem() throws Exception {
         //given
+        String path = "src/test/resources/image/image.png";
+        FileInputStream fileInputStream = new FileInputStream(path);
+        MockMultipartFile image1 = new MockMultipartFile(
+                "img1",
+                "img1.png",
+                "png",
+                fileInputStream
+        );
+
         Merchant merchant = Merchant.builder().name("merchant").build();
         Category category = new Category("category");
-        ItemDto itemDto = ItemDto.builder()
+        ItemCreationDto itemCreationDto = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
+                .thumbnail(image1)
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
+                .descriptionImg1(image1)
+                .descriptionImg2(image1)
+                .descriptionImg3(image1)
                 .percentOff(10)
                 .build();
 
         //when
-        Long itemId = itemService.createItem(itemDto, merchant.getId());
-        when(itemRepository.findById(itemId)).thenReturn(Optional.ofNullable(ItemMapper.toEntity(itemDto)));
+        Long itemId = itemService.createItem(itemCreationDto);
+        when(itemRepository.findById(itemId)).thenReturn(Optional.ofNullable(ItemMapper.toEntity(itemCreationDto)));
 
 
         //then
         Item findItem = itemRepository.findById(itemId).orElse(null);
         assertThat(findItem.getName()).isEqualTo("name");
+        assertThat(findItem.getThumbnail().getUploadFileName()).isEqualTo("img1.png");
     }
 
     @Test
@@ -85,68 +98,48 @@ public class ItemServiceTest {
         //given
         Merchant merchant = Merchant.builder().name("merchant").build();
         Category category = new Category("category");
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
 
-        itemService.createItem(itemDto1, merchant.getId());
-        itemService.createItem(itemDto2, merchant.getId());
-        itemService.createItem(itemDto3, merchant.getId());
-        itemService.createItem(itemDto4, merchant.getId());
-        itemService.createItem(itemDto5, merchant.getId());
-        Stream<ItemDto> itemDtos = Stream.of(itemDto1, itemDto2, itemDto3, itemDto4);
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
+        Stream<ItemCreationDto> itemDtos = Stream.of(itemDto1, itemDto2, itemDto3, itemDto4);
 
         given(itemRepository.findAllByNameLike("%name%"))
                 .willReturn(itemDtos.map(ItemMapper::toEntity).toList());
@@ -167,19 +160,23 @@ public class ItemServiceTest {
         List<ItemDto> itemDtos = new ArrayList<>();
 
         for (int i = 0; i < 100; i++) {
-            ItemDto itemDto = ItemDto.builder()
+            ItemCreationDto itemCreationDto = ItemCreationDto.builder()
                     .name(i + "name" + i)
                     .category(category)
-                    .thumbnail("thumbnail.png")
                     .price(1000)
                     .quantity(100)
-                    .descriptionImg1("img1.png")
-                    .descriptionImg2("img2.png")
-                    .descriptionImg3("img3.png")
                     .percentOff(10)
                     .build();
 
-            itemService.createItem(itemDto, merchant.getId());
+            ItemDto itemDto = ItemDto.builder()
+                    .name(i + "name" + i)
+                    .category(category)
+                    .price(1000)
+                    .quantity(100)
+                    .percentOff(10)
+                    .build();
+
+            itemService.createItem(itemCreationDto);
             itemDtos.add(itemDto);
         }
 
@@ -208,70 +205,48 @@ public class ItemServiceTest {
         Merchant merchant = Merchant.builder().name("merchant").build();
         Category category = new Category("category");
 
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
-                .merchant(merchant)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
-                .merchant(merchant)
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
 
-        itemService.createItem(itemDto1, merchant.getId());
-        itemService.createItem(itemDto2, merchant.getId());
-        itemService.createItem(itemDto3, merchant.getId());
-        itemService.createItem(itemDto4, merchant.getId());
-        itemService.createItem(itemDto5, merchant.getId());
-        Stream<ItemDto> itemDtos = Stream.of(itemDto1, itemDto2);
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
+        Stream<ItemCreationDto> itemDtos = Stream.of(itemDto1, itemDto2);
 
         given(itemRepository.findAllByMerchantName("merchant"))
                 .willReturn(itemDtos.map(ItemMapper::toEntity).toList());
@@ -288,68 +263,46 @@ public class ItemServiceTest {
         //given
         Merchant merchant = Merchant.builder().name("merchant").build();
         Category category = new Category("category");
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
-                .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
-                .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
 
-        itemService.createItem(itemDto1, merchant.getId());
-        itemService.createItem(itemDto2, merchant.getId());
-        itemService.createItem(itemDto3, merchant.getId());
-        itemService.createItem(itemDto4, merchant.getId());
-        itemService.createItem(itemDto5, merchant.getId());
-        Stream<ItemDto> itemDtos = Stream.of(itemDto1, itemDto2, itemDto3);
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
+        Stream<ItemCreationDto> itemDtos = Stream.of(itemDto1, itemDto2, itemDto3);
 
         given(itemRepository.findAllByCategory(category))
                 .willReturn(itemDtos.map(ItemMapper::toEntity).toList());
@@ -367,68 +320,48 @@ public class ItemServiceTest {
         //given
         Merchant merchant = Merchant.builder().name("merchant").build();
         Category category = new Category("category");
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(200)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(300)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(400)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(500)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
 
-        itemService.createItem(itemDto1, merchant.getId());
-        itemService.createItem(itemDto2, merchant.getId());
-        itemService.createItem(itemDto3, merchant.getId());
-        itemService.createItem(itemDto4, merchant.getId());
-        itemService.createItem(itemDto5, merchant.getId());
-        Stream<ItemDto> itemDtos = Stream.of(itemDto1, itemDto2, itemDto3);
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
+        Stream<ItemCreationDto> itemDtos = Stream.of(itemDto1, itemDto2, itemDto3);
         given(itemRepository.findAllByQuantity(0, 300))
                 .willReturn(itemDtos.map(ItemMapper::toEntity).toList());
 
@@ -454,68 +387,48 @@ public class ItemServiceTest {
         //given
         Merchant merchant = Merchant.builder().name("merchant").build();
         Category category = new Category("category");
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(2000)
                 .quantity(200)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(3000)
                 .quantity(300)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(4000)
                 .quantity(400)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(5000)
                 .quantity(500)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
 
-        itemService.createItem(itemDto1, merchant.getId());
-        itemService.createItem(itemDto2, merchant.getId());
-        itemService.createItem(itemDto3, merchant.getId());
-        itemService.createItem(itemDto4, merchant.getId());
-        itemService.createItem(itemDto5, merchant.getId());
-        Stream<ItemDto> itemDtos = Stream.of(itemDto2, itemDto3, itemDto4);
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
+        Stream<ItemCreationDto> itemDtos = Stream.of(itemDto2, itemDto3, itemDto4);
         given(itemRepository.findAllByPrice(2000, 4000))
                 .willReturn(itemDtos.map(ItemMapper::toEntity).toList());
 
@@ -540,66 +453,46 @@ public class ItemServiceTest {
         //given
         Merchant merchant = Merchant.builder().name("merchant").build();
         Category category = new Category("category");
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(2000)
                 .quantity(200)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(3000)
                 .quantity(300)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(4000)
                 .quantity(400)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(5000)
                 .quantity(500)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
 
-        itemService.createItem(itemDto1, merchant.getId());
-        itemService.createItem(itemDto2, merchant.getId());
-        itemService.createItem(itemDto3, merchant.getId());
-        itemService.createItem(itemDto4, merchant.getId());
-        itemService.createItem(itemDto5, merchant.getId());
-        Stream<ItemDto> itemDtos = Stream.of(itemDto1, itemDto4, itemDto5);
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
+        Stream<ItemCreationDto> itemDtos = Stream.of(itemDto1, itemDto4, itemDto5);
         given(itemRepository.findAllByDiscount())
                 .willReturn(itemDtos.map(ItemMapper::toEntity).toList());
 

@@ -1,14 +1,13 @@
 package project.mockshop.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import project.mockshop.entity.Category;
 import project.mockshop.entity.Merchant;
 
 @Builder
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"name", "price", "quantity"})
 public class ItemDto {
     private Long id;

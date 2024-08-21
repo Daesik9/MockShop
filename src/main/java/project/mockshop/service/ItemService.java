@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.Category;
@@ -18,11 +20,13 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class ItemService {
     private final ItemRepository itemRepository;
 
-    public Long createItem(ItemDto  itemDto, Long merchantId) {
-        Item item = ItemMapper.toEntity(itemDto);
+    @Transactional
+    public Long createItem(ItemCreationDto itemCreationDto) {
+        Item item = ItemMapper.toEntity(itemCreationDto);
         itemRepository.save(item);
 
         return item.getId();

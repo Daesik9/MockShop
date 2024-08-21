@@ -12,22 +12,23 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import project.mockshop.advice.ExceptionAdvice;
+import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.*;
 import project.mockshop.mapper.ItemMapper;
 import project.mockshop.service.ItemService;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -51,6 +52,46 @@ public class ItemControllerTest {
                 .setControllerAdvice(new ExceptionAdvice())
                 .build();
     }
+
+    @Test
+    void create() throws Exception {
+        //given
+        String path = "src/test/resources/image/image.png";
+        FileInputStream fileInputStream = new FileInputStream(path);
+        MockMultipartFile image1 = new MockMultipartFile(
+                "img1",
+                "img1.png",
+                "png",
+                fileInputStream
+        );
+
+        ItemCreationDto creationDto = ItemCreationDto.builder()
+                .name("name")
+                .category(new Category("category"))
+                .thumbnail(image1)
+                .price(1000)
+                .quantity(100)
+                .descriptionImg1(image1)
+                .descriptionImg2(image1)
+                .descriptionImg3(image1)
+                .percentOff(10)
+                .build();
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                multipart("/api/items")
+                        .file(image1)
+                        .param("name", creationDto.getName())
+                        .param("price", String.valueOf(creationDto.getPrice()))
+                        .param("quantity", String.valueOf(creationDto.getQuantity()))
+                        .param("percentOff", String.valueOf(creationDto.getPercentOff()))
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+    }
+
 
     @Test
     void getBestFiveItemsThisWeek() throws Exception {
@@ -85,19 +126,27 @@ public class ItemControllerTest {
         List<ItemDto> itemDtos = new ArrayList<>();
 
         for (int i = 0; i < 100; i++) {
-            ItemDto itemDto = ItemDto.builder()
+            ItemCreationDto itemCreationDto = ItemCreationDto.builder()
                     .name(i + "name" + i)
                     .category(category)
-                    .thumbnail("thumbnail.png")
+//                    .thumbnail("thumbnail.png")
                     .price(1000 * (i + 1))
                     .quantity(100)
-                    .descriptionImg1("img1.png")
-                    .descriptionImg2("img2.png")
-                    .descriptionImg3("img3.png")
+//                    .descriptionImg1("img1.png")
+//                    .descriptionImg2("img2.png")
+//                    .descriptionImg3("img3.png")
                     .percentOff((i + 1) % 2 == 0 ? 0 : 0.1) // 홀수번째 아이템만 할인.
                     .build();
 
-            itemService.createItem(itemDto, merchant.getId());
+            ItemDto itemDto = ItemDto.builder()
+                    .name(i + "name" + i)
+                    .category(category)
+                    .price(1000 * (i + 1))
+                    .quantity(100)
+                    .percentOff((i + 1) % 2 == 0 ? 0 : 0.1) // 홀수번째 아이템만 할인.
+                    .build();
+
+            itemService.createItem(itemCreationDto);
             itemDtos.add(itemDto);
         }
 

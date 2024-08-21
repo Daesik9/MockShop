@@ -8,6 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.*;
@@ -17,14 +20,12 @@ import project.mockshop.repository.ItemRepository;
 import project.mockshop.repository.MerchantRepository;
 import project.mockshop.repository.OrderRepository;
 
+import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @Transactional
@@ -53,96 +54,83 @@ public class ItemServiceSpringTest {
     @Test
     void createItem() throws Exception {
         //given
+        String path = "src/test/resources/image/image.png";
+
+        FileInputStream fileInputStream = new FileInputStream(path);
+        MultipartFile multipartFile = new MockMultipartFile(
+                "img1",
+                "img1.png",
+                "png",
+                fileInputStream);
+
         Merchant merchant = Merchant.builder().name("merchant").build();
         merchantRepository.save(merchant);
 
-        ItemDto itemDto = ItemDto.builder()
+        ItemCreationDto itemCreationDto = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
+                .thumbnail(multipartFile)
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .merchant(merchant)
                 .percentOff(10)
                 .build();
 
         //when
-        Long itemId = itemService.createItem(itemDto, merchant.getId());
+        Long itemId = itemService.createItem(itemCreationDto);
 
 
         //then
         Item findItem = itemRepository.findById(itemId).orElse(null);
         assertThat(findItem.getName()).isEqualTo("name");
+        assertThat(findItem.getThumbnail().getUploadFileName()).isEqualTo("img1.png");
     }
 
     @Test
     void findItemsByName() throws Exception {
         //given
         Merchant merchant = Merchant.builder().name("merchant").build();
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
 
-        itemService.createItem(itemDto1, merchant.getId());
-        itemService.createItem(itemDto2, merchant.getId());
-        itemService.createItem(itemDto3, merchant.getId());
-        itemService.createItem(itemDto4, merchant.getId());
-        itemService.createItem(itemDto5, merchant.getId());
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
 
         //when
         List<ItemDto> findItems = itemService.findItemsByNameLike("name");
@@ -161,69 +149,49 @@ public class ItemServiceSpringTest {
         Merchant merchant = Merchant.builder().name("merchant").build();
         merchantRepository.save(merchant);
 
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .merchant(merchant)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .merchant(merchant)
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
 
-        itemService.createItem(itemDto1, merchant.getId());
-        itemService.createItem(itemDto2, merchant.getId());
-        itemService.createItem(itemDto3, merchant.getId());
-        itemService.createItem(itemDto4, merchant.getId());
-        itemService.createItem(itemDto5, merchant.getId());
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
 
         //when
         List<ItemDto> findItems = itemService.findItemsByMerchantName("merchant");
@@ -239,67 +207,47 @@ public class ItemServiceSpringTest {
         Category category1 = new Category("category1");
         categoryRepository.save(category1);
         Long merchantId = 1L;
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .category(category1)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .category(category1)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
 
-        itemService.createItem(itemDto1, merchantId);
-        itemService.createItem(itemDto2, merchantId);
-        itemService.createItem(itemDto3, merchantId);
-        itemService.createItem(itemDto4, merchantId);
-        itemService.createItem(itemDto5, merchantId);
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
 
         //when
         List<ItemDto> findItems = itemService.findAllByCategory(category);
@@ -314,72 +262,47 @@ public class ItemServiceSpringTest {
         Merchant merchant = Merchant.builder().name("merchant").build();
         merchantRepository.save(merchant);
 
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
-                .merchant(merchant)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(200)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
-                .merchant(merchant)
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(300)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
-                .merchant(merchant)
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(400)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
-                .merchant(merchant)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(500)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
-                .merchant(merchant)
                 .build();
 
-        itemService.createItem(itemDto1, merchant.getId());
-        itemService.createItem(itemDto2, merchant.getId());
-        itemService.createItem(itemDto3, merchant.getId());
-        itemService.createItem(itemDto4, merchant.getId());
-        itemService.createItem(itemDto5, merchant.getId());
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
 
         //when
         List<ItemDto> findItems = itemService.findItemsByQuantity(0, 300);
@@ -400,67 +323,47 @@ public class ItemServiceSpringTest {
     void findItemsByPrice() throws Exception {
         //given
         Merchant merchant = Merchant.builder().name("merchant").build();
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(2000)
                 .quantity(200)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(3000)
                 .quantity(300)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(4000)
                 .quantity(400)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(5000)
                 .quantity(500)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
 
-        itemService.createItem(itemDto1, merchant.getId());
-        itemService.createItem(itemDto2, merchant.getId());
-        itemService.createItem(itemDto3, merchant.getId());
-        itemService.createItem(itemDto4, merchant.getId());
-        itemService.createItem(itemDto5, merchant.getId());
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
 
         //when
         List<ItemDto> findItems = itemService.findItemsByPrice(2000, 4000);
@@ -481,65 +384,46 @@ public class ItemServiceSpringTest {
     void findDiscountItems() throws Exception {
         //given
         Merchant merchant = Merchant.builder().name("merchant").build();
-        ItemDto itemDto1 = ItemDto.builder()
+        ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto2 = ItemDto.builder()
+        ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(2000)
                 .quantity(200)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .build();
-        ItemDto itemDto3 = ItemDto.builder()
+        ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(3000)
                 .quantity(300)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .build();
-        ItemDto itemDto4 = ItemDto.builder()
+        ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(4000)
                 .quantity(400)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
-        ItemDto itemDto5 = ItemDto.builder()
+        ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .category(category)
-                .thumbnail("thumbnail.png")
                 .price(5000)
                 .quantity(500)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
                 .percentOff(10)
                 .build();
 
-        itemService.createItem(itemDto1, merchant.getId());
-        itemService.createItem(itemDto2, merchant.getId());
-        itemService.createItem(itemDto3, merchant.getId());
-        itemService.createItem(itemDto4, merchant.getId());
-        itemService.createItem(itemDto5, merchant.getId());
+
+        itemService.createItem(itemDto1);
+        itemService.createItem(itemDto2);
+        itemService.createItem(itemDto3);
+        itemService.createItem(itemDto4);
+        itemService.createItem(itemDto5);
 
         //when
         List<ItemDto> findItems = itemService.findDiscountItems();
@@ -610,12 +494,12 @@ public class ItemServiceSpringTest {
             Item item = Item.builder()
                     .name(i + "name" + i)
 //                    .category(category)
-                    .thumbnail("thumbnail.png")
+//                    .thumbnail("thumbnail.png")
                     .price(1000 * (i + 1))
                     .quantity(100)
-                    .descriptionImg1("img1.png")
-                    .descriptionImg2("img2.png")
-                    .descriptionImg3("img3.png")
+//                    .descriptionImg1("img1.png")
+//                    .descriptionImg2("img2.png")
+//                    .descriptionImg3("img3.png")
                     .percentOff((i + 1) % 2 == 0 ? 0 : 0.1) // 홀수번째 아이템만 할인.
                     .build();
 

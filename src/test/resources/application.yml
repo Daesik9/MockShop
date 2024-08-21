@@ -1,3 +1,6 @@
 spring:
   profiles:
     active: test
+
+file:
+  dir: /Users/personal/Documents/Study/project/mockshop-file/

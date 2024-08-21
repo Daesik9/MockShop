@@ -1,9 +1,8 @@
 package project.mockshop.service;
 
-import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.CartDto;
 import project.mockshop.entity.Cart;
 import project.mockshop.entity.CartItem;
