@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class EventService {
 
     private final EventRepository eventRepository;
@@ -30,6 +30,7 @@ public class EventService {
     private final EventParticipantRepository eventParticipantRepository;
     private final CouponService couponService;
 
+    @Transactional
     public Long createEvent(EventCreationDto creationDto) {
         List<EventRewardDto> eventRewardDtos = creationDto.getEventRewardDtos();
         List<EventReward> eventRewards = new ArrayList<>();
@@ -57,6 +58,7 @@ public class EventService {
         return event.getId();
     }
 
+    @Transactional
     public void participateEvent(Long customerId, Long eventId) {
         LocalDateTime now = LocalDateTime.now();
         Event event = eventRepository.findById(eventId)

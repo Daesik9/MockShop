@@ -5,37 +5,30 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.advice.ExceptionAdvice;
-import project.mockshop.dto.ItemDto;
+import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemSearchCondition;
-import project.mockshop.dto.OrderRequestDto;
 import project.mockshop.entity.*;
-import project.mockshop.mapper.ItemMapper;
 import project.mockshop.repository.ItemRepository;
 import project.mockshop.repository.OrderRepository;
-import project.mockshop.service.ItemService;
 import project.mockshop.service.OrderService;
 
+import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -60,6 +53,57 @@ public class ItemControllerSpringTest {
         mockMvc = MockMvcBuilders.standaloneSetup(itemController)
                 .setControllerAdvice(new ExceptionAdvice())
                 .build();
+    }
+
+    @Test
+    void create() throws Exception {
+        //given
+        String path = "src/test/resources/image/image.png";
+        FileInputStream fileInputStream = new FileInputStream(path);
+        MockMultipartFile thumb = new MockMultipartFile(
+                "thumbnail",
+                "thumb.png",
+                "png",
+                fileInputStream
+        );
+
+        FileInputStream fileInputStream2 = new FileInputStream(path);
+        MockMultipartFile img1 = new MockMultipartFile(
+                "descriptionImg1",
+                "img1.png",
+                "png",
+                fileInputStream2
+        );
+
+        ItemCreationDto creationDto = ItemCreationDto.builder()
+                .name("name")
+                .category(new Category("category"))
+                .thumbnail(thumb)
+                .price(1000)
+                .quantity(100)
+                .descriptionImg1(img1)
+                .percentOff(10)
+                .build();
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                multipart("/api/items")
+                        .file(thumb).file(img1)
+                        .param("name", creationDto.getName())
+                        .param("price", String.valueOf(creationDto.getPrice()))
+                        .param("quantity", String.valueOf(creationDto.getQuantity()))
+                        .param("percentOff", String.valueOf(creationDto.getPercentOff()))
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        List<Item> items = itemRepository.findAll();
+        Item item = items.get(0);
+        assertThat(item.getName()).isEqualTo("name");
+        assertThat(item.getThumbnail().getUploadFileName()).isEqualTo("thumb.png");
+        assertThat(item.getDescriptionImg1().getUploadFileName()).isEqualTo("img1.png");
     }
 
     @Test
@@ -128,12 +172,12 @@ public class ItemControllerSpringTest {
             Item item = Item.builder()
                     .name(i + "name" + i)
 //                    .category(category)
-                    .thumbnail("thumbnail.png")
+                    .thumbnail(UploadFile.builder().storeFileName("thumbnail.png").build())
                     .price(1000 * (i + 1))
                     .quantity(100)
-                    .descriptionImg1("img1.png")
-                    .descriptionImg2("img2.png")
-                    .descriptionImg3("img3.png")
+                    .descriptionImg1(UploadFile.builder().storeFileName("img1.png").build())
+                    .descriptionImg2(UploadFile.builder().storeFileName("img2.png").build())
+                    .descriptionImg3(UploadFile.builder().storeFileName("img3.png").build())
                     .percentOff((i + 1) % 2 == 0 ? 0 : 0.1) // 홀수번째 아이템만 할인.
                     .build();
 

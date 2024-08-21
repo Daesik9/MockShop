@@ -3,6 +3,7 @@ package project.mockshop.service;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.CouponDto;
 import project.mockshop.dto.CouponItemDto;
 import project.mockshop.entity.Coupon;
@@ -20,11 +21,13 @@ import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CouponService {
     private final CouponRepository couponRepository;
     private final CouponItemRepository couponItemRepository;
     private final CustomerRepository customerRepository;
 
+    @Transactional
     public Long createCoupon(CouponDto couponDto) {
         if (couponDto.getMinPriceRequired() < couponDto.getPriceOff()) {
             throw new IllegalStateException(MockShopPolicy.INPUT_STRING_METHOD("사용조건"));
@@ -35,6 +38,7 @@ public class CouponService {
         return coupon.getId();
     }
 
+    @Transactional
     public Long issueCoupon(Long couponId, Long customerId) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new NoSuchElementException("해당 구매자가 없습니다."));

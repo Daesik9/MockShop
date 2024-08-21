@@ -3,7 +3,6 @@ package project.mockshop.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -24,7 +23,6 @@ import project.mockshop.service.OrderService;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -68,8 +66,12 @@ public class OrderControllerSpringTest {
     @Test
     void order() throws Exception {
         //given
-        ItemDto itemDto = ItemDto.builder().name("사과").quantity(100).price(1000).build();
-        Long itemId = itemService.createItem(itemDto, 1L);
+        ItemCreationDto itemCreationDto = ItemCreationDto.builder()
+                .name("사과")
+                .quantity(100)
+                .price(1000)
+                .build();
+        Long itemId = itemService.createItem(itemCreationDto);
         CustomerCreationDto userCreationDto = CustomerCreationDto.builder()
                 .name("테스트")
                 .loginId("loginid")
@@ -111,8 +113,12 @@ public class OrderControllerSpringTest {
     @Test
     void getOrderHistory() throws Exception {
         //given
-        ItemDto itemDto = ItemDto.builder().name("사과").quantity(100).price(1000).build();
-        Long itemId = itemService.createItem(itemDto, 1L);
+        ItemCreationDto itemCreationDto = ItemCreationDto.builder()
+                .name("사과")
+                .quantity(100)
+                .price(1000)
+                .build();
+        Long itemId = itemService.createItem(itemCreationDto);
         CustomerCreationDto userCreationDto = CustomerCreationDto.builder()
                 .name("테스트")
                 .loginId("loginid")
@@ -144,8 +150,12 @@ public class OrderControllerSpringTest {
     @Test
     void getOrderDetail() throws Exception {
         //given
-        ItemDto itemDto = ItemDto.builder().name("사과").quantity(100).price(1000).build();
-        Long itemId = itemService.createItem(itemDto, 1L);
+        ItemCreationDto itemCreationDto = ItemCreationDto.builder()
+                .name("사과")
+                .quantity(100)
+                .price(1000)
+                .build();
+        Long itemId = itemService.createItem(itemCreationDto);
         CustomerCreationDto userCreationDto = CustomerCreationDto.builder()
                 .name("테스트")
                 .loginId("loginid")

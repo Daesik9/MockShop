@@ -34,12 +34,12 @@ public class ItemTest {
                 .id(1L)
                 .name("name")
                 .category(new Category("Book"))
-                .thumbnail("image.png")
+                .thumbnail(UploadFile.builder().storeFileName("image.png").build())
                 .price(1000)
                 .quantity(100)
-                .descriptionImg1("img1.png")
-                .descriptionImg2("img2.png")
-                .descriptionImg3("img3.png")
+                .descriptionImg1(UploadFile.builder().storeFileName("img1.png").build())
+                .descriptionImg2(UploadFile.builder().storeFileName("img2.png").build())
+                .descriptionImg3(UploadFile.builder().storeFileName("img3.png").build())
                 .percentOff(5)
 //                .merchantId(1L)
                 .build();
@@ -48,6 +48,7 @@ public class ItemTest {
 
         //then
         assertThat(item.getName()).isEqualTo("name");
+        assertThat(item.getDescriptionImg1().getStoreFileName()).isEqualTo("img1.png");
     }
 
     @Test

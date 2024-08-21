@@ -47,9 +47,11 @@ public class CartControllerSpringTest {
     @BeforeEach
     void init() {
         mockMvc = MockMvcBuilders.standaloneSetup(cartController)
-                .setControllerAdvice(new ExceptionAdvice()).build();
+                .setControllerAdvice(new ExceptionAdvice())
+                .build();
 
-        itemId = itemService.createItem(ItemDto.builder().name("사과").price(1000).quantity(100).build(), 1L);
+        ItemCreationDto creationDto = ItemCreationDto.builder().name("사과").price(1000).quantity(100).build();
+        itemId = itemService.createItem(creationDto);
 
         Customer customer = Customer.builder().name("테스트").password("Password1!").email("test@gmail.com").loginId("test").phoneNumber("01011111111").build();
         customerId = customerService.createAccount(CustomerMapper.toCreationDto(customer));

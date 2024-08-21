@@ -2,6 +2,7 @@ package project.mockshop.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.OrderDto;
 import project.mockshop.entity.*;
 import project.mockshop.mapper.OrderMapper;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -82,6 +84,7 @@ public class OrderService {
         return orderRepository.findAll().stream().map(OrderMapper::toDto).toList();
     }
 
+    @Transactional
     public String order(Long customerId, String paymentMethod) {
         //장바구니에서 상품 가져오기
         Cart cart = cartRepository.findCartWithItems(customerId);
