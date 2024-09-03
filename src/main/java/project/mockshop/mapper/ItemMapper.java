@@ -4,9 +4,6 @@ import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.entity.Item;
 import project.mockshop.entity.UploadFile;
-import project.mockshop.util.FileStore;
-
-import java.io.IOException;
 
 public class ItemMapper {
     public static Item toEntity(ItemDto dto) {
@@ -26,21 +23,12 @@ public class ItemMapper {
     }
 
     public static Item toEntity(ItemCreationDto dto) {
-        FileStore fileStore = new FileStore();
-        UploadFile thumbnail = dto.getThumbnail() == null ? null : fileStore.createUploadFile(dto.getThumbnail());
-        UploadFile descriptionImg1 = dto.getDescriptionImg1() == null ? null : fileStore.createUploadFile(dto.getDescriptionImg1());
-        UploadFile descriptionImg2 = dto.getDescriptionImg2() == null ? null : fileStore.createUploadFile(dto.getDescriptionImg2());
-        UploadFile descriptionImg3 = dto.getDescriptionImg3() == null ? null : fileStore.createUploadFile(dto.getDescriptionImg3());
-
         return Item.builder()
+                .id(dto.getId())
                 .name(dto.getName())
                 .category(dto.getCategory())
-                .thumbnail(thumbnail)
                 .price(dto.getPrice())
                 .quantity(dto.getQuantity())
-                .descriptionImg1(descriptionImg1)
-                .descriptionImg2(descriptionImg2)
-                .descriptionImg3(descriptionImg3)
                 .percentOff(dto.getPercentOff())
                 .merchant(dto.getMerchant())
                 .build();
@@ -66,20 +54,4 @@ public class ItemMapper {
                 .merchant(item.getMerchant())
                 .build();
     }
-
-//    public static ItemDto toDto(ItemCreationDto creationDto) {
-//        return ItemDto.builder()
-//                .id(creationDto.getId())
-//                .name(creationDto.getName())
-//                .category(creationDto.getCategory())
-//                .thumbnail(creationDto.getThumbnail())
-//                .price(creationDto.getPrice())
-//                .quantity(creationDto.getQuantity())
-//                .descriptionImg1(creationDto.getDescriptionImg1().getStoreFileName())
-//                .descriptionImg2(creationDto.getDescriptionImg2().getStoreFileName())
-//                .descriptionImg3(creationDto.getDescriptionImg3().getStoreFileName())
-//                .percentOff(creationDto.getPercentOff())
-//                .merchant(creationDto.getMerchant())
-//                .build();
-//    }
 }

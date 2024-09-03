@@ -15,7 +15,9 @@ import project.mockshop.dto.ItemDto;
 import project.mockshop.entity.Address;
 import project.mockshop.entity.Customer;
 import project.mockshop.entity.Item;
+import project.mockshop.entity.Merchant;
 import project.mockshop.mapper.CustomerMapper;
+import project.mockshop.repository.MerchantRepository;
 import project.mockshop.service.CouponService;
 import project.mockshop.service.CustomerService;
 import project.mockshop.service.EventService;
@@ -43,6 +45,7 @@ public class InitConfig {
         private final CustomerService customerService;
         private final EventService eventService;
         private final CouponService couponService;
+        private final MerchantRepository merchantRepository;
         private final EntityManager em;
 
         @Transactional
@@ -61,19 +64,19 @@ public class InitConfig {
 
         @Transactional
         public void init() {
-            List<Item> items = new ArrayList<>();
-            for (int i = 0; i < 10000; i++) {
-                Item item = Item.builder()
-                        .name("사과")
-                        .price(1000 * (i + 1))
-                        .quantity(100)
-                        .percentOff(i % 100 == 0 ? 10 : 0)
-                        .build();
-                items.add(item);
-//            itemService.createItem(itemDto, 1L);
-            }
-
-            saveAll(items);
+//            List<Item> items = new ArrayList<>();
+//            for (int i = 0; i < 10000; i++) {
+//                Item item = Item.builder()
+//                        .name("사과")
+//                        .price(1000 * (i + 1))
+//                        .quantity(100)
+//                        .percentOff(i % 100 == 0 ? 10 : 0)
+//                        .build();
+//                items.add(item);
+////            itemService.createItem(itemDto, 1L);
+//            }
+//
+//            saveAll(items);
 
             Customer customer = Customer.builder()
                     .name("테스트")
@@ -93,6 +96,14 @@ public class InitConfig {
                     .build();
             customerService.createAccount(CustomerMapper.toCreationDto(customer));
             customerService.createAccount(CustomerMapper.toCreationDto(customer2));
+
+            Merchant merchant = Merchant.builder()
+                    .name("판매자")
+                    .password("Password1!")
+                    .email("merchant@email.com")
+                    .loginId("merchant")
+                    .build();
+            merchantRepository.save(merchant);
 
 
             LocalDateTime now = LocalDateTime.now();

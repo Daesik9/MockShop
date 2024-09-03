@@ -194,10 +194,11 @@ public class ItemServiceSpringTest {
         itemService.createItem(itemDto5);
 
         //when
-        List<ItemDto> findItems = itemService.findItemsByMerchantName("merchant");
+        List<ItemDto> findItems = itemService.findItemsByMerchantId(merchant.getId());
 
         //then
         assertThat(findItems.size()).isEqualTo(2);
+        assertThat(findItems.get(0).getMerchant()).isEqualTo(merchant);
     }
 
     @Test

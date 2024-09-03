@@ -16,7 +16,9 @@ import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.*;
 import project.mockshop.mapper.ItemMapper;
 import project.mockshop.repository.ItemRepository;
+import project.mockshop.repository.MerchantRepository;
 import project.mockshop.repository.OrderRepository;
+import project.mockshop.util.FileStore;
 
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
@@ -44,6 +46,10 @@ public class ItemServiceTest {
     private ItemRepository itemRepository;
     @Mock
     private OrderRepository orderRepository;
+    @Mock
+    private MerchantRepository merchantRepository;
+    @Mock
+    private FileStore fileStore;
 
     @Test
     void itemServiceAndRepositoryNotNull() throws Exception {
@@ -84,7 +90,10 @@ public class ItemServiceTest {
 
         //when
         Long itemId = itemService.createItem(itemCreationDto);
-        when(itemRepository.findById(itemId)).thenReturn(Optional.ofNullable(ItemMapper.toEntity(itemCreationDto)));
+        Item item = ItemMapper.toEntity(itemCreationDto);
+        when(fileStore.createUploadFile(itemCreationDto.getThumbnail())).thenReturn(UploadFile.builder().uploadFileName("img1.png").build());
+        item.changeThumbnail(fileStore.createUploadFile(itemCreationDto.getThumbnail()));
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
 
 
         //then
@@ -200,9 +209,9 @@ public class ItemServiceTest {
     }
 
     @Test
-    void findItemsByMerchantName() throws Exception {
+    void findItemsByMerchant() throws Exception {
         //given
-        Merchant merchant = Merchant.builder().name("merchant").build();
+        Merchant merchant = Merchant.builder().id(1L).name("merchant").build();
         Category category = new Category("category");
 
         ItemCreationDto itemDto1 = ItemCreationDto.builder()
@@ -211,6 +220,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
@@ -218,6 +228,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
@@ -248,14 +259,16 @@ public class ItemServiceTest {
         itemService.createItem(itemDto5);
         Stream<ItemCreationDto> itemDtos = Stream.of(itemDto1, itemDto2);
 
-        given(itemRepository.findAllByMerchantName("merchant"))
+        given(merchantRepository.findById(merchant.getId())).willReturn(Optional.ofNullable(merchant));
+        given(itemRepository.findAllByMerchant(merchant))
                 .willReturn(itemDtos.map(ItemMapper::toEntity).toList());
 
         //when
-        List<ItemDto> findItems = itemService.findItemsByMerchantName("merchant");
+        List<ItemDto> findItems = itemService.findItemsByMerchantId(merchant.getId());
 
         //then
         assertThat(findItems.size()).isEqualTo(2);
+        assertThat(findItems.get(0).getMerchant()).isEqualTo(merchant);
     }
 
     @Test

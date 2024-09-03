@@ -19,6 +19,7 @@ import project.mockshop.service.CartService;
 import project.mockshop.service.CustomerService;
 import project.mockshop.service.ItemService;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -51,7 +52,12 @@ public class CartControllerSpringTest {
                 .build();
 
         ItemCreationDto creationDto = ItemCreationDto.builder().name("사과").price(1000).quantity(100).build();
-        itemId = itemService.createItem(creationDto);
+        try {
+            itemId = itemService.createItem(creationDto);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
 
         Customer customer = Customer.builder().name("테스트").password("Password1!").email("test@gmail.com").loginId("test").phoneNumber("01011111111").build();
         customerId = customerService.createAccount(CustomerMapper.toCreationDto(customer));
