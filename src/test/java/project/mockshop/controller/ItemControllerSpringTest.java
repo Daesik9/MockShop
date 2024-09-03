@@ -18,6 +18,7 @@ import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.*;
 import project.mockshop.repository.ItemRepository;
+import project.mockshop.repository.MerchantRepository;
 import project.mockshop.repository.OrderRepository;
 import project.mockshop.service.OrderService;
 
@@ -44,6 +45,8 @@ public class ItemControllerSpringTest {
     private ItemRepository itemRepository;
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private MerchantRepository merchantRepository;
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -211,6 +214,26 @@ public class ItemControllerSpringTest {
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.result.data.content[0].name").value("2name2"))
                 .andExpect(jsonPath("$.result.data.content[0].price").value(3000));
+    }
+
+    @Test
+    void getItemsByMerchant() throws Exception {
+        //given
+        Merchant merchant = Merchant.builder().name("merchant").build();
+        merchantRepository.save(merchant);
+
+        Item item = Item.builder().name("1등").merchant(merchant).quantity(100).price(1000).build();
+        itemRepository.save(item);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/merchants/{merchantId}/items", merchant.getId())
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.result.data[0].merchant.name").value("merchant"));
     }
 
 }

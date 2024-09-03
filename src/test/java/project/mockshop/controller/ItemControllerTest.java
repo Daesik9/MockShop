@@ -184,5 +184,26 @@ public class ItemControllerTest {
         verify(itemService, times(1)).search(any(ItemSearchCondition.class), any(Pageable.class));
     }
 
+    @Test
+    void getItemsByMerchant() throws Exception {
+        //given
+        Merchant merchant = Merchant.builder().id(1L).name("merchant").build();
+        List<ItemDto> itemDtos = List.of(ItemDto.builder().merchant(merchant).build());
+
+        given(itemService.findItemsByMerchantId(merchant.getId())).willReturn(itemDtos);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/merchants/{merchantId}/items", merchant.getId())
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.result.data[0].merchant.name").value("merchant"));
+    }
+
+
+
 
 }

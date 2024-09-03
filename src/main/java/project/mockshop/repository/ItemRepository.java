@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import project.mockshop.entity.Category;
 import project.mockshop.entity.Item;
+import project.mockshop.entity.Merchant;
 
 import java.util.List;
 
@@ -15,5 +16,5 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
 
     List<Item> findAllByCategory(Category category);
 
-    List<Item> findAllByMerchantName(String merchantName);
+    List<Item> findAllByMerchant(Merchant merchant);
 }
