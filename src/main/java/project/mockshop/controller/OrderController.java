@@ -1,7 +1,9 @@
 package project.mockshop.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.OrderDto;
 import project.mockshop.dto.OrderRequestDto;
 import project.mockshop.response.Response;
@@ -24,7 +26,7 @@ public class OrderController {
         return Response.success(orderNumber);
     }
 
-    @GetMapping("/orders/customer/{customerId}")
+    @GetMapping("/orders/customers/{customerId}")
     public Response getOrderHistory(@PathVariable Long customerId) {
 
         List<OrderDto> orderDtos = orderService.findAllByCustomerId(customerId);
@@ -39,4 +41,12 @@ public class OrderController {
 
         return Response.success(orderDto);
     }
+
+    @GetMapping("/orders/merchants/{merchantId}")
+    public Response getOrdersByMerchant(@PathVariable Long merchantId) {
+        List<OrderDto> ordersByMerchant = orderService.findAllByMerchantId(merchantId);
+        return Response.success(ordersByMerchant);
+    }
+
+
 }

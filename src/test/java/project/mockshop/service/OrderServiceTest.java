@@ -336,4 +336,19 @@ public class OrderServiceTest {
         assertThat(orders.size()).isEqualTo(3);
     }
 
+    @Test
+    void findAllByMerchantId() throws Exception {
+        //given
+        given(orderRepository.findAllByMerchantId(merchant1.getId()))
+                .willReturn(orders.subList(0, 3));
+
+        //when
+        List<OrderDto> ordersByMerchantId = orderService.findAllByMerchantId(merchant1.getId());
+
+        //then
+        assertThat(ordersByMerchantId.size()).isEqualTo(3);
+    }
+
+
+
 }

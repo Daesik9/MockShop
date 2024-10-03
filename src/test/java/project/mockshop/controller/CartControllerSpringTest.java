@@ -103,13 +103,13 @@ public class CartControllerSpringTest {
         //customerId 1로 로그인했는데도  2인 유저의 정보를 가져올 수 있음 -> 그러면 안됨!!!
         //컨트롤러에서 현재 로그인한 계정의 id로 조회하도록 로직을 수정함.
         //그래서 테스트시에 user 정보를 넣어줘야해서 이렇게 수정함.
-//        Member member = Customer.builder().id(customerId).build();
-//        CustomUserDetails userDetails = new CustomUserDetails(member);
+        Member member = Customer.builder().id(customerId).build();
+        CustomUserDetails userDetails = new CustomUserDetails(member);
 
         //when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/cart")
-//                        .with(user(userDetails))
+                        .with(user(userDetails))
 
 //                        .param("customerId", customerId.toString())
         );

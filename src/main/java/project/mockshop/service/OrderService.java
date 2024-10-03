@@ -102,4 +102,10 @@ public class OrderService {
 
         return newOrder.getOrderNumber();
     }
+
+    public List<OrderDto> findAllByMerchantId(Long merchantId) {
+        List<Order> allByMerchantId = orderRepository.findAllByMerchantId(merchantId);
+
+        return allByMerchantId.stream().map(OrderMapper::toDto).toList();
+    }
 }

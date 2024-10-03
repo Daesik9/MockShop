@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/merchants/*/items").hasRole("ADMIN")
                         .requestMatchers("/api/items/best-five", "/api/items/search").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("CUSTOMER")
+                        .requestMatchers("/api/orders/merchants/**").hasRole("ADMIN")
                         .requestMatchers("/api/orders/*").hasAnyRole("CUSTOMER", "ADMIN")
                         .requestMatchers("/api/events/**").permitAll()
 

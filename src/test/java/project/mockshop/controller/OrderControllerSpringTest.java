@@ -17,6 +17,7 @@ import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.annotation.WithMockMember;
 import project.mockshop.dto.*;
 import project.mockshop.entity.*;
+import project.mockshop.repository.MemberRepository;
 import project.mockshop.service.CartService;
 import project.mockshop.service.CustomerService;
 import project.mockshop.service.ItemService;
@@ -45,6 +46,8 @@ public class OrderControllerSpringTest {
     private ItemService itemService;
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private MemberRepository memberRepository;
     @Autowired
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -139,7 +142,7 @@ public class OrderControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/orders/customer/{customerId}", customerId)
+                MockMvcRequestBuilders.get("/api/orders/customers/{customerId}", customerId)
         );
 
         //then
@@ -184,5 +187,44 @@ public class OrderControllerSpringTest {
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.result.data.orderNumber").value(orderNumber));
     }
+    
+    @Test
+    @WithMockMember(role = "ROLE_ADMIN")
+    void getOrdersByMerchant() throws Exception {
+        //given
+        Merchant merchant = Merchant.builder().name("merchant1").build();
+        memberRepository.save(merchant);
+
+        ItemCreationDto itemCreationDto = ItemCreationDto.builder()
+                .name("사과")
+                .quantity(100)
+                .price(1000)
+                .merchant(merchant)
+                .build();
+        Long itemId = itemService.createItem(itemCreationDto);
+
+        CustomerCreationDto userCreationDto = CustomerCreationDto.builder()
+                .name("테스트")
+                .loginId("loginid")
+                .password("Password1!")
+                .phoneNumber("01011111111")
+                .email("email@gmail.com")
+                .address(new Address("city", "street", "11111"))
+                .build();
+        Long customerId = customerService.createAccount(userCreationDto);
+
+        Long cartId = cartService.addToCart(itemId, 10, customerId);
+        String orderNumber = orderService.order(customerId, "MOCK-PAY");
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/orders/merchants/{merchantId}", merchant.getId())
+        );
+
+        //then
+        resultActions.andExpect(status().isOk());
+    }
+    
+    
 
 }
