@@ -91,7 +91,7 @@ public class OrderControllerTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/orders/customer/{customerId}", customerId)
+                get("/api/orders/customers/{customerId}", customerId)
         );
 
         //then

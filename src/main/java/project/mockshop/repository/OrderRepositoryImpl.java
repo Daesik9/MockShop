@@ -19,12 +19,12 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public List<Order> findAllByMerchant(Merchant merchant) {
+    public List<Order> findAllByMerchantId(Long merchantId) {
         return queryFactory
                 .selectFrom(order)
                 .join(order.orderItems, orderItem)
                 .join(orderItem.item, item)
-                .where(item.merchant.eq(merchant))
+                .where(item.merchant.id.eq(merchantId))
                 .distinct()
                 .fetch();
     }
