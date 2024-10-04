@@ -213,7 +213,7 @@ public class EventServiceTest {
         List<CouponItemDto> couponItemDtos = couponService.getAllCouponItemsByCustomerId(customerId);
         assertThat(couponItemDtos.size()).isEqualTo(0);
     }
-    
+
     @Test
     void getOnGoingEvents() throws Exception {
         //given
@@ -237,10 +237,10 @@ public class EventServiceTest {
 
         //파라미터로 LocalDateTime.now()를 넣으면 eventService에서 호출하는 now()랑 시간이 달라서 오류 발생.
         given(eventRepository.findAllByDateTime(any(LocalDateTime.class))).willReturn(List.of(event1));
-        
+
         //when
         List<EventDto> eventDtos = eventService.getOnGoingEvents();
-        
+
         //then
         assertThat(eventDtos.size()).isEqualTo(1);
     }

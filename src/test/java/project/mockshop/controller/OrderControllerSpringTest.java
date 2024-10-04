@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,6 +14,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.advice.ExceptionAdvice;
+import project.mockshop.annotation.WithMockMember;
 import project.mockshop.dto.*;
 import project.mockshop.entity.*;
 import project.mockshop.service.CartService;
@@ -29,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @Transactional
+@AutoConfigureMockMvc
 public class OrderControllerSpringTest {
 
     @Autowired
@@ -42,15 +45,15 @@ public class OrderControllerSpringTest {
     private ItemService itemService;
     @Autowired
     private CustomerService customerService;
-
+    @Autowired
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(orderController)
-                .setControllerAdvice(new ExceptionAdvice())
-                .build();
+//        mockMvc = MockMvcBuilders.standaloneSetup(orderController)
+//                .setControllerAdvice(new ExceptionAdvice())
+//                .build();
     }
 
     @Test
@@ -64,6 +67,7 @@ public class OrderControllerSpringTest {
     }
 
     @Test
+    @WithMockMember
     void order() throws Exception {
         //given
         ItemCreationDto itemCreationDto = ItemCreationDto.builder()
@@ -111,6 +115,7 @@ public class OrderControllerSpringTest {
     }
 
     @Test
+    @WithMockMember
     void getOrderHistory() throws Exception {
         //given
         ItemCreationDto itemCreationDto = ItemCreationDto.builder()
@@ -148,6 +153,7 @@ public class OrderControllerSpringTest {
     }
 
     @Test
+    @WithMockMember
     void getOrderDetail() throws Exception {
         //given
         ItemCreationDto itemCreationDto = ItemCreationDto.builder()
