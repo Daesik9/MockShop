@@ -8,6 +8,7 @@ import project.mockshop.dto.CustomerDto;
 import project.mockshop.dto.LoginRequestDto;
 import project.mockshop.dto.UpdateProfileDto;
 import project.mockshop.entity.Customer;
+import project.mockshop.entity.Role;
 import project.mockshop.mapper.CustomerMapper;
 import project.mockshop.policy.CustomerPolicy;
 import project.mockshop.repository.CustomerRepository;
@@ -33,7 +34,10 @@ public class CustomerService {
         CustomerValidator.validatePhoneNumber(dto.getPhoneNumber());
         CustomerValidator.validateEmail(dto.getEmail());
 
-        Customer newCustomer = customerRepository.save(CustomerMapper.toEntity(dto));
+        Customer customer = CustomerMapper.toEntity(dto);
+        customer.changeRole(Role.CUSTOMER.name());
+
+        Customer newCustomer = customerRepository.save(customer);
 
         return newCustomer.getId();
     }

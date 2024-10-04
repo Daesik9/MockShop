@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -14,8 +15,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.advice.ExceptionAdvice;
+import project.mockshop.annotation.WithMockMember;
 import project.mockshop.dto.*;
 import project.mockshop.entity.Address;
+import project.mockshop.entity.Customer;
+import project.mockshop.entity.Member;
 import project.mockshop.repository.EventRepository;
 import project.mockshop.response.Response;
 import project.mockshop.service.CouponService;
@@ -28,6 +32,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -35,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @Transactional
+@AutoConfigureMockMvc
 public class EventControllerSpringTest {
     @Autowired
     private EventController eventController;
@@ -46,15 +52,15 @@ public class EventControllerSpringTest {
     private CustomerService customerService;
     @Autowired
     private EventRepository eventRepository;
-
+    @Autowired
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(eventController)
-                .setControllerAdvice(new ExceptionAdvice())
-                .build();
+//        mockMvc = MockMvcBuilders.standaloneSetup(eventController)
+//                .setControllerAdvice(new ExceptionAdvice())
+//                .build();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
@@ -70,6 +76,7 @@ public class EventControllerSpringTest {
     }
 
     @Test
+    @WithMockMember(role = "ROLE_ADMIN")
     void createEvent() throws Exception {
         //given
         CouponDto couponDtoPriceOff = CouponDto.builder()
@@ -109,6 +116,7 @@ public class EventControllerSpringTest {
     }
 
     @Test
+    @WithMockMember
     void participateEvent() throws Exception {
         //given
         CustomerCreationDto requestDto = CustomerCreationDto.builder()

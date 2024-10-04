@@ -137,12 +137,12 @@ public class CouponServiceTest {
         //when
         Long couponItemId = couponService.issueCoupon(coupon.getId(), customer.getId());
         given(couponItemRepository.findAllByCustomerId(customer.getId())).willReturn(List.of(couponItem));
-        
+
         //then
         List<CouponItem> couponItems = couponItemRepository.findAllByCustomerId(customer.getId());
         assertThat(couponItems.size()).isEqualTo(1);
         verify(couponItemRepository, times(1)).save(any(CouponItem.class));
     }
-    
-    
+
+
 }

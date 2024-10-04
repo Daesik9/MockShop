@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import project.mockshop.dto.*;
 import project.mockshop.response.Response;
+import project.mockshop.security.JwtUtil;
 import project.mockshop.service.CartService;
 
 @RestController
@@ -11,6 +12,7 @@ import project.mockshop.service.CartService;
 @RequiredArgsConstructor
 public class CartController {
     private final CartService cartService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/cart")
     public Response addToCart(@RequestBody CartAddRequestDto cartRequest) {
@@ -19,8 +21,9 @@ public class CartController {
     }
 
     @GetMapping("/cart")
-    public Response getCartWithItems(@RequestParam Long customerId) {
-        CartDto cartDto = cartService.getCartWithItems(customerId);
+    public Response getCartWithItems() { //(@RequestParam Long customerId) {
+        Long loginMemberId = jwtUtil.getLoginMemberId();
+        CartDto cartDto = cartService.getCartWithItems(loginMemberId);
         return Response.success(cartDto);
     }
 

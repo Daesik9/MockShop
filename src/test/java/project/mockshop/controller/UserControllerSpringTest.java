@@ -1,11 +1,14 @@
 package project.mockshop.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.With;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -30,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @Transactional
+@AutoConfigureMockMvc
 public class UserControllerSpringTest {
     @Autowired
     private CustomerController customerController;
@@ -37,14 +41,18 @@ public class UserControllerSpringTest {
     private CustomerService customerService;
     @Autowired
     private CouponService couponService;
+
+    @Autowired
     private MockMvc mockMvc;
     private ObjectMapper objectMapper = new ObjectMapper();
     Long userId;
 
     @BeforeEach
     void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(customerController)
-                .setControllerAdvice(new ExceptionAdvice()).build();
+//        mockMvc = MockMvcBuilders
+//                .standaloneSetup(customerController)
+//                .apply(springSecurity())
+//                .setControllerAdvice(new ExceptionAdvice()).build();
 
         CustomerCreationDto requestDto = CustomerCreationDto.builder()
                 .loginId("loginid")
@@ -116,6 +124,7 @@ public class UserControllerSpringTest {
     }
 
     @Test
+    @WithMockUser(roles={"ADMIN"})
     void findOne() throws Exception {
         //given
 
@@ -130,6 +139,7 @@ public class UserControllerSpringTest {
     }
 
     @Test
+    @WithMockUser(roles={"ADMIN"})
     void findAll() throws Exception {
         //given
 
@@ -146,6 +156,7 @@ public class UserControllerSpringTest {
     }
 
     @Test
+        //아이디, 비번 찾기는 누구나 가능해야함. 로그인 한 유저만 가능한게 아니라
     void findLoginId() throws Exception {
         //given
         String phoneNumber = "01011111111";
@@ -197,15 +208,14 @@ public class UserControllerSpringTest {
 
         // When
         ResultActions resultActions = mockMvc.perform(
-                post("/api/users/login")
+                post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequestDto))
         );
 
         // Then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.result.data.loginId").value("loginid"));
+                .andExpect(jsonPath("$.code").value(200));
     }
 
     @Test
@@ -233,6 +243,7 @@ public class UserControllerSpringTest {
     }
 
     @Test
+    @WithMockUser(roles = {"CUSTOMER"})
     void updateProfile() throws Exception {
         //given
         UpdateProfileDto updateProfileDto = UpdateProfileDto.builder()
@@ -258,6 +269,7 @@ public class UserControllerSpringTest {
     }
 
     @Test
+    @WithMockUser(roles = {"CUSTOMER"})
     void getAllCouponItems() throws Exception {
         //given
         CouponDto couponDto = CouponDto.builder().build();
@@ -284,7 +296,6 @@ public class UserControllerSpringTest {
                 .andExpect(jsonPath("$.result.data[0].customerDto.id").value(customerId));
     }
 }
-
 
 
 

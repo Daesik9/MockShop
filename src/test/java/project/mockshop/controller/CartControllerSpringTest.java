@@ -4,16 +4,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.advice.ExceptionAdvice;
+import project.mockshop.annotation.WithMockMember;
 import project.mockshop.dto.*;
 import project.mockshop.entity.Customer;
+import project.mockshop.entity.Member;
 import project.mockshop.mapper.CustomerMapper;
 import project.mockshop.service.CartService;
 import project.mockshop.service.CustomerService;
@@ -26,9 +31,11 @@ import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 
 @SpringBootTest
 @Transactional
+@AutoConfigureMockMvc
 public class CartControllerSpringTest {
     @Autowired
     private CartController cartController;
@@ -38,7 +45,7 @@ public class CartControllerSpringTest {
     private ItemService itemService;
     @Autowired
     private CustomerService customerService;
-
+    @Autowired
     private MockMvc mockMvc;
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,9 +54,9 @@ public class CartControllerSpringTest {
 
     @BeforeEach
     void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(cartController)
-                .setControllerAdvice(new ExceptionAdvice())
-                .build();
+//        mockMvc = MockMvcBuilders.standaloneSetup(cartController)
+//                .setControllerAdvice(new ExceptionAdvice())
+//                .build();
 
         ItemCreationDto creationDto = ItemCreationDto.builder().name("사과").price(1000).quantity(100).build();
         try {
@@ -70,6 +77,7 @@ public class CartControllerSpringTest {
     }
 
     @Test
+    @WithMockMember
     void addToCart() throws Exception {
         //given
         CartAddRequestDto cartRequest = CartAddRequestDto.builder().itemId(itemId).count(3).customerId(customerId).build();
@@ -86,14 +94,24 @@ public class CartControllerSpringTest {
     }
 
     @Test
+    @WithMockMember //멤버
+//    @WithMockMember(id = customerId) -> constant value밖에 못 넣음.
     void getCartWithItems() throws Exception {
         //given
         cartService.addToCart(itemId, 3, customerId);
 
+        //customerId 1로 로그인했는데도  2인 유저의 정보를 가져올 수 있음 -> 그러면 안됨!!!
+        //컨트롤러에서 현재 로그인한 계정의 id로 조회하도록 로직을 수정함.
+        //그래서 테스트시에 user 정보를 넣어줘야해서 이렇게 수정함.
+//        Member member = Customer.builder().id(customerId).build();
+//        CustomUserDetails userDetails = new CustomUserDetails(member);
+
         //when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/cart")
-                        .param("customerId", customerId.toString())
+//                        .with(user(userDetails))
+
+//                        .param("customerId", customerId.toString())
         );
 
         //then
@@ -105,6 +123,7 @@ public class CartControllerSpringTest {
     }
 
     @Test
+    @WithMockMember
     void changeCartItemCount() throws Exception {
         //given
         Long cartId = cartService.addToCart(itemId, 3, customerId);
@@ -132,6 +151,7 @@ public class CartControllerSpringTest {
     }
 
     @Test
+    @WithMockMember
     void changeCartItemCount_fail() throws Exception {
         //given
         Long cartId = cartService.addToCart(itemId, 3, customerId);
@@ -160,6 +180,7 @@ public class CartControllerSpringTest {
     }
 
     @Test
+    @WithMockMember
     void removeCartItem() throws Exception {
         //given
         Long cartId = cartService.addToCart(itemId, 3, customerId);
@@ -184,6 +205,7 @@ public class CartControllerSpringTest {
     }
 
     @Test
+    @WithMockMember
     void removeCartItem_fail() throws Exception {
         //given
         Long cartId = cartService.addToCart(itemId, 3, customerId);

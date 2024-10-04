@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.advice.ExceptionAdvice;
+import project.mockshop.annotation.WithMockMember;
 import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.*;
@@ -35,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @Transactional
+@AutoConfigureMockMvc
 public class ItemControllerSpringTest {
 
     @Autowired
@@ -47,18 +50,20 @@ public class ItemControllerSpringTest {
     private OrderRepository orderRepository;
     @Autowired
     private MerchantRepository merchantRepository;
+    @Autowired
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(itemController)
-                .setControllerAdvice(new ExceptionAdvice())
-                .build();
+//        mockMvc = MockMvcBuilders.standaloneSetup(itemController)
+//                .setControllerAdvice(new ExceptionAdvice())
+//                .build();
     }
 
     @Test
+    @WithMockMember(role = "ROLE_MERCHANT")
     void create() throws Exception {
         //given
         String path = "src/test/resources/image/image.png";
@@ -217,6 +222,7 @@ public class ItemControllerSpringTest {
     }
 
     @Test
+    @WithMockMember(role = "ROLE_ADMIN")
     void getItemsByMerchant() throws Exception {
         //given
         Merchant merchant = Merchant.builder().name("merchant").build();

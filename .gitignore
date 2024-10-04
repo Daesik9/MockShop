@@ -38,3 +38,6 @@ out/
 
 ### 설정 정보 ###
 /src/main/resources/application.yml
+/src/main/resources/jwt.yml
+
+.DS_Store

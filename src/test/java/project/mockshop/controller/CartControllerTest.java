@@ -19,6 +19,7 @@ import project.mockshop.entity.CartItem;
 import project.mockshop.entity.Customer;
 import project.mockshop.entity.Item;
 import project.mockshop.mapper.CartMapper;
+import project.mockshop.security.JwtUtil;
 import project.mockshop.service.CartService;
 
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -38,6 +40,8 @@ public class CartControllerTest {
 
     @Mock
     private CartService cartService;
+    @Mock
+    private JwtUtil jwtUtil;
 
     @BeforeEach
     void init() {
@@ -69,7 +73,7 @@ public class CartControllerTest {
 
         //then
         resultActions.andExpect(status().isOk())
-                        .andExpect(jsonPath("$.code").value(200));
+                .andExpect(jsonPath("$.code").value(200));
     }
 
     @Test
@@ -118,9 +122,10 @@ public class CartControllerTest {
         given(cartService.getCartWithItems(1L)).willReturn(CartMapper.toDto(cart));
 
         //when
+        when(jwtUtil.getLoginMemberId()).thenReturn(1L);
         ResultActions resultActions = mockMvc.perform(
                 get("/api/cart")
-                        .param("customerId", "1")
+//                        .param("customerId", "1")
         );
 
         //then
