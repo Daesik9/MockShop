@@ -1,6 +1,7 @@
 package project.mockshop.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.CustomerCreationDto;
@@ -22,6 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
     public Long createAccount(CustomerCreationDto dto) {
@@ -36,6 +38,7 @@ public class CustomerService {
 
         Customer customer = CustomerMapper.toEntity(dto);
         customer.changeRole(Role.CUSTOMER.name());
+        customer.changePassword(bCryptPasswordEncoder.encode(customer.getPassword()));
 
         Customer newCustomer = customerRepository.save(customer);
 
