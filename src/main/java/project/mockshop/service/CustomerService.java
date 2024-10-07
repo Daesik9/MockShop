@@ -118,7 +118,7 @@ public class CustomerService {
 
         Customer customer = optionalCustomer.get();
 
-        if (customer.getPassword().equals(updateProfileDto.getPassword())) {
+        if (bCryptPasswordEncoder.matches(updateProfileDto.getPassword(), customer.getPassword())) {
             throw new IllegalArgumentException(CustomerPolicy.SAME_PASSWORD_STRING);
         }
 

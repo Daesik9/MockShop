@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import project.mockshop.dto.CustomerCreationDto;
 import project.mockshop.dto.CustomerDto;
 import project.mockshop.dto.LoginRequestDto;
@@ -31,6 +32,8 @@ public class CustomerServiceTest {
     private CustomerService customerService;
     @Mock
     private CustomerRepository customerRepository;
+    @Mock
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private CustomerDto customerDto;
     @BeforeEach
@@ -65,6 +68,7 @@ public class CustomerServiceTest {
 //            savedCustomer.changeId(1L);
             return savedCustomer;
         });
+        given(bCryptPasswordEncoder.encode(customer.getPassword())).willReturn("encodedPassword1!");
 
         //when
         customerService.createAccount(creationDto);
@@ -301,6 +305,7 @@ public class CustomerServiceTest {
                 .build();
 
         //when
+        when(bCryptPasswordEncoder.matches(updateProfileDto.getPassword(), customer.getPassword())).thenReturn(true);
         assertThatThrownBy(() -> customerService.updateProfile(updateProfileDto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.SAME_PASSWORD_STRING);
