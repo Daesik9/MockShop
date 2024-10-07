@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.CustomerCreationDto;
 import project.mockshop.dto.CustomerDto;
@@ -24,6 +25,8 @@ import static org.mockito.Mockito.when;
 public class CustomerServiceSpringTest {
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     Long userId;
 
@@ -97,7 +100,7 @@ public class CustomerServiceSpringTest {
         //then
         CustomerDto customerDto = customerService.findOne(updateProfileDto.getUserId());
         assertThat(customerDto.getName()).isEqualTo("구매자");
-        assertThat(customerDto.getPassword()).isEqualTo("Password1!");
+        assertThat(passwordEncoder.matches("Password1!", customerDto.getPassword())).isTrue();
         assertThat(customerDto.getEmail()).isEqualTo("email@email.com");
         assertThat(customerDto.getPhoneNumber()).isEqualTo("01088888888");
         assertThat(customerDto.getAddress().getCity()).isEqualTo("city");

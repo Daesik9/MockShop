@@ -194,8 +194,7 @@ public class UserControllerSpringTest {
 
         //then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.result.data").value("Password1!"));
+                .andExpect(jsonPath("$.code").value(200));
     }
 
     @Test

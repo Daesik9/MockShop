@@ -179,7 +179,7 @@ public class OrderRepositoryTest {
         //given
 
         //when
-        List<Order> orders = orderRepository.findAllByMerchant(merchant1);
+        List<Order> orders = orderRepository.findAllByMerchantId(merchant1.getId());
 
         //then
         assert orders != null;

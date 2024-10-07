@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import project.mockshop.dto.LoginRequestDto;
 import project.mockshop.entity.*;
 import project.mockshop.repository.MemberRepository;
@@ -25,6 +26,8 @@ public class AuthServiceTest {
 
     @Mock
     private JwtTokenProvider jwtTokenProvider;
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Test
     void login_customer() throws Exception {
@@ -43,6 +46,7 @@ public class AuthServiceTest {
 
         //when
         when(memberRepository.findByLoginId(loginRequestDto.getLoginId())).thenReturn(Optional.of(member));
+        when(passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())).thenReturn(true);
         String token = authService.login(loginRequestDto);
 
         //then
@@ -67,6 +71,7 @@ public class AuthServiceTest {
 
         //when
         when(memberRepository.findByLoginId(loginRequestDto.getLoginId())).thenReturn(Optional.of(member));
+        when(passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())).thenReturn(true);
         String token = authService.login(loginRequestDto);
 
         //then
@@ -91,6 +96,7 @@ public class AuthServiceTest {
 
         //when
         when(memberRepository.findByLoginId(loginRequestDto.getLoginId())).thenReturn(Optional.of(member));
+        when(passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())).thenReturn(true);
         String token = authService.login(loginRequestDto);
 
         //then

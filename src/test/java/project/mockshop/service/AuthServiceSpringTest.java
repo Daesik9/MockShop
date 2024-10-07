@@ -3,6 +3,7 @@ package project.mockshop.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.LoginRequestDto;
 import project.mockshop.entity.*;
@@ -21,6 +22,8 @@ public class AuthServiceSpringTest {
     private MemberRepository memberRepository;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Test
     void login_customer() throws Exception {
@@ -32,7 +35,7 @@ public class AuthServiceSpringTest {
 
         Member member = Customer.builder()
                 .loginId(loginRequestDto.getLoginId())
-                .password(loginRequestDto.getPassword())
+                .password(passwordEncoder.encode(loginRequestDto.getPassword()))
                 .role(Role.CUSTOMER.name())
                 .build();
         memberRepository.save(member);
@@ -55,7 +58,7 @@ public class AuthServiceSpringTest {
 
         Member member = Merchant.builder()
                 .loginId(loginRequestDto.getLoginId())
-                .password(loginRequestDto.getPassword())
+                .password(passwordEncoder.encode(loginRequestDto.getPassword()))
                 .role(Role.MERCHANT.name())
                 .build();
         memberRepository.save(member);
@@ -78,7 +81,7 @@ public class AuthServiceSpringTest {
 
         Member member = Admin.builder()
                 .loginId(loginRequestDto.getLoginId())
-                .password(loginRequestDto.getPassword())
+                .password(passwordEncoder.encode(loginRequestDto.getPassword()))
                 .role(Role.ADMIN.name())
                 .build();
         memberRepository.save(member);
