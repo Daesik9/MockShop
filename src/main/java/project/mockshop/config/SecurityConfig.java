@@ -44,23 +44,22 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-//                        .requestMatchers("/api/login", "api/signup").permitAll()
+                        .requestMatchers("/", "/swagger-ui/**", "/v3/**").permitAll()
                         .requestMatchers("/api/auth/**", "/api/users/find/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll() //회원가입 누구나 가능
                         .requestMatchers("/api/users/check-duplicate/**").permitAll()
+                        .requestMatchers("/api/events/**").permitAll()
+                        .requestMatchers("/api/items/best-five", "/api/items/search").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/users").hasRole("CUSTOMER")
                         .requestMatchers("/api/users/*/coupons").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.POST, "/api/events/*/participants").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("CUSTOMER")
+                        .requestMatchers("/api/orders/*").hasAnyRole("CUSTOMER", "ADMIN")
                         .requestMatchers("/api/admin/**", "/api/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/events").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/items").hasRole("MERCHANT")
                         .requestMatchers("/api/merchants/*/items").hasRole("ADMIN")
-                        .requestMatchers("/api/items/best-five", "/api/items/search").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("CUSTOMER")
                         .requestMatchers("/api/orders/merchants/**").hasRole("ADMIN")
-                        .requestMatchers("/api/orders/*").hasAnyRole("CUSTOMER", "ADMIN")
-                        .requestMatchers("/api/events/**").permitAll()
-
+                        .requestMatchers(HttpMethod.POST, "/api/items").hasRole("MERCHANT")
                         .anyRequest().authenticated());
 
         http
