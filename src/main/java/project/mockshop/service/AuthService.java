@@ -26,6 +26,6 @@ public class AuthService {
             throw new NullPointerException("아이디나 비밀번호가 일치하지 않습니다.");
         }
 
-        return jwtTokenProvider.createToken(loginRequestDto.getLoginId(), findMember.getRole(), findMember.getId().toString());
+        return jwtTokenProvider.createToken(loginRequestDto.getLoginId(), "ROLE_" + findMember.getRole(), findMember.getId().toString());
     }
 }
