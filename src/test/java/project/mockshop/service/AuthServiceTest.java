@@ -157,4 +157,19 @@ public class AuthServiceTest {
         assertThat(code).isNotNull();
     }
 
+    @Test
+    void getIdFromToken() throws Exception {
+        //given
+        String token = "temp_token";
+        given(jwtTokenProvider.getMemberId(token)).willReturn("1");
+        given(memberRepository.findById(1L)).willReturn(Optional.of(Member.memberBuilder().id(1L).build()));
+
+        //when
+        String memberId = jwtTokenProvider.getMemberId(token);
+        Member byId = memberRepository.findById(Long.valueOf(memberId))
+                .orElseThrow();
+
+        //then
+        assertThat(byId.getId()).isEqualTo(1L);
+    }
 }

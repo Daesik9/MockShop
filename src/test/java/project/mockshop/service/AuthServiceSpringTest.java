@@ -128,4 +128,30 @@ public class AuthServiceSpringTest {
         //then
         assertThat(isVerified).isTrue();
     }
+
+    @Test
+    void getIdFromToken() throws Exception {
+        //given
+        LoginRequestDto loginRequestDto = LoginRequestDto.builder()
+                .loginId("customer")
+                .password("Customer1!")
+                .build();
+
+        Member member = Customer.builder()
+                .loginId(loginRequestDto.getLoginId())
+                .password(passwordEncoder.encode(loginRequestDto.getPassword()))
+                .role(Role.CUSTOMER.name())
+                .build();
+        memberRepository.save(member);
+        String token = authService.login(loginRequestDto);
+
+        //when
+        String memberId = jwtTokenProvider.getMemberId(token);
+        Member byId = memberRepository.findById(Long.valueOf(memberId))
+                .orElseThrow();
+
+        //then
+        assertThat(byId.getId()).isEqualTo(member.getId());
+    }
+
 }
