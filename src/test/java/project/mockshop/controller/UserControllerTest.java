@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.dto.*;
-import project.mockshop.entity.Address;
+import project.mockshop.entity.AddressInfo;
 import project.mockshop.service.CouponService;
 import project.mockshop.service.CustomerService;
 
@@ -59,7 +59,7 @@ public class UserControllerTest {
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@email.com")
-                .address(new Address("city", "street", "88888"))
+                .addressInfo(new AddressInfo("city", "street", "88888"))
                 .build();
 
 
@@ -136,12 +136,12 @@ public class UserControllerTest {
     }
 
     @Test
-    void findLoginId() throws Exception {
+    void findLoginIdByEmail() throws Exception {
         //given
-        String phoneNumber = "01011111111";
-        CustomerDto customer = CustomerDto.builder().loginId("loginid").phoneNumber(phoneNumber).build();
-        given(customerService.findLoginId(phoneNumber)).willReturn(customer);
-        FindLoginIdRequestDto requestDto = FindLoginIdRequestDto.builder().phoneNumber(phoneNumber).build();
+        String email = "test@test.com";
+        CustomerDto customer = CustomerDto.builder().loginId("loginid").email(email).build();
+        given(customerService.findLoginIdByEmail(email)).willReturn(customer.getLoginId());
+        FindLoginIdRequestDto requestDto = FindLoginIdRequestDto.builder().email(email).build();
 
         //when
         ResultActions resultActions = mockMvc.perform(
@@ -216,7 +216,7 @@ public class UserControllerTest {
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@email.com")
-                .address(new Address("city", "street", "88888"))
+                .addressInfo(new AddressInfo("city", "street", "88888"))
                 .build();
 
         //when
@@ -239,7 +239,7 @@ public class UserControllerTest {
                 .password("Newpassword1!")
                 .email("newemail@gmail.com")
                 .phoneNumber("01022222222")
-                .address(new Address("new city", "new street", "99999"))
+                .addressInfo(new AddressInfo("new city", "new street", "99999"))
                 .build();
 
         //when
@@ -264,7 +264,7 @@ public class UserControllerTest {
                 .password("Password1!")
                 .email("newemail@gmail.com")
                 .phoneNumber("01022222222")
-                .address(new Address("new city", "new street", "99999"))
+                .addressInfo(new AddressInfo("new city", "new street", "99999"))
                 .build();
         willThrow(IllegalArgumentException.class)
                 .given(customerService).updateProfile(argThat(dto -> dto.getPassword().equals("Password1!")));

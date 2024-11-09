@@ -1,34 +1,31 @@
 package project.mockshop.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.With;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import project.mockshop.advice.ExceptionAdvice;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import project.mockshop.dto.*;
-import project.mockshop.entity.Address;
+import project.mockshop.entity.AddressInfo;
+import project.mockshop.response.Response;
 import project.mockshop.service.CouponService;
 import project.mockshop.service.CustomerService;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -41,6 +38,8 @@ public class UserControllerSpringTest {
     private CustomerService customerService;
     @Autowired
     private CouponService couponService;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     private MockMvc mockMvc;
@@ -60,7 +59,7 @@ public class UserControllerSpringTest {
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@email.com")
-                .address(new Address("city", "street", "88888"))
+                .addressInfo(new AddressInfo("city", "street", "88888"))
                 .build();
         userId = customerService.createAccount(requestDto);
     }
@@ -84,7 +83,7 @@ public class UserControllerSpringTest {
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@email.com")
-                .address(new Address("city", "street", "88888"))
+                .addressInfo(new AddressInfo("city", "street", "88888"))
                 .build();
 
 
@@ -157,10 +156,10 @@ public class UserControllerSpringTest {
 
     @Test
         //아이디, 비번 찾기는 누구나 가능해야함. 로그인 한 유저만 가능한게 아니라
-    void findLoginId() throws Exception {
+    void findLoginIdByEmail() throws Exception {
         //given
-        String phoneNumber = "01011111111";
-        FindLoginIdRequestDto requestDto = FindLoginIdRequestDto.builder().phoneNumber(phoneNumber).build();
+        String email = "email@email.com";
+        FindLoginIdRequestDto requestDto = FindLoginIdRequestDto.builder().email("email@email.com").build();
 
         //when
         ResultActions resultActions = mockMvc.perform(
@@ -227,7 +226,7 @@ public class UserControllerSpringTest {
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@email.com")
-                .address(new Address("city", "street", "88888"))
+                .addressInfo(new AddressInfo("city", "street", "88888"))
                 .build();
 
         //when
@@ -251,7 +250,7 @@ public class UserControllerSpringTest {
                 .password("Newpassword1!")
                 .email("newemail@gmail.com")
                 .phoneNumber("01022222222")
-                .address(new Address("new city", "new street", "99999"))
+                .addressInfo(new AddressInfo("new city", "new street", "99999"))
                 .build();
 
         //when
@@ -278,7 +277,7 @@ public class UserControllerSpringTest {
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@email.com")
-                .address(new Address("city", "street", "88888"))
+                .addressInfo(new AddressInfo("city", "street", "88888"))
                 .build();
         Long customerId = customerService.createAccount(requestDto);
         Long couponId = couponService.createCoupon(couponDto);
@@ -294,7 +293,26 @@ public class UserControllerSpringTest {
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.result.data[0].customerDto.id").value(customerId));
     }
+
+    @Test
+    void resetPassword() throws Exception {
+        //given
+        ResetPasswordDto resetPasswordDto = ResetPasswordDto.builder()
+                .email("email@email.com")
+                .password("NewPassword1!")
+                .build();
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                put("/api/users/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(resetPasswordDto))
+        );
+        CustomerDto customerDto = customerService.findOne(userId);
+
+        //then
+        resultActions.andExpect(status().isOk());
+        assertThat(passwordEncoder.matches("NewPassword1!", customerDto.getPassword())).isTrue();
+    }
+
 }
-
-
-

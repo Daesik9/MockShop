@@ -7,5 +7,5 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FindLoginIdRequestDto {
-    private String phoneNumber;
+    private String email;
 }

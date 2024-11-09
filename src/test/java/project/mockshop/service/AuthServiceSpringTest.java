@@ -1,17 +1,26 @@
 package project.mockshop.service;
 
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import project.mockshop.dto.AuthCodeDto;
 import project.mockshop.dto.LoginRequestDto;
 import project.mockshop.entity.*;
+import project.mockshop.repository.AuthCodeRepository;
 import project.mockshop.repository.MemberRepository;
 import project.mockshop.security.JwtTokenProvider;
 
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 @Transactional
@@ -21,9 +30,13 @@ public class AuthServiceSpringTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
+    private AuthCodeRepository authCodeRepository;
+    @Autowired
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Test
     void login_customer() throws Exception {
@@ -44,7 +57,7 @@ public class AuthServiceSpringTest {
         String token = authService.login(loginRequestDto);
 
         //then
-        assertThat(jwtTokenProvider.getRole(token)).isEqualTo(Role.CUSTOMER.name());
+        assertThat(jwtTokenProvider.getRole(token)).isEqualTo("ROLE_CUSTOMER");
         assertThat(jwtTokenProvider.getLoginId(token)).isEqualTo("customer");
     }
 
@@ -67,7 +80,7 @@ public class AuthServiceSpringTest {
         String token = authService.login(loginRequestDto);
 
         //then
-        assertThat(jwtTokenProvider.getRole(token)).isEqualTo(Role.MERCHANT.name());
+        assertThat(jwtTokenProvider.getRole(token)).isEqualTo("ROLE_MERCHANT");
         assertThat(jwtTokenProvider.getLoginId(token)).isEqualTo("merchant");
     }
 
@@ -92,7 +105,27 @@ public class AuthServiceSpringTest {
 
         //then
         String role = jwtTokenProvider.getRole(token);
-        assertThat(role).isEqualTo(Role.ADMIN.name());
+        assertThat(role).isEqualTo("ROLE_ADMIN");
         assertThat(jwtTokenProvider.getLoginId(token)).isEqualTo("admin");
+    }
+
+    @Test
+    void verifyAuthCode() throws Exception {
+        //given
+        AuthCode authCode = AuthCode.builder()
+                .code("123456")
+                .email("email@email.com")
+                .expirationTime(LocalDateTime.now().plusMinutes(3))
+                .build();
+        authCodeRepository.save(authCode);
+
+        //when
+        boolean isVerified = authService.verifyAuthCode(AuthCodeDto.builder()
+                .authCode("123456")
+                .email("email@email.com")
+                .build());
+
+        //then
+        assertThat(isVerified).isTrue();
     }
 }
