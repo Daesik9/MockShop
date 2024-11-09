@@ -3,7 +3,6 @@ package project.mockshop.entity;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import project.mockshop.validator.CustomerValidator;
 
 @Entity
@@ -14,8 +13,8 @@ public class Customer extends Member {
     private int point;
 
     public Customer(Long id, String loginId, String name, String password, String phoneNumber,
-                    String email, Address address, boolean isDeleted, int point, String role) {
-        super(id, loginId, name, password, phoneNumber, email, address, isDeleted, role);
+                    String email, AddressInfo addressInfo, boolean isDeleted, int point, String role) {
+        super(id, loginId, name, password, phoneNumber, email, addressInfo, isDeleted, role);
         this.point = point;
     }
 
@@ -27,7 +26,7 @@ public class Customer extends Member {
         private String password;
         private String phoneNumber;
         private String email;
-        private Address address;
+        private AddressInfo addressInfo;
         private boolean isDeleted;
         private int point;
         private String role;
@@ -68,8 +67,8 @@ public class Customer extends Member {
             return this;
         }
 
-        public CustomerBuilder address(Address address) {
-            this.address = address;
+        public CustomerBuilder addressInfo(AddressInfo addressInfo) {
+            this.addressInfo = addressInfo;
             return this;
         }
 
@@ -89,7 +88,7 @@ public class Customer extends Member {
         }
 
         public Customer build() {
-            return new Customer(id, loginId, name, password, phoneNumber, email, address, isDeleted, point, role);
+            return new Customer(id, loginId, name, password, phoneNumber, email, addressInfo, isDeleted, point, role);
         }
     }
 

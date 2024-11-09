@@ -2,7 +2,6 @@ package project.mockshop.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import project.mockshop.validator.CustomerValidator;
 
 @Entity
@@ -26,7 +25,7 @@ public class Member {
     private String email;
 
     @Embedded
-    private Address address;
+    private AddressInfo addressInfo;
     private boolean isDeleted;
 
     @Column(insertable=false, updatable=false)
@@ -39,7 +38,7 @@ public class Member {
         private String password;
         private String phoneNumber;
         private String email;
-        private Address address;
+        private AddressInfo addressInfo;
         private boolean isDeleted;
         private String role;
 
@@ -59,7 +58,7 @@ public class Member {
         }
 
         public Member build() {
-            return new Member(id, loginId, name, password, phoneNumber, email, address, isDeleted, role);
+            return new Member(id, loginId, name, password, phoneNumber, email, addressInfo, isDeleted, role);
         }
     }
 
@@ -91,8 +90,8 @@ public class Member {
         this.email = email;
     }
 
-    public void changeAddress(Address address) {
-        this.address = address;
+    public void changeAddressInfo(AddressInfo addressInfo) {
+        this.addressInfo = addressInfo;
     }
 
     public void changeRole(String role) {

@@ -12,7 +12,7 @@ public class CustomerMapper {
                 .password(dto.getPassword())
                 .phoneNumber(dto.getPhoneNumber())
                 .email(dto.getEmail())
-                .address(dto.getAddress())
+                .addressInfo(dto.getAddressInfo())
                 .point(0)
                 .isDeleted(false)
                 .build();
@@ -26,7 +26,7 @@ public class CustomerMapper {
                 .password(dto.getPassword())
                 .phoneNumber(dto.getPhoneNumber())
                 .email(dto.getEmail())
-                .address(dto.getAddress())
+                .addressInfo(dto.getAddressInfo())
                 .point(0)
                 .isDeleted(false)
                 .build();
@@ -40,7 +40,7 @@ public class CustomerMapper {
                 .password(entity.getPassword())
                 .phoneNumber(entity.getPhoneNumber())
                 .email(entity.getEmail())
-                .address(entity.getAddress())
+                .addressInfo(entity.getAddressInfo())
                 .point(entity.getPoint())
                 .isDeleted(entity.isDeleted())
                 .build();
@@ -53,7 +53,7 @@ public class CustomerMapper {
                 .password(entity.getPassword())
                 .phoneNumber(entity.getPhoneNumber())
                 .email(entity.getEmail())
-                .address(entity.getAddress())
+                .addressInfo(entity.getAddressInfo())
                 .build();
     }
 }

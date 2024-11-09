@@ -11,11 +11,8 @@ import project.mockshop.repository.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 @Transactional
@@ -73,7 +70,7 @@ public class EventServiceSpringTest {
                     .password("Password1!")
                     .phoneNumber("01088888888")
                     .email("email@email.com")
-                    .address(new Address("city", "street", "88888"))
+                    .addressInfo(new AddressInfo("city", "street", "88888"))
                     .build();
             Long customerId = customerService.createAccount(cusomterCreationDto);
 
@@ -109,7 +106,7 @@ public class EventServiceSpringTest {
                     .password("Password1!")
                     .phoneNumber("01088888888")
                     .email("email@email.com")
-                    .address(new Address("city", "street", "88888"))
+                    .addressInfo(new AddressInfo("city", "street", "88888"))
                     .build();
             Long customerId = customerService.createAccount(cusomterCreationDto);
 
@@ -144,7 +141,7 @@ public class EventServiceSpringTest {
                     .password("Password1!")
                     .phoneNumber("01088888888")
                     .email("email@email.com")
-                    .address(new Address("city", "street", "88888"))
+                    .addressInfo(new AddressInfo("city", "street", "88888"))
                     .build();
             Long customerId = customerService.createAccount(cusomterCreationDto);
 
@@ -154,7 +151,7 @@ public class EventServiceSpringTest {
                     .password("Password1!")
                     .phoneNumber("01077777777")
                     .email("email2@email.com")
-                    .address(new Address("city", "street", "88888"))
+                    .addressInfo(new AddressInfo("city", "street", "88888"))
                     .build();
             Long customerId2 = customerService.createAccount(cusomterCreationDto2);
 
@@ -190,7 +187,7 @@ public class EventServiceSpringTest {
                     .password("Password1!")
                     .phoneNumber("01088888888")
                     .email("email@email.com")
-                    .address(new Address("city", "street", "88888"))
+                    .addressInfo(new AddressInfo("city", "street", "88888"))
                     .build();
             Long customerId = customerService.createAccount(cusomterCreationDto);
 

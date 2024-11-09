@@ -10,18 +10,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.annotation.WithMockMember;
 import project.mockshop.dto.*;
-import project.mockshop.entity.Address;
-import project.mockshop.entity.Customer;
-import project.mockshop.entity.Member;
+import project.mockshop.entity.AddressInfo;
 import project.mockshop.repository.EventRepository;
-import project.mockshop.response.Response;
 import project.mockshop.service.CouponService;
 import project.mockshop.service.CustomerService;
 import project.mockshop.service.EventService;
@@ -29,9 +23,7 @@ import project.mockshop.service.EventService;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -125,7 +117,7 @@ public class EventControllerSpringTest {
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@email.com")
-                .address(new Address("city", "street", "88888"))
+                .addressInfo(new AddressInfo("city", "street", "88888"))
                 .build();
 
         Long customerId = customerService.createAccount(requestDto);

@@ -10,12 +10,8 @@ import project.mockshop.repository.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Transactional
@@ -39,7 +35,7 @@ public class OrderServiceSpringTest {
     @Test
     void order() throws Exception {
         //given
-        Customer customer = Customer.builder().name("테스트").address(new Address("city", "street", "11111")).build();
+        Customer customer = Customer.builder().name("테스트").addressInfo(new AddressInfo("city", "street", "11111")).build();
         customerRepository.save(customer);
 
         Item item = Item.builder().name("사과").quantity(100).price(1000).build();
@@ -98,7 +94,7 @@ public class OrderServiceSpringTest {
         Order order1 = Order.builder()
                 .id(1L)
                 .customer(customer)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -109,7 +105,7 @@ public class OrderServiceSpringTest {
         Order order2 = Order.builder()
                 .id(2L)
                 .customer(customer)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -121,7 +117,7 @@ public class OrderServiceSpringTest {
         Order order3 = Order.builder()
                 .id(3L)
                 .customer(customer)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -132,7 +128,7 @@ public class OrderServiceSpringTest {
         Order order4 = Order.builder()
                 .id(4L)
                 .customer(customer)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)

@@ -7,7 +7,6 @@ import project.mockshop.util.OrderNumberGenerator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Builder
@@ -25,7 +24,7 @@ public class Order {
     private Customer customer;
 
     @Embedded
-    private Address address;
+    private AddressInfo addressInfo;
 
     private String paymentMethod;
     private LocalDateTime orderDate;
@@ -41,7 +40,7 @@ public class Order {
     public static Order createOrder(Customer customer, String paymentMethod, List<OrderItem> orderItems) {
         return Order.builder()
                 .customer(customer)
-                .address(customer.getAddress())
+                .addressInfo(customer.getAddressInfo())
                 .paymentMethod(paymentMethod)
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -51,11 +50,11 @@ public class Order {
     }
 
     public static class OrderBuilder {
-            public OrderBuilder address(Address address) {
-            if (address == null) {
+            public OrderBuilder addressInfo(AddressInfo addressInfo) {
+            if (addressInfo == null) {
                 throw new IllegalArgumentException(MockShopPolicy.INPUT_STRING_METHOD("배송지"));
             }
-            this.address = address;
+            this.addressInfo = addressInfo;
 
             return this;
         }
@@ -70,7 +69,7 @@ public class Order {
         }
 
         public Order build() {
-            Order order = new Order(id, customer, address, paymentMethod, orderDate, status, orderItems, orderNumber);
+            Order order = new Order(id, customer, addressInfo, paymentMethod, orderDate, status, orderItems, orderNumber);
 
             for (OrderItem orderItem : this.orderItems) {
                 orderItem.changeOrder(order);

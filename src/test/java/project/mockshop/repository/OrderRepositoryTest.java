@@ -97,7 +97,7 @@ public class OrderRepositoryTest {
         OrderItem orderItem1 = OrderItem.builder().item(item1Merchant1).build();
         Order order1 = Order.builder()
                 .customer(customer1)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -108,7 +108,7 @@ public class OrderRepositoryTest {
         OrderItem orderItem2 = OrderItem.builder().item(item2Merchant1).build();
         Order order2 = Order.builder()
                 .customer(customer2)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.DELIVERED)
@@ -120,7 +120,7 @@ public class OrderRepositoryTest {
         OrderItem orderItem3 = OrderItem.builder().item(item3Merchant1).build();
         Order order3 = Order.builder()
                 .customer(customer1)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -131,7 +131,7 @@ public class OrderRepositoryTest {
         OrderItem orderItem4 = OrderItem.builder().item(item1Merchant2).build();
         Order order4 = Order.builder()
                 .customer(customer2)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.DELIVERED)
@@ -142,7 +142,7 @@ public class OrderRepositoryTest {
         OrderItem orderItem5 = OrderItem.builder().item(item2Merchant2).build();
         Order order5 = Order.builder()
                 .customer(customer1)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)

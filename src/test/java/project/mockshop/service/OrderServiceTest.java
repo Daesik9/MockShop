@@ -80,7 +80,7 @@ public class OrderServiceTest {
         Order order1 = Order.builder()
                 .id(1L)
                 .customer(customer1)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -91,7 +91,7 @@ public class OrderServiceTest {
         Order order2 = Order.builder()
                 .id(2L)
                 .customer(customer2)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -103,7 +103,7 @@ public class OrderServiceTest {
         Order order3 = Order.builder()
                 .id(3L)
                 .customer(customer1)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -114,7 +114,7 @@ public class OrderServiceTest {
         Order order4 = Order.builder()
                 .id(4L)
                 .customer(customer2)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -125,7 +125,7 @@ public class OrderServiceTest {
         Order order5 = Order.builder()
                 .id(5L)
                 .customer(customer1)
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -160,7 +160,7 @@ public class OrderServiceTest {
     @Test
     void order() throws Exception {
         //given
-        Customer customer = Customer.builder().name("테스트").address(new Address("city", "street", "11111")).build();
+        Customer customer = Customer.builder().name("테스트").addressInfo(new AddressInfo("city", "street", "11111")).build();
         Item item = Item.builder().quantity(100).build();
         OrderItem orderItem = OrderItem.builder().item(item).build();
         Order order = Order.builder()

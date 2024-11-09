@@ -15,7 +15,8 @@ public class CustomerPolicy {
     public static final String LOGIN_ID_LENGTH_STRING = "로그인 아이디는 " + CustomerPolicy.MIN_LOGIN_ID_LENGTH + "-" +
             CustomerPolicy.MAX_LOGIN_ID_LENGTH + "자리로 구성되어야 합니다.";
 
-    public static final String LOGIN_ID_POLICY_STRING = "로그인 아이디는 소문자와 숫자로만 구성되어야 합니다.";
+    public static final String LOGIN_ID_POLICY_STRING = "로그인 아이디는 소문자, 숫자, -, _로만 구성되어야 " +
+            "하며 영어 소문자로 시작해야 합니다.";
 
     public static final int MIN_PASSWORD_LENGTH = 8;
 
@@ -38,7 +39,7 @@ public class CustomerPolicy {
 
     public static final String EMAIL_POLICY_STRING = "이메일 형식을 다시 확인해주세요.";
 
-    public static final String ZIPCODE_POLICY_STRING = "우편번호는 숫자로만 구성되어야 합니다.";
+    public static final String ZONECODE_POLICY_STRING = "우편번호는 숫자로만 구성되어야 합니다.";
 
     public static final String POINT_POLICY_STRING = "포인트는 음수일 수 없습니다.";
 
