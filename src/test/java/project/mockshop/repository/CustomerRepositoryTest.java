@@ -3,10 +3,11 @@ package project.mockshop.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import project.mockshop.entity.Address;
+import project.mockshop.entity.AddressInfo;
 import project.mockshop.entity.Customer;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -58,14 +59,14 @@ public class CustomerRepositoryTest {
     @Test
     void update() {
         //given
-        Address address = new Address("city", "street", "12345");
+        AddressInfo addressInfo = new AddressInfo("city", "street", "12345");
         Customer customer = Customer.builder()
                 .loginId("customer")
                 .name("이름")
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@email.com")
-                .address(address)
+                .addressInfo(addressInfo)
                 .build();
         customerRepository.save(customer);
 
@@ -79,8 +80,8 @@ public class CustomerRepositoryTest {
         findCustomer.changeName("새이름");
         findCustomer.changePhoneNumber("01012341234");
         findCustomer.changeEmail("newemail@email.com");
-        Address newAddress = new Address("new city", "new street", "22222");
-        findCustomer.changeAddress(newAddress);
+        AddressInfo newAddressInfo = new AddressInfo("new city", "new street", "22222");
+        findCustomer.changeAddressInfo(newAddressInfo);
 
         //then
         Customer updatedCustomer = customerRepository.findById(customer.getId()).orElse(null);
@@ -92,7 +93,7 @@ public class CustomerRepositoryTest {
         assertThat(updatedCustomer.getName()).isEqualTo("새이름");
         assertThat(updatedCustomer.getPhoneNumber()).isEqualTo("01012341234");
         assertThat(updatedCustomer.getEmail()).isEqualTo("newemail@email.com");
-        assertThat(updatedCustomer.getAddress()).isEqualTo(newAddress);
+        assertThat(updatedCustomer.getAddressInfo()).isEqualTo(newAddressInfo);
     }
 
     @Test
@@ -113,4 +114,20 @@ public class CustomerRepositoryTest {
         assertThat(customers.size()).isEqualTo(1);
         assertThat(customerRepository.findById(customer1.getId())).isEmpty();
     }
+
+    @Test
+    void findByEmail() throws Exception {
+        //given
+        Customer customer = Customer.builder().loginId("customer").email("email@email.com").build();
+        customerRepository.save(customer);
+
+        //when
+        Optional<Customer> byEmail = customerRepository.findByEmail("email@email.com");
+
+        //then
+        assertThat(byEmail).isNotEmpty();
+        assertThat(byEmail.get().getEmail()).isEqualTo("email@email.com");
+    }
+
+
 }

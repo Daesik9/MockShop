@@ -1,19 +1,31 @@
 package project.mockshop.service;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import project.mockshop.dto.AuthCodeDto;
 import project.mockshop.dto.LoginRequestDto;
 import project.mockshop.entity.*;
+import project.mockshop.repository.AuthCodeRepository;
 import project.mockshop.repository.MemberRepository;
 import project.mockshop.security.JwtTokenProvider;
 
+import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Random;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,6 +40,10 @@ public class AuthServiceTest {
     private JwtTokenProvider jwtTokenProvider;
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
+    @Mock
+    private AuthCodeRepository authCodeRepository;
+    @Mock
+    private JavaMailSender javaMailSender;
 
     @Test
     void login_customer() throws Exception {
@@ -104,5 +120,41 @@ public class AuthServiceTest {
         assertThat(jwtTokenProvider.getRole(token)).isEqualTo(Role.ADMIN.name());
     }
 
+    @Test
+    void verifyAuthCode() throws Exception {
+        //given
+        AuthCode authCode = AuthCode.builder()
+                .code("123456")
+                .email("email@email.com")
+                .expirationTime(LocalDateTime.now().plusMinutes(3))
+                .build();
+        given(authCodeRepository.findByEmail("email@email.com")).willReturn(authCode);
+
+        //when
+        boolean isVerified = authService.verifyAuthCode(AuthCodeDto.builder().authCode("123456").email("email@email.com").build());
+
+        //then
+        assertThat(isVerified).isTrue();
+    }
+
+    @Test
+    void sendAuthCode() throws Exception {
+        //given
+        Member member = Customer.builder()
+                .id(1L)
+                .loginId("loginid")
+                .password("Password1!")
+                .role(Role.CUSTOMER.name())
+                .build();
+
+        given(memberRepository.findByEmail("email@email.com")).willReturn(Optional.of(member));
+        given(javaMailSender.createMimeMessage()).willReturn(new MimeMessage((Session) null));
+
+        //when
+        String code = authService.sendAuthCode("email@email.com");
+
+        //then
+        assertThat(code).isNotNull();
+    }
 
 }

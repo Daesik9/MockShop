@@ -11,7 +11,7 @@ import project.mockshop.dto.CustomerCreationDto;
 import project.mockshop.dto.CustomerDto;
 import project.mockshop.dto.LoginRequestDto;
 import project.mockshop.dto.UpdateProfileDto;
-import project.mockshop.entity.Address;
+import project.mockshop.entity.AddressInfo;
 import project.mockshop.entity.Customer;
 import project.mockshop.mapper.CustomerMapper;
 import project.mockshop.policy.CustomerPolicy;
@@ -45,7 +45,7 @@ public class CustomerServiceTest {
                 .password("Password1!")
                 .phoneNumber("01088888888")
                 .email("email@email.com")
-                .address(new Address("city", "street", "88888"))
+                .addressInfo(new AddressInfo("city", "street", "88888"))
                 .build();
     }
 
@@ -59,7 +59,7 @@ public class CustomerServiceTest {
                 .password("Password1!")
                 .phoneNumber("01088888888")
                 .email("email@email.com")
-                .address(new Address("city", "street", "88888"))
+                .addressInfo(new AddressInfo("city", "street", "88888"))
                 .build();
         Customer customer = CustomerMapper.toEntity(customerDto);
         given(customerRepository.findByLoginId(customer.getLoginId())).willReturn(Optional.empty());
@@ -147,28 +147,55 @@ public class CustomerServiceTest {
     @Test
     void findLoginIdByPhoneNumber() {
         //given
-        given(customerRepository.findLoginIdByPhoneNumber(customerDto.getPhoneNumber()))
+        given(customerRepository.findByPhoneNumber(customerDto.getPhoneNumber()))
                 .willReturn(Optional.of(CustomerMapper.toEntity(customerDto)));
 
         //when
-        CustomerDto findCustomer = customerService.findLoginId("01088888888");
+        CustomerDto findCustomer = customerService.findLoginIdByPhoneNumber("01088888888");
 
         //then
         assertThat(findCustomer.getLoginId()).isEqualTo(customerDto.getLoginId());
-        verify(customerRepository, times(1)).findLoginIdByPhoneNumber("01088888888");
+        verify(customerRepository, times(1)).findByPhoneNumber("01088888888");
     }
 
     @Test
     void findLoginIdByPhoneNumber_fail() {
         //given
         willThrow(new NullPointerException("입력한 핸드폰 번호와 일치하는 아이디가 없습니다."))
-                .given(customerRepository).findLoginIdByPhoneNumber("01011111111");
+                .given(customerRepository).findByPhoneNumber("01011111111");
 
         //then
-        assertThatThrownBy(() -> customerService.findLoginId("01011111111"))
+        assertThatThrownBy(() -> customerService.findLoginIdByPhoneNumber("01011111111"))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("입력한 핸드폰 번호와 일치하는 아이디가 없습니다.");
-        verify(customerRepository, times(1)).findLoginIdByPhoneNumber("01011111111");
+        verify(customerRepository, times(1)).findByPhoneNumber("01011111111");
+    }
+
+    @Test
+    void findLoginIdByEmail() {
+        //given
+        given(customerRepository.findByEmail(customerDto.getEmail()))
+                .willReturn(Optional.of(CustomerMapper.toEntity(customerDto)));
+
+        //when
+        String loginId = customerService.findLoginIdByEmail("email@email.com");
+
+        //then
+        assertThat(loginId).isEqualTo(customerDto.getLoginId());
+        verify(customerRepository, times(1)).findByEmail("email@email.com");
+    }
+
+    @Test
+    void findLoginIdByEmail_fail() {
+        //given
+        willThrow(new NullPointerException("일치하는 아이디가 없습니다."))
+                .given(customerRepository).findByEmail("noemail@email.com");
+
+        //then
+        assertThatThrownBy(() -> customerService.findLoginIdByEmail("noemail@email.com"))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("일치하는 아이디가 없습니다.");
+        verify(customerRepository, times(1)).findByEmail("noemail@email.com");
     }
 
     @Test
@@ -228,16 +255,17 @@ public class CustomerServiceTest {
     @Test
     void resetPassword() {
         //given
-        given(customerRepository.findById(customerDto.getId()))
+        given(customerRepository.findByEmail(customerDto.getEmail()))
                 .willReturn(Optional.of(CustomerMapper.toEntity(customerDto)));
+        given(bCryptPasswordEncoder.encode("NewPassword1!")).willReturn("EncodedPassword1!");
 
         //when
-        customerService.resetPassword(customerDto, "NewPassword!1");
+        customerService.resetPassword(customerDto.getEmail(), "NewPassword1!");
 
         //then
-        CustomerDto findCustomer = customerService.findOne(customerDto.getId());
-        assertThat(findCustomer.getPassword()).isEqualTo("NewPassword!1");
-        verify(customerRepository, times(2)).findById(customerDto.getId());
+        Optional<Customer> findCustomer = customerRepository.findByEmail(customerDto.getEmail());
+        assertThat(findCustomer.get().getPassword()).isEqualTo("EncodedPassword1!");
+        verify(customerRepository, times(2)).findByEmail(customerDto.getEmail());
     }
 
     /**
@@ -252,7 +280,7 @@ public class CustomerServiceTest {
                 .password("Password1!")
                 .email("email@gmail.com")
                 .phoneNumber("01011111111")
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .build();
 
         given(customerRepository.findById(1L)).willReturn(Optional.of(CustomerMapper.toEntity(customer)));
@@ -263,7 +291,7 @@ public class CustomerServiceTest {
                 .password("Newpassword1!")
                 .email("newemail@gmail.com")
                 .phoneNumber("01022222222")
-                .address(new Address("new city", "new street", "99999"))
+                .addressInfo(new AddressInfo("new city", "new street", "99999"))
                 .build();
 
         //when
@@ -274,7 +302,7 @@ public class CustomerServiceTest {
                 .password("Newpassword1!")
                 .email("newemail@gmail.com")
                 .phoneNumber("01022222222")
-                .address(new Address("new city", "new street", "99999"))
+                .addressInfo(new AddressInfo("new city", "new street", "99999"))
                 .build();
         when(customerRepository.findById(1L)).thenReturn(Optional.of(CustomerMapper.toEntity(newCustomer)));
 
@@ -292,7 +320,7 @@ public class CustomerServiceTest {
                 .password("Password1!")
                 .email("email@gmail.com")
                 .phoneNumber("01011111111")
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .build();
         given(customerRepository.findById(1L)).willReturn(Optional.of(CustomerMapper.toEntity(customer)));
         UpdateProfileDto updateProfileDto = UpdateProfileDto.builder()
@@ -301,7 +329,7 @@ public class CustomerServiceTest {
                 .password("Password1!")
                 .email("newemail@gmail.com")
                 .phoneNumber("01022222222")
-                .address(new Address("new city", "new street", "99999"))
+                .addressInfo(new AddressInfo("new city", "new street", "99999"))
                 .build();
 
         //when

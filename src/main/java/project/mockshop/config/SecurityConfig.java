@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/merchants/*/items").hasRole("ADMIN")
                         .requestMatchers("/api/orders/merchants/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/items").hasRole("MERCHANT")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/reset-password").permitAll()
                         .anyRequest().authenticated());
 
         http

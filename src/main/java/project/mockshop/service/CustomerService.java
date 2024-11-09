@@ -47,6 +47,8 @@ public class CustomerService {
 
     public boolean validateDuplicateLoginId(String loginId) {
         Optional<Customer> findCustomer = customerRepository.findByLoginId(loginId);
+        CustomerValidator.validateLoginId(loginId);
+
         return findCustomer.isPresent();
     }
 
@@ -66,14 +68,24 @@ public class CustomerService {
         return CustomerMapper.toDto(findCustomer.get());
     }
 
-    public CustomerDto findLoginId(String phoneNumber) {
-        Optional<Customer> findCustomer = customerRepository.findLoginIdByPhoneNumber(phoneNumber);
+    public CustomerDto findLoginIdByPhoneNumber(String phoneNumber) {
+        Optional<Customer> findCustomer = customerRepository.findByPhoneNumber(phoneNumber);
 
         if (findCustomer.isEmpty()) {
-            throw new NullPointerException("입력한 핸드폰 번호와 일치하는 아이디가 없습니다.");
+            throw new NullPointerException("일치하는 아이디가 없습니다.");
         }
 
         return CustomerMapper.toDto(findCustomer.get());
+    }
+
+    public String findLoginIdByEmail(String email) {
+        Optional<Customer> findCustomer = customerRepository.findByEmail(email);
+
+        if (findCustomer.isEmpty()) {
+            throw new NullPointerException("일치하는 아이디가 없습니다.");
+        }
+
+        return findCustomer.get().getLoginId();
     }
 
     public CustomerDto findPassword(String loginId, String phoneNumber) {
@@ -98,9 +110,9 @@ public class CustomerService {
     }
 
     @Transactional
-    public void resetPassword(CustomerDto customer, String password) {
-        Optional<Customer> findCustomer = customerRepository.findById(customer.getId());
-        findCustomer.ifPresent(value -> value.changePassword(password));
+    public void resetPassword(String email, String password) {
+        Optional<Customer> findCustomer = customerRepository.findByEmail(email);
+        findCustomer.ifPresent(value -> value.changePassword(bCryptPasswordEncoder.encode(password)));
     }
 
     public List<CustomerDto> findAll() {
@@ -128,6 +140,6 @@ public class CustomerService {
         }
         customer.changeEmail(updateProfileDto.getEmail());
         customer.changePhoneNumber(updateProfileDto.getPhoneNumber());
-        customer.changeAddress(updateProfileDto.getAddress());
+        customer.changeAddressInfo(updateProfileDto.getAddressInfo());
     }
 }

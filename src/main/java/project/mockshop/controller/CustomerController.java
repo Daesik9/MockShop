@@ -37,9 +37,9 @@ public class CustomerController {
     }
 
     @PostMapping("/users/find/login-id")
-    public Response findLoginId(@RequestBody FindLoginIdRequestDto requestDto) {
-        CustomerDto customer = customerService.findLoginId(requestDto.getPhoneNumber());
-        return Response.success(customer.getLoginId());
+    public Response findLoginIdByEmail(@RequestBody FindLoginIdRequestDto requestDto) {
+        String loginId = customerService.findLoginIdByEmail(requestDto.getEmail());
+        return Response.success(loginId);
     }
 
     @PostMapping("/users/find/password")
@@ -74,5 +74,12 @@ public class CustomerController {
         List<CouponItemDto> couponItemDtos = couponService.getAllCouponItemsByCustomerId(customerId);
 
         return Response.success(couponItemDtos);
+    }
+
+    @PutMapping("/users/reset-password")
+    public Response resetPassword(@RequestBody ResetPasswordDto resetPasswordDto) {
+        customerService.resetPassword(resetPasswordDto.getEmail(), resetPasswordDto.getPassword());
+
+        return Response.success();
     }
 }

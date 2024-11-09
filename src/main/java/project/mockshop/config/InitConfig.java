@@ -3,7 +3,6 @@ package project.mockshop.config;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -11,8 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.CouponDto;
 import project.mockshop.dto.EventCreationDto;
 import project.mockshop.dto.EventRewardDto;
-import project.mockshop.dto.ItemDto;
-import project.mockshop.entity.Address;
+import project.mockshop.entity.AddressInfo;
 import project.mockshop.entity.Customer;
 import project.mockshop.entity.Item;
 import project.mockshop.entity.Merchant;
@@ -64,19 +62,19 @@ public class InitConfig {
 
         @Transactional
         public void init() {
-//            List<Item> items = new ArrayList<>();
-//            for (int i = 0; i < 10000; i++) {
-//                Item item = Item.builder()
-//                        .name("사과")
-//                        .price(1000 * (i + 1))
-//                        .quantity(100)
-//                        .percentOff(i % 100 == 0 ? 10 : 0)
-//                        .build();
-//                items.add(item);
-////            itemService.createItem(itemDto, 1L);
-//            }
-//
-//            saveAll(items);
+            List<Item> items = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                Item item = Item.builder()
+                        .name("사과")
+                        .price(1000 * (i + 1))
+                        .quantity(100)
+                        .percentOff(i % 100 == 0 ? 10 : 0)
+                        .build();
+                items.add(item);
+//            itemService.createItem(itemDto, 1L);
+            }
+
+            saveAll(items);
 
             Customer customer = Customer.builder()
                     .name("테스트")
@@ -84,7 +82,7 @@ public class InitConfig {
                     .email("test@gmail.com")
                     .loginId("test")
                     .phoneNumber("01011111111")
-                    .address(new Address("city", "street", "11111"))
+                    .addressInfo(new AddressInfo("city", "street", "11111"))
                     .build();
             Customer customer2 = Customer.builder()
                     .name("테스트둘")
@@ -92,7 +90,7 @@ public class InitConfig {
                     .email("test@gmail.com")
                     .loginId("test2")
                     .phoneNumber("01011111111")
-                    .address(new Address("city", "street", "11111"))
+                    .addressInfo(new AddressInfo("city", "street", "11111"))
                     .build();
             customerService.createAccount(CustomerMapper.toCreationDto(customer));
             customerService.createAccount(CustomerMapper.toCreationDto(customer2));
@@ -127,17 +125,17 @@ public class InitConfig {
             EventCreationDto eventCreationDto = EventCreationDto.builder()
                     .name("이벤트1")
                     .photo("photo1.png")
-                    .maxParticipationNumber(1)
-                    .startDate(now.minusDays(1))
-                    .endDate(now.plusDays(1))
+                    .maxParticipationNumber(10)
+                    .startDate(now.minusDays(1).withHour(14).withMinute(0).withSecond(0))
+                    .endDate(now.plusDays(1).withHour(14).withMinute(0).withSecond(0))
                     .eventRewardDtos(List.of(EventRewardDto.builder().couponId(couponId1).count(1).build()))
                     .build();
             EventCreationDto eventCreationDto2 = EventCreationDto.builder()
                     .name("이벤트2")
                     .photo("photo2.png")
-                    .maxParticipationNumber(2)
-                    .startDate(now.minusDays(2))
-                    .endDate(now.plusDays(2))
+                    .maxParticipationNumber(10)
+                    .startDate(now.plusDays(2).withHour(14).withMinute(0).withSecond(0))
+                    .endDate(now.plusDays(2).withHour(16).withMinute(0).withSecond(0))
                     .eventRewardDtos(List.of(EventRewardDto.builder().couponId(couponId1).count(2).build(),
                             EventRewardDto.builder().couponId(couponId2).count(3).build()))
                     .build();

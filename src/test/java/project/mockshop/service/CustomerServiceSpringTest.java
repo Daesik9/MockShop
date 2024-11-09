@@ -9,16 +9,18 @@ import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.CustomerCreationDto;
 import project.mockshop.dto.CustomerDto;
 import project.mockshop.dto.UpdateProfileDto;
-import project.mockshop.entity.Address;
+import project.mockshop.entity.AddressInfo;
+import project.mockshop.entity.Customer;
 import project.mockshop.mapper.CustomerMapper;
 import project.mockshop.policy.CustomerPolicy;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @Transactional
@@ -38,7 +40,7 @@ public class CustomerServiceSpringTest {
                 .password("Password1!")
                 .phoneNumber("01088888888")
                 .email("email@email.com")
-                .address(new Address("city", "street", "88888"))
+                .addressInfo(new AddressInfo("city", "street", "88888"))
                 .build();
         userId = customerService.createAccount(creationDto);
     }
@@ -65,7 +67,7 @@ public class CustomerServiceSpringTest {
                 .password("Newpassword1!")
                 .email("newemail@gmail.com")
                 .phoneNumber("01022222222")
-                .address(new Address("new city", "new street", "99999"))
+                .addressInfo(new AddressInfo("new city", "new street", "99999"))
                 .build();
 
         //when
@@ -77,7 +79,7 @@ public class CustomerServiceSpringTest {
         assertThat(customerDto.getPassword()).isEqualTo("Newpassword1!");
         assertThat(customerDto.getEmail()).isEqualTo("newemail@gmail.com");
         assertThat(customerDto.getPhoneNumber()).isEqualTo("01022222222");
-        assertThat(customerDto.getAddress().getCity()).isEqualTo("new city");
+        assertThat(customerDto.getAddressInfo().getAddress()).isEqualTo("new city");
     }
 
     @Test
@@ -89,7 +91,7 @@ public class CustomerServiceSpringTest {
                 .password("Password1!")
                 .email("newemail@gmail.com")
                 .phoneNumber("01022222222")
-                .address(new Address("new city", "new street", "99999"))
+                .addressInfo(new AddressInfo("new city", "new street", "99999"))
                 .build();
 
         //when
@@ -103,8 +105,43 @@ public class CustomerServiceSpringTest {
         assertThat(passwordEncoder.matches("Password1!", customerDto.getPassword())).isTrue();
         assertThat(customerDto.getEmail()).isEqualTo("email@email.com");
         assertThat(customerDto.getPhoneNumber()).isEqualTo("01088888888");
-        assertThat(customerDto.getAddress().getCity()).isEqualTo("city");
+        assertThat(customerDto.getAddressInfo().getAddress()).isEqualTo("city");
     }
 
+
+    @Test
+    void findLoginIdByEmail() {
+        //given
+        CustomerDto customerDto = customerService.findOne(userId);
+
+        //when
+        String loginId = customerService.findLoginIdByEmail("email@email.com");
+
+        //then
+        assertThat(loginId).isEqualTo(customerDto.getLoginId());
+    }
+
+    @Test
+    void findLoginIdByEmail_fail() {
+        //given
+
+        //then
+        assertThatThrownBy(() -> customerService.findLoginIdByEmail("noemail@email.com"))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("일치하는 아이디가 없습니다.");
+    }
+
+    @Test
+    void resetPassword() {
+        //given
+        CustomerDto customerDto = customerService.findOne(userId);
+
+        //when
+        customerService.resetPassword(customerDto.getEmail(), "NewPassword1!");
+
+        //then
+        CustomerDto findCustomerDto = customerService.findOne(userId);
+        assertThat(passwordEncoder.matches("NewPassword1!", findCustomerDto.getPassword())).isTrue();
+    }
 
 }
