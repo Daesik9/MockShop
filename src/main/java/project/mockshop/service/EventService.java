@@ -105,4 +105,10 @@ public class EventService {
 
         return EventMapper.toDto(event);
     }
+
+    public List<EventDto> getAllEvents() {
+        List<Event> allEvents = eventRepository.findAll();
+
+        return allEvents.stream().map(EventMapper::toDto).toList();
+    }
 }

@@ -226,4 +226,48 @@ public class EventControllerSpringTest {
                 .andExpect(jsonPath("$.result.data.photo").value("event_banner.png"));
     }
 
+    @Test
+    void getAllEvents() throws Exception {
+        //given
+        CouponDto couponDtoPriceOff = CouponDto.builder()
+                .name("coupon")
+                .priceOff(1000)
+                .expiredDate(LocalDateTime.now().plusDays(30))
+                .minPriceRequired(1000)
+                .build();
+        Long couponId = couponService.createCoupon(couponDtoPriceOff);
+
+        EventCreationDto eventCreationDto1 = EventCreationDto.builder()
+                .name("이벤트1")
+                .photo("event_banner.png")
+                .maxParticipationNumber(100)
+                .startDate(LocalDateTime.now().minusDays(1))
+                .endDate(LocalDateTime.now().plusDays(1))
+                .eventRewardDtos(List.of(EventRewardDto.builder().couponId(couponId).count(10).build()))
+                .build();
+
+        EventCreationDto eventCreationDto2 = EventCreationDto.builder()
+                .name("이벤트2")
+                .photo("event_banner.png")
+                .maxParticipationNumber(100)
+                .startDate(LocalDateTime.now().plusDays(2))
+                .endDate(LocalDateTime.now().plusDays(4))
+                .eventRewardDtos(List.of(EventRewardDto.builder().couponId(couponId).count(10).build()))
+                .build();
+
+        Long eventId1 = eventService.createEvent(eventCreationDto1);
+        Long eventId2 = eventService.createEvent(eventCreationDto2);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/events")
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.result.data[0].name").value("이벤트1"))
+                .andExpect(jsonPath("$.result.data[1].name").value("이벤트2"));
+    }
+
 }

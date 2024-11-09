@@ -26,6 +26,13 @@ class EventController {
         return Response.success(HttpStatus.CREATED.value(), eventId);
     }
 
+    @GetMapping("/events")
+    public Response getAllEvents() {
+        List<EventDto> allEvents = eventService.getAllEvents();
+
+        return Response.success(allEvents);
+    }
+
     @PostMapping("/events/{eventId}/participants")
     public Response participateEvent(@PathVariable Long eventId, @RequestBody EventParticipationDto participationDto) {
         eventService.participateEvent(participationDto.getCustomerId(), eventId);

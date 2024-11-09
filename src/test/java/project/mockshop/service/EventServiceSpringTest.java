@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 @Transactional
@@ -273,6 +274,34 @@ public class EventServiceSpringTest {
 
         //then
         assertThat(eventDto.getName()).isEqualTo("이벤트");
+    }
+
+    @Test
+    void getAllEvents() throws Exception {
+        //given
+        Event event1 = Event.builder()
+                .id(1L)
+                .name("이벤트1")
+                .startDate(LocalDateTime.now().minusDays(1))
+                .endDate(LocalDateTime.now().plusDays(1))
+                .eventRewards(List.of(EventReward.builder().build()))
+                .build();
+        Event event2 = Event.builder()
+                .id(2L)
+                .name("이벤트2")
+                .startDate(LocalDateTime.now().plusDays(2))
+                .endDate(LocalDateTime.now().plusDays(4))
+                .eventRewards(List.of(EventReward.builder().build()))
+                .build();
+
+        eventRepository.save(event1);
+        eventRepository.save(event2);
+
+        //when
+        List<EventDto> allEvents = eventService.getAllEvents();
+
+        //then
+        assertThat(allEvents.size()).isEqualTo(2);
     }
 
 }

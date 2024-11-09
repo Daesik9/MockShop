@@ -264,8 +264,30 @@ public class EventServiceTest {
         assertThat(eventDto.getName()).isEqualTo("이벤트");
     }
 
+    @Test
+    void getAllEvents() throws Exception {
+        //given
+        Event event1 = Event.builder()
+                .id(1L)
+                .name("이벤트1")
+                .startDate(LocalDateTime.now().minusDays(1))
+                .endDate(LocalDateTime.now().plusDays(1))
+                .eventRewards(List.of(EventReward.builder().build()))
+                .build();
+        Event event2 = Event.builder()
+                .id(2L)
+                .name("이벤트2")
+                .startDate(LocalDateTime.now().plusDays(2))
+                .endDate(LocalDateTime.now().plusDays(4))
+                .eventRewards(List.of(EventReward.builder().build()))
+                .build();
+        given(eventRepository.findAll()).willReturn(List.of(event1, event2));
 
+        //when
+        List<EventDto> allEvents = eventService.getAllEvents();
 
-
+        //then
+        assertThat(allEvents.size()).isEqualTo(2);
+    }
 
 }
