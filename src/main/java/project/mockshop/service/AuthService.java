@@ -16,6 +16,7 @@ import project.mockshop.repository.AuthCodeRepository;
 import project.mockshop.security.JwtTokenProvider;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
@@ -39,6 +40,14 @@ public class AuthService {
         }
 
         return jwtTokenProvider.createToken(loginRequestDto.getLoginId(), "ROLE_" + findMember.getRole(), findMember.getId().toString());
+    }
+
+    public Long getIdFromToken(String token) {
+        String memberId = jwtTokenProvider.getMemberId(token);
+        Member byId = memberRepository.findById(Long.valueOf(memberId))
+                .orElseThrow();
+
+        return byId.getId();
     }
 
     public boolean verifyAuthCode(AuthCodeDto authCodeDto) {
