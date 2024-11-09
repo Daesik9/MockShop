@@ -22,6 +22,11 @@ public class CustomerValidator {
                 throw new IllegalArgumentException(CustomerPolicy.LOGIN_ID_POLICY_STRING);
             }
         }
+
+        //숫자로 시작하거나, 숫자로만 된 아이디는 불가능. 영어로 시작해야함.
+        if (!Character.isLowerCase(loginId.charAt(0))) {
+            throw new IllegalArgumentException(CustomerPolicy.LOGIN_ID_POLICY_STRING);
+        }
     }
 
     private static void loginIdLengthCheck(String loginId) {

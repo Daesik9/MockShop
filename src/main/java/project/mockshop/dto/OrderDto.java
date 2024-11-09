@@ -2,7 +2,7 @@ package project.mockshop.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import project.mockshop.entity.Address;
+import project.mockshop.entity.AddressInfo;
 import project.mockshop.entity.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ public class OrderDto {
     private OrderStatus status;
     private LocalDateTime orderDate;
     private String paymentMethod;
-    private Address address;
+    private AddressInfo addressInfo;
 
         //==조회 로직==//
         /** 전체 결제금액(수량*상품금액(할인된) */

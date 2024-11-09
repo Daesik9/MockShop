@@ -16,7 +16,7 @@ public class OrderMapper {
                 .status(order.getStatus())
                 .orderDate(order.getOrderDate())
                 .paymentMethod(order.getPaymentMethod())
-                .address(order.getAddress())
+                .addressInfo(order.getAddressInfo())
                 .build();
     }
 }

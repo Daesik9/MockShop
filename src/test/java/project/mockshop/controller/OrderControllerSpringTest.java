@@ -11,9 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.annotation.WithMockMember;
 import project.mockshop.dto.*;
 import project.mockshop.entity.*;
@@ -85,7 +83,7 @@ public class OrderControllerSpringTest {
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@gmail.com")
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .build();
         Long customerId = customerService.createAccount(userCreationDto);
         Long cartId = cartService.addToCart(itemId, 10, customerId);
@@ -133,7 +131,7 @@ public class OrderControllerSpringTest {
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@gmail.com")
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .build();
         Long customerId = customerService.createAccount(userCreationDto);
         Long cartId = cartService.addToCart(itemId, 10, customerId);
@@ -171,7 +169,7 @@ public class OrderControllerSpringTest {
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@gmail.com")
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .build();
         Long customerId = customerService.createAccount(userCreationDto);
         Long cartId = cartService.addToCart(itemId, 10, customerId);
@@ -209,7 +207,7 @@ public class OrderControllerSpringTest {
                 .password("Password1!")
                 .phoneNumber("01011111111")
                 .email("email@gmail.com")
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .build();
         Long customerId = customerService.createAccount(userCreationDto);
 

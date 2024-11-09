@@ -6,7 +6,6 @@ import project.mockshop.policy.MockShopPolicy;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 
 public class OrderTest {
@@ -19,7 +18,7 @@ public class OrderTest {
                 .build();
         Order order = Order.builder()
                 .customer(Customer.builder().build())
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -41,7 +40,7 @@ public class OrderTest {
         //then
         assertThatThrownBy(() -> Order.builder()
                 .customer(Customer.builder().build())
-                .address(new Address("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "11111"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -64,7 +63,7 @@ public class OrderTest {
         //then
         assertThatThrownBy(() -> Order.builder()
                 .customer(Customer.builder().build())
-                .address(null)
+                .addressInfo(null)
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)

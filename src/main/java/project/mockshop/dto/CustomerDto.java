@@ -2,7 +2,7 @@ package project.mockshop.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import project.mockshop.entity.Address;
+import project.mockshop.entity.AddressInfo;
 
 @Builder
 @Getter
@@ -13,7 +13,7 @@ public class CustomerDto {
     private String password;
     private String phoneNumber;
     private String email;
-    private Address address;
+    private AddressInfo addressInfo;
     private int point;
     private boolean isDeleted;
 }

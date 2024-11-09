@@ -2,7 +2,7 @@ package project.mockshop.dto;
 
 import jakarta.persistence.Embedded;
 import lombok.*;
-import project.mockshop.entity.Address;
+import project.mockshop.entity.AddressInfo;
 
 @Builder
 @AllArgsConstructor
@@ -15,5 +15,5 @@ public class CustomerCreationDto {
     private String phoneNumber;
     private String email;
     @Embedded
-    private Address address;
+    private AddressInfo addressInfo;
 }

@@ -40,15 +40,15 @@ public class CustomerTest {
      */
     @Test
     void loginIdLength3to15() {
-        assertThatThrownBy(() -> Customer.builder().loginId("12").build())
+        assertThatThrownBy(() -> Customer.builder().loginId("a1").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.LOGIN_ID_LENGTH_STRING);
 
-        assertThatThrownBy(() -> Customer.builder().loginId("1234567890123456").build())
+        assertThatThrownBy(() -> Customer.builder().loginId("a1234567890123456").build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.LOGIN_ID_LENGTH_STRING);
 
-        assertThatCode(() -> Customer.builder().loginId("12345").build()).doesNotThrowAnyException();
+        assertThatCode(() -> Customer.builder().loginId("a12345").build()).doesNotThrowAnyException();
     }
 
     /**
@@ -274,21 +274,21 @@ public class CustomerTest {
     }
 
     /**
-     * Address는 city, street, zipcode로 구성되어 있고,
-     * zipcode는 숫자로만 구성되어야 한다.
+     * Address는 address, detailedAddress, zonecode 구성되어 있고,
+     * zonecode는 숫자로만 구성되어야 한다.
      */
     @Test
     void address() {
-        assertThatThrownBy(() -> new Address("city", "street", "zipcode"))
+        assertThatThrownBy(() -> new AddressInfo("city", "street", "zonecode"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining(CustomerPolicy.ZIPCODE_POLICY_STRING);
+                .hasMessageContaining(CustomerPolicy.ZONECODE_POLICY_STRING);
 
-        Address address = new Address("city", "street", "88888");
+        AddressInfo addressInfo = new AddressInfo("city", "street", "88888");
         Customer customer = Customer.builder().loginId("loginid").name("이름").password("Password1!")
-                .phoneNumber("01011111111").email("email@email.com").address(address).build();
-        assertThat(customer.getAddress().getCity()).isEqualTo("city");
-        assertThat(customer.getAddress().getStreet()).isEqualTo("street");
-        assertThat(customer.getAddress().getZipcode()).isEqualTo("88888");
+                .phoneNumber("01011111111").email("email@email.com").addressInfo(addressInfo).build();
+        assertThat(customer.getAddressInfo().getAddress()).isEqualTo("city");
+        assertThat(customer.getAddressInfo().getDetailedAddress()).isEqualTo("street");
+        assertThat(customer.getAddressInfo().getZonecode()).isEqualTo("88888");
     }
 
     /**
@@ -296,25 +296,25 @@ public class CustomerTest {
      */
     @Test
     void point() {
-        Address address = new Address("city", "street", "88888");
+        AddressInfo addressInfo = new AddressInfo("city", "street", "88888");
 
 
         assertThatThrownBy(() -> Customer.builder().loginId("loginid").name("이름").password("Password1!")
-                .phoneNumber("01011111111").email("email@email.com").address(address).point(-100).build())
+                .phoneNumber("01011111111").email("email@email.com").addressInfo(addressInfo).point(-100).build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CustomerPolicy.POINT_POLICY_STRING);
 
         Customer customer = Customer.builder().loginId("loginid").name("이름").password("Password1!")
-                .phoneNumber("01011111111").email("email@email.com").address(address).point(100).build();
+                .phoneNumber("01011111111").email("email@email.com").addressInfo(addressInfo).point(100).build();
 
         assertThat(customer.getPoint()).isEqualTo(100);
     }
 
     @Test
     void isDeleted() {
-        Address address = new Address("city", "street", "88888");
+        AddressInfo addressInfo = new AddressInfo("city", "street", "88888");
         Customer customer = Customer.builder().loginId("loginid").name("이름").password("Password1!")
-                .phoneNumber("01011111111").email("email@email.com").address(address).point(100).isDeleted(false).build();
+                .phoneNumber("01011111111").email("email@email.com").addressInfo(addressInfo).point(100).isDeleted(false).build();
 
         assertThat(customer.isDeleted()).isFalse();
     }
