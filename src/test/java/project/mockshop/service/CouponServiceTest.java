@@ -1,23 +1,15 @@
 package project.mockshop.service;
 
-import jakarta.transaction.Transactional;
-import lombok.Builder;
-import lombok.Getter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Service;
 import project.mockshop.dto.CouponDto;
 import project.mockshop.dto.CouponItemDto;
 import project.mockshop.entity.Coupon;
 import project.mockshop.entity.CouponItem;
 import project.mockshop.entity.Customer;
-import project.mockshop.entity.Item;
 import project.mockshop.mapper.CouponMapper;
 import project.mockshop.policy.MockShopPolicy;
 import project.mockshop.repository.CouponItemRepository;
@@ -28,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.when;
@@ -144,5 +135,63 @@ public class CouponServiceTest {
         verify(couponItemRepository, times(1)).save(any(CouponItem.class));
     }
 
+    @Test
+    void useCoupon_priceOff() throws Exception {
+        //given
+        Coupon coupon = Coupon.builder().priceOff(3000).build();
+        Customer customer = Customer.builder().build();
+        CouponItem couponItem = CouponItem.builder().id(1L).coupon(coupon).customer(customer).build();
+        given(couponItemRepository.findById(couponItem.getId())).willReturn(Optional.of(couponItem));
+
+        //when
+        int discountAmount = couponService.useCoupon(couponItem.getId(), 10000);
+
+        //then
+        assertThat(discountAmount).isEqualTo(3000);
+    }
+
+    @Test
+    void useCoupon_percentOff() throws Exception {
+        //given
+        Coupon coupon_max2000 = Coupon.builder().percentOff(30).maxPriceOff(2000).build();
+        Coupon coupon_max5000 = Coupon.builder().percentOff(23).maxPriceOff(5000).build();
+        Customer customer = Customer.builder().build();
+        CouponItem couponItem = CouponItem.builder().id(1L).coupon(coupon_max2000).customer(customer).build();
+        CouponItem couponItem2 = CouponItem.builder().id(2L).coupon(coupon_max5000).customer(customer).build();
+        given(couponItemRepository.findById(couponItem.getId())).willReturn(Optional.of(couponItem));
+        given(couponItemRepository.findById(couponItem2.getId())).willReturn(Optional.of(couponItem2));
+
+        //when
+        int discountAmount = couponService.useCoupon(couponItem.getId(), 10000);
+        int discountAmount2 = couponService.useCoupon(couponItem2.getId(), 20000);
+
+        //then
+        assertThat(discountAmount).isEqualTo(2000);
+        assertThat(discountAmount2).isEqualTo(4600);
+    }
+
+    @Test
+    void getAvailableCoupons() throws Exception {
+        //given
+        Coupon coupon_4000off = Coupon.builder().priceOff(4000).build();
+        Coupon coupon_max5000 = Coupon.builder()
+                .name("coupon_max5000")
+                .percentOff(23)
+                .maxPriceOff(5000)
+                .expiredDate(LocalDateTime.now().plusDays(30))
+                .build();
+        Customer customer = Customer.builder().id(1L).build();
+        CouponItem couponItem = CouponItem.builder().id(1L).coupon(coupon_4000off).customer(customer).build();
+        CouponItem couponItem2 = CouponItem.builder().id(2L).coupon(coupon_max5000).customer(customer).build();
+        given(couponItemRepository.findAvailableCouponsByCustomerIdAndTotalPrice(customer.getId(), 3000))
+                .willReturn(List.of(couponItem2));
+
+        //when
+        List<CouponItemDto> availableCoupons = couponService.getAvailableCoupons(customer.getId(), 3000);
+
+        //then
+        assertThat(availableCoupons.size()).isEqualTo(1);
+        assertThat(availableCoupons.get(0).getCouponDto().getName()).isEqualTo("coupon_max5000");
+    }
 
 }

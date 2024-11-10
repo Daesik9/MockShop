@@ -13,13 +13,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import project.mockshop.dto.*;
 import project.mockshop.entity.AddressInfo;
 import project.mockshop.response.Response;
 import project.mockshop.service.CouponService;
 import project.mockshop.service.CustomerService;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -313,6 +315,49 @@ public class UserControllerSpringTest {
         //then
         resultActions.andExpect(status().isOk());
         assertThat(passwordEncoder.matches("NewPassword1!", customerDto.getPassword())).isTrue();
+    }
+
+    @Test
+    @WithMockUser(roles = {"CUSTOMER"})
+    void getAvailableCoupons() throws Exception {
+        //given
+        CouponDto couponDtoPriceOff = CouponDto.builder()
+                .name("coupon")
+                .priceOff(4000)
+                .expiredDate(LocalDateTime.now().plusDays(30))
+                .minPriceRequired(5000)
+                .build();
+        CouponDto couponDtoPercentOff = CouponDto.builder()
+                .name("coupon2")
+                .percentOff(10)
+                .expiredDate(LocalDateTime.now().plusDays(15))
+                .minPriceRequired(1000)
+                .maxPriceOff(2000)
+                .build();
+        CustomerCreationDto requestDto = CustomerCreationDto.builder()
+                .loginId("newloginid")
+                .name("테스트")
+                .password("Password1!")
+                .phoneNumber("01011111111")
+                .email("email@email.com")
+                .addressInfo(new AddressInfo("city", "street", "88888"))
+                .build();
+        Long customerId = customerService.createAccount(requestDto);
+        Long couponId1 = couponService.createCoupon(couponDtoPriceOff);
+        Long couponId2 = couponService.createCoupon(couponDtoPercentOff);
+        couponService.issueCoupon(couponId1, customerId);
+        couponService.issueCoupon(couponId2, customerId);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/users/{customerId}/coupons/available-for-order", customerId)
+                        .param("orderAmount", "3000")
+        );
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.result.data[0].couponDto.name").value("coupon2"));
     }
 
 }

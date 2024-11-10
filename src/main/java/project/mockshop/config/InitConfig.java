@@ -108,9 +108,9 @@ public class InitConfig {
 
             CouponDto couponDtoPriceOff = CouponDto.builder()
                     .name("coupon")
-                    .priceOff(1000)
+                    .priceOff(4000)
                     .expiredDate(now.plusDays(30))
-                    .minPriceRequired(1000)
+                    .minPriceRequired(5000)
                     .build();
             CouponDto couponDtoPercentOff = CouponDto.builder()
                     .name("coupon2")
@@ -125,10 +125,11 @@ public class InitConfig {
             EventCreationDto eventCreationDto = EventCreationDto.builder()
                     .name("이벤트1")
                     .photo("photo1.png")
-                    .maxParticipationNumber(10)
+                    .maxParticipationNumber(1)
                     .startDate(now.minusDays(1).withHour(14).withMinute(0).withSecond(0))
                     .endDate(now.plusDays(1).withHour(14).withMinute(0).withSecond(0))
-                    .eventRewardDtos(List.of(EventRewardDto.builder().couponId(couponId1).count(1).build()))
+                    .eventRewardDtos(List.of(EventRewardDto.builder().couponId(couponId1).count(3).build(),
+                            EventRewardDto.builder().couponId(couponId2).count(2).build()))
                     .build();
             EventCreationDto eventCreationDto2 = EventCreationDto.builder()
                     .name("이벤트2")

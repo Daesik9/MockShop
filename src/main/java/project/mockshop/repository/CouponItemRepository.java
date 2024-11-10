@@ -5,7 +5,7 @@ import project.mockshop.entity.CouponItem;
 
 import java.util.List;
 
-public interface CouponItemRepository extends JpaRepository<CouponItem, Long> {
+public interface CouponItemRepository extends JpaRepository<CouponItem, Long>, CouponItemRepositoryCustom {
 
     List<CouponItem> findAllByCustomerId(Long customerId);
 }

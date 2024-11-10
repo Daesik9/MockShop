@@ -36,8 +36,10 @@ public class Order {
     private List<OrderItem> orderItems;
 
     private String orderNumber;
+    private int discountAmount;
 
-    public static Order createOrder(Customer customer, String paymentMethod, List<OrderItem> orderItems) {
+    public static Order createOrder(Customer customer, String paymentMethod, List<OrderItem> orderItems,
+                                    int discountAmount) {
         return Order.builder()
                 .customer(customer)
                 .addressInfo(customer.getAddressInfo())
@@ -46,6 +48,7 @@ public class Order {
                 .status(OrderStatus.ORDER)
                 .orderItems(orderItems)
                 .orderNumber(OrderNumberGenerator.generateOrdeNumber())
+                .discountAmount(discountAmount)
                 .build();
     }
 
@@ -69,7 +72,8 @@ public class Order {
         }
 
         public Order build() {
-            Order order = new Order(id, customer, addressInfo, paymentMethod, orderDate, status, orderItems, orderNumber);
+            Order order = new Order(id, customer, addressInfo, paymentMethod, orderDate, status, orderItems, orderNumber,
+                    discountAmount);
 
             for (OrderItem orderItem : this.orderItems) {
                 orderItem.changeOrder(order);

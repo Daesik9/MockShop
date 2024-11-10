@@ -142,7 +142,7 @@ public class OrderRepositoryTest {
         OrderItem orderItem5 = OrderItem.builder().item(item2Merchant2).build();
         Order order5 = Order.builder()
                 .customer(customer1)
-                .addressInfo(new AddressInfo("city", "street", "11111"))
+                .addressInfo(new AddressInfo("city", "street", "00000"))
                 .paymentMethod("card")
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.ORDER)
@@ -287,6 +287,20 @@ public class OrderRepositoryTest {
         //then
         assert orders != null;
         assertThat(orders.size()).isEqualTo(3);
+    }
+
+    @Test
+    void findAllByCustomerIdOrderByOrderDateDesc() throws Exception {
+        //given
+
+        //when
+        List<Order> orders = orderRepository.findAllByCustomerIdOrderByOrderDateDesc(customer1.getId());
+
+        //then
+        assert orders != null;
+        assertThat(orders.size()).isEqualTo(3);
+        //order5가 제일 최근에 주문. order5의 zonecode는 "00000"
+        assertThat(orders.get(0).getAddressInfo().getZonecode()).isEqualTo("00000");
     }
 
 }

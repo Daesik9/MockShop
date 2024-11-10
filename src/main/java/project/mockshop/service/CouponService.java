@@ -1,6 +1,5 @@
 package project.mockshop.service;
 
-import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,12 +54,24 @@ public class CouponService {
         return couponItemRepository.findAllByCustomerId(customerId).stream().map(CouponItemMapper::toDto).toList();
     }
 
-    //쿠폰 발급 선착순 몇명 -(이벤트에 따라서 쿠폰 개수랑, 항목, 선착순이 다름)
-    //eventId, customerId -> 이벤트 아이디로 해당 이벤트를 찾아서 쿠폰 항목, 개수, 선착순을 보고, 이미 참여했는지도 보고
-    //cusotomerId로 찾은 구매자에게 쿠폰을 발급
-//    coupon_item	id
-//    coupon_id
-//            customer_id
-//    use_yn
+    public List<CouponItemDto> getAvailableCoupons(Long customerId, Integer totalPrice) {
+        return couponItemRepository.findAvailableCouponsByCustomerIdAndTotalPrice(customerId, totalPrice).stream().map(CouponItemMapper::toDto).toList();
+    }
+
+    public int useCoupon(Long couponItemId, int totalPrice) {
+        CouponItem couponItem = couponItemRepository.findById(couponItemId)
+                .orElseThrow();
+        Coupon coupon = couponItem.getCoupon();
+
+        couponItem.changeIsUsed(true); //쿠폰 사용처리
+
+        if (coupon.getPercentOff() > 0) {
+            int discountAmount = (int) (totalPrice * coupon.getPercentOff() / 100);
+
+            return Math.min(discountAmount, coupon.getMaxPriceOff());
+        } else {
+            return coupon.getPriceOff();
+        }
+    }
 
 }

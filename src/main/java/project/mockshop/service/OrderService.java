@@ -19,6 +19,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
+    private final CouponService couponService;
 
 //    public List<OrderDto> findAllByMerchant(Merchant merchant) {
 //        List<Order> orders = orderRepository.findAllByMerchant(merchant);
@@ -27,7 +28,9 @@ public class OrderService {
 //    }
 
     public List<OrderDto> findAllByCustomerId(Long customerId) {
-        List<Order> orders = orderRepository.findAllByCustomerId(customerId);
+//        List<Order> orders = orderRepository.findAllByCustomerId(customerId);
+        List<Order> orders = orderRepository.findAllByCustomerIdOrderByOrderDateDesc(customerId);
+
 
         return orders.stream().map(OrderMapper::toDto).toList();
     }
@@ -85,7 +88,7 @@ public class OrderService {
     }
 
     @Transactional
-    public String order(Long customerId, String paymentMethod) {
+    public String order(Long customerId, String paymentMethod, Long couponItemId) {
         //장바구니에서 상품 가져오기
         Cart cart = cartRepository.findCartWithItems(customerId);
 
@@ -94,8 +97,19 @@ public class OrderService {
                 .map(ci -> OrderItem.createOrderItem(ci.getItem(), ci.getCartPrice(), ci.getCount()))
                 .toList();
 
+        int totalPrice = 0;
+        for (OrderItem oi: orderItems) {
+            totalPrice += oi.getOrderPrice() * oi.getCount();
+        }
+
+        //쿠폰 사용
+        int discountAmount = 0;
+        if (couponItemId != null) {
+            discountAmount = couponService.useCoupon(couponItemId, totalPrice);
+        }
+
         //Order 만들기
-        Order newOrder = Order.createOrder(cart.getCustomer(), paymentMethod, orderItems);
+        Order newOrder = Order.createOrder(cart.getCustomer(), paymentMethod, orderItems, discountAmount);
 
         cart.removeAllCartItems();
         orderRepository.save(newOrder);

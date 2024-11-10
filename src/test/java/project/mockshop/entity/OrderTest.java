@@ -72,4 +72,27 @@ public class OrderTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(MockShopPolicy.INPUT_STRING_METHOD("배송지"));
     }
+
+    @Test
+    void order_discountAmount() throws Exception {
+        //given
+        Item item = Item.builder()
+                .quantity(100)
+                .build();
+        Order order = Order.builder()
+                .customer(Customer.builder().build())
+                .addressInfo(new AddressInfo("city", "street", "11111"))
+                .paymentMethod("card")
+                .orderDate(LocalDateTime.now())
+                .status(OrderStatus.ORDER)
+                .orderItems(List.of(OrderItem.builder().item(item).build()))
+                .discountAmount(3000)
+                .build();
+
+        //when
+
+        //then
+        assertThat(order.getDiscountAmount()).isEqualTo(3000);
+    }
+
 }

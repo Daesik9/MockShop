@@ -19,6 +19,7 @@ public class OrderDto {
     private LocalDateTime orderDate;
     private String paymentMethod;
     private AddressInfo addressInfo;
+    private int discountAmount;
 
         //==조회 로직==//
         /** 전체 결제금액(수량*상품금액(할인된) */
