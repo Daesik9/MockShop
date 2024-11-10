@@ -135,7 +135,7 @@ public class OrderControllerSpringTest {
                 .build();
         Long customerId = customerService.createAccount(userCreationDto);
         Long cartId = cartService.addToCart(itemId, 10, customerId);
-        String orderNumber = orderService.order(customerId, "MOCK-PAY");
+        String orderNumber = orderService.order(customerId, "MOCK-PAY", null);
 
 
         //when
@@ -173,7 +173,7 @@ public class OrderControllerSpringTest {
                 .build();
         Long customerId = customerService.createAccount(userCreationDto);
         Long cartId = cartService.addToCart(itemId, 10, customerId);
-        String orderNumber = orderService.order(customerId, "MOCK-PAY");
+        String orderNumber = orderService.order(customerId, "MOCK-PAY", null);
 
         //when
         ResultActions resultActions = mockMvc.perform(
@@ -212,7 +212,7 @@ public class OrderControllerSpringTest {
         Long customerId = customerService.createAccount(userCreationDto);
 
         Long cartId = cartService.addToCart(itemId, 10, customerId);
-        String orderNumber = orderService.order(customerId, "MOCK-PAY");
+        String orderNumber = orderService.order(customerId, "MOCK-PAY", null);
 
         //when
         ResultActions resultActions = mockMvc.perform(
@@ -222,7 +222,5 @@ public class OrderControllerSpringTest {
         //then
         resultActions.andExpect(status().isOk());
     }
-    
-    
 
 }

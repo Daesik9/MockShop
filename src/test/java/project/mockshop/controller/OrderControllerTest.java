@@ -78,7 +78,7 @@ public class OrderControllerTest {
         //then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
-        Mockito.verify(orderService).order(1L, "MOCK_PAY");
+        Mockito.verify(orderService).order(1L, "MOCK_PAY", null);
     }
 
     @Test
@@ -116,7 +116,5 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.result.data.orderNumber").value(orderNumber));
     }
-
-
 
 }

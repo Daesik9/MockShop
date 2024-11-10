@@ -17,6 +17,7 @@ public class OrderMapper {
                 .orderDate(order.getOrderDate())
                 .paymentMethod(order.getPaymentMethod())
                 .addressInfo(order.getAddressInfo())
+                .discountAmount(order.getDiscountAmount())
                 .build();
     }
 }

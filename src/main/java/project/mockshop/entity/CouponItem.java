@@ -25,4 +25,8 @@ public class CouponItem {
     private Customer customer;
 
     private boolean isUsed;
+
+    public void changeIsUsed(boolean isUsed) {
+        this.isUsed = isUsed;
+    }
 }

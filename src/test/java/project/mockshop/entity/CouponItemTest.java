@@ -16,7 +16,6 @@ public class CouponItemTest {
     void couponItem() throws Exception {
         //given
 
-
         //when
         CouponItem couponItem = CouponItem.builder()
                 .id(1L)
@@ -29,5 +28,24 @@ public class CouponItemTest {
         assertThat(couponItem.getId()).isEqualTo(1L);
         assertThat(couponItem.isUsed()).isEqualTo(false);
     }
+
+    @Test
+    void changeIsUsed() throws Exception {
+        //given
+        CouponItem couponItem = CouponItem.builder()
+                .id(1L)
+                .coupon(Coupon.builder().build())
+                .customer(Customer.builder().build())
+                .isUsed(false)
+                .build();
+
+        //when
+        couponItem.changeIsUsed(true);
+
+        //then
+        assertThat(couponItem.isUsed()).isEqualTo(true);
+    }
+
+
 
 }

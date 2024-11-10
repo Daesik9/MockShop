@@ -47,8 +47,7 @@ public class OrderServiceSpringTest {
 
         //when
         String paymentMethod = "MOCK_PAY";
-        String orderNumber = orderService.order(customer.getId(), paymentMethod);
-
+        String orderNumber = orderService.order(customer.getId(), paymentMethod, null);
 
         //then
         Order foundOrder = orderRepository.findByOrderNumber(orderNumber).orElseThrow(() -> new NullPointerException("해당 주문이 없습니다."));
@@ -56,6 +55,7 @@ public class OrderServiceSpringTest {
         assertThat(foundOrder.getOrderItems().size()).isEqualTo(1);
         assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.ORDER);
         assertThat(foundOrder.getOrderItems().get(0).getOrder()).isNotNull();
+        assertThat(foundOrder.getDiscountAmount()).isEqualTo(0);
     }
 
     @Test

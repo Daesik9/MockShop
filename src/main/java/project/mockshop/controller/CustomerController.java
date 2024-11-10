@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import project.mockshop.dto.*;
+import project.mockshop.entity.CouponItem;
 import project.mockshop.response.Response;
 import project.mockshop.service.CouponService;
 import project.mockshop.service.CustomerService;
@@ -74,6 +75,13 @@ public class CustomerController {
         List<CouponItemDto> couponItemDtos = couponService.getAllCouponItemsByCustomerId(customerId);
 
         return Response.success(couponItemDtos);
+    }
+
+    @GetMapping("/users/{customerId}/coupons/available-for-order")
+    public Response getAvailableCoupons(@PathVariable Long customerId , @RequestParam Integer orderAmount) {
+        List<CouponItemDto> availableCoupons = couponService.getAvailableCoupons(customerId, orderAmount);
+
+        return Response.success(availableCoupons);
     }
 
     @PutMapping("/users/reset-password")

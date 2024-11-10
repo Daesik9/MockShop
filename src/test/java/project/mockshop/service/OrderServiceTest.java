@@ -172,12 +172,13 @@ public class OrderServiceTest {
 
         //when
         String paymentMethod = "MOCK_PAY";
-        String orderNumber = orderService.order(customer.getId(), paymentMethod);
+        String orderNumber = orderService.order(customer.getId(), paymentMethod, null);
         when(orderRepository.findByOrderNumber(orderNumber)).thenReturn(Optional.of(order));
 
         //then
         Optional<Order> optionalOrder = orderRepository.findByOrderNumber(orderNumber);
         assertThat(optionalOrder.get().getCustomer()).isEqualTo(customer);
+        assertThat(optionalOrder.get().getDiscountAmount()).isEqualTo(0);
     }
 
 
@@ -212,7 +213,7 @@ public class OrderServiceTest {
     @Test
     void findAllByCustomer() throws Exception {
         //given
-        given(orderRepository.findAllByCustomerId(customer1.getId()))
+        given(orderRepository.findAllByCustomerIdOrderByOrderDateDesc(customer1.getId()))
                 .willReturn(List.of(orders.get(0), orders.get(2), orders.get(4)));
 
         //when

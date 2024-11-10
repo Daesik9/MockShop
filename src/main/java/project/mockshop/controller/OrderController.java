@@ -1,6 +1,7 @@
 package project.mockshop.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.mockshop.dto.ItemDto;
@@ -14,14 +15,18 @@ import java.util.List;
 @RestController
 @RequestMapping("api")
 @RequiredArgsConstructor
+@Slf4j
 public class OrderController {
 
     private final OrderService orderService;
 
     @PostMapping("/orders")
     public Response order(@RequestBody OrderRequestDto requestDto) {
+        log.info("/api/orders, requestBody={}", requestDto);
 
-        String orderNumber = orderService.order(requestDto.getCustomerId(), requestDto.getPaymentMethod());
+        String orderNumber = orderService.order(requestDto.getCustomerId(),
+                requestDto.getPaymentMethod(),
+                requestDto.getCouponItemId());
 
         return Response.success(orderNumber);
     }
