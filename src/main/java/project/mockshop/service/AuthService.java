@@ -7,7 +7,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.AuthCodeDto;
+import project.mockshop.dto.LoginDto;
 import project.mockshop.dto.LoginRequestDto;
 import project.mockshop.entity.AuthCode;
 import project.mockshop.entity.Member;
@@ -23,6 +25,7 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -31,15 +34,15 @@ public class AuthService {
     private final AuthCodeRepository authCodeRepository;
 
     public String login(LoginRequestDto loginRequestDto) {
-        Member findMember = memberRepository.findByLoginId(loginRequestDto.getLoginId())
+        LoginDto loginDto = memberRepository.findLoginDtoByLoginId(loginRequestDto.getLoginId())
                 .orElseThrow(() -> new NullPointerException("아이디나 비밀번호가 일치하지 않습니다."));
 
         //비밀번호가 일치하지 않을 때
-        if (!bCryptPasswordEncoder.matches(loginRequestDto.getPassword(), findMember.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(loginRequestDto.getPassword(), loginDto.getPassword())) {
             throw new NullPointerException("아이디나 비밀번호가 일치하지 않습니다.");
         }
 
-        return jwtTokenProvider.createToken(loginRequestDto.getLoginId(), "ROLE_" + findMember.getRole(), findMember.getId().toString());
+        return jwtTokenProvider.createToken(loginRequestDto.getLoginId(), "ROLE_" + loginDto.getRole(), loginDto.getId().toString());
     }
 
     public Long getIdFromToken(String token) {
@@ -60,6 +63,7 @@ public class AuthService {
         return false;
     }
 
+    @Transactional
     public String sendAuthCode(String toEmail) {
         Optional<Member> byEmail = memberRepository.findByEmail(toEmail);
         if (byEmail.isEmpty()) {
