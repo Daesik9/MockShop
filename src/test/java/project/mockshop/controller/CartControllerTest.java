@@ -14,10 +14,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.dto.*;
-import project.mockshop.entity.Cart;
-import project.mockshop.entity.CartItem;
-import project.mockshop.entity.Customer;
-import project.mockshop.entity.Item;
+import project.mockshop.entity.*;
 import project.mockshop.mapper.CartMapper;
 import project.mockshop.security.JwtUtil;
 import project.mockshop.service.CartService;
@@ -26,7 +23,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -115,8 +111,15 @@ public class CartControllerTest {
     @Test
     void getCartItems() throws Exception {
         //given
+        Category category = new Category("category");
+        Merchant merchant = Merchant.builder().name("merchant").storeName("merchant_store").build();
+
         Cart cart = Cart.builder()
-                .cartItems(List.of(CartItem.builder().item(Item.builder().build()).count(3).cartPrice(3000).build()))
+                .cartItems(List.of(CartItem.builder()
+                        .item(Item.builder().merchant(merchant).category(category).build())
+                        .count(3)
+                        .cartPrice(3000)
+                        .build()))
                 .customer(Customer.builder().build())
                 .build();
         given(cartService.getCartWithItems(1L)).willReturn(CartMapper.toDto(cart));

@@ -7,8 +7,10 @@ import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.Item;
+import project.mockshop.entity.QCategory;
 import project.mockshop.entity.QOrder;
 
 import java.time.DayOfWeek;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
+import static project.mockshop.entity.QCategory.category;
 import static project.mockshop.entity.QItem.item;
 import static project.mockshop.entity.QOrderItem.orderItem;
 
@@ -96,6 +99,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         isOnSale(searchCondition.getIsOnSale()))
                 .fetchOne();
 
+//        return new PagedModel<>(new PageImpl<>(content, pageable, count));
         return new PageImpl<>(content, pageable, count);
     }
 

@@ -19,6 +19,7 @@ import project.mockshop.annotation.WithMockMember;
 import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.*;
+import project.mockshop.repository.CategoryRepository;
 import project.mockshop.repository.ItemRepository;
 import project.mockshop.repository.MerchantRepository;
 import project.mockshop.repository.OrderRepository;
@@ -50,6 +51,8 @@ public class ItemControllerSpringTest {
     private OrderRepository orderRepository;
     @Autowired
     private MerchantRepository merchantRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
     @Autowired
     private MockMvc mockMvc;
 
@@ -117,16 +120,20 @@ public class ItemControllerSpringTest {
     @Test
     void getBestFiveItemsThisWeek() throws Exception {
         //given
-        Item item1 = Item.builder().name("1등").quantity(100).price(1000).build();
-        Item item2 = Item.builder().name("2등").quantity(100).price(1000).build();
-        Item item3 = Item.builder().name("3등").quantity(100).price(1000).build();
-        Item item4 = Item.builder().name("4등").quantity(100).price(1000).build();
-        Item item5 = Item.builder().name("5등").quantity(100).price(1000).build();
-        Item item6 = Item.builder().name("6등").quantity(100).price(1000).build();
-        Item item7 = Item.builder().name("7등").quantity(100).price(1000).build();
-        Item item8 = Item.builder().name("8등").quantity(100).price(1000).build();
-        Item item9 = Item.builder().name("9등").quantity(100).price(1000).build();
-        Item item10 = Item.builder().name("10등").quantity(100).price(1000).build();
+        Category category = new Category("category");
+        categoryRepository.save(category);
+        Merchant merchant = Merchant.builder().name("merchant").storeName("merchant_store").build();
+        merchantRepository.save(merchant);
+        Item item1 = Item.builder().name("1등").quantity(100).price(1000).category(category).merchant(merchant).build();
+        Item item2 = Item.builder().name("2등").quantity(100).price(1000).category(category).merchant(merchant).build();
+        Item item3 = Item.builder().name("3등").quantity(100).price(1000).category(category).merchant(merchant).build();
+        Item item4 = Item.builder().name("4등").quantity(100).price(1000).category(category).merchant(merchant).build();
+        Item item5 = Item.builder().name("5등").quantity(100).price(1000).category(category).merchant(merchant).build();
+        Item item6 = Item.builder().name("6등").quantity(100).price(1000).category(category).merchant(merchant).build();
+        Item item7 = Item.builder().name("7등").quantity(100).price(1000).category(category).merchant(merchant).build();
+        Item item8 = Item.builder().name("8등").quantity(100).price(1000).category(category).merchant(merchant).build();
+        Item item9 = Item.builder().name("9등").quantity(100).price(1000).category(category).merchant(merchant).build();
+        Item item10 = Item.builder().name("10등").quantity(100).price(1000).category(category).build();
         itemRepository.saveAll(List.of(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10));
 
         OrderItem orderItem1 = OrderItem.builder().item(item1).count(1).build();
@@ -173,13 +180,15 @@ public class ItemControllerSpringTest {
     void search() throws Exception {
         //given
         Merchant merchant = Merchant.builder().name("merchant").build();
+        merchantRepository.save(merchant);
         Category category = new Category("category");
+        categoryRepository.save(category);
         List<Item> items = new ArrayList<>();
 
         for (int i = 0; i < 100; i++) {
             Item item = Item.builder()
                     .name(i + "name" + i)
-//                    .category(category)
+                    .category(category)
                     .thumbnail(UploadFile.builder().storeFileName("thumbnail.png").build())
                     .price(1000 * (i + 1))
                     .quantity(100)
@@ -187,6 +196,7 @@ public class ItemControllerSpringTest {
                     .descriptionImg2(UploadFile.builder().storeFileName("img2.png").build())
                     .descriptionImg3(UploadFile.builder().storeFileName("img3.png").build())
                     .percentOff((i + 1) % 2 == 0 ? 0 : 0.1) // 홀수번째 아이템만 할인.
+                    .merchant(merchant)
                     .build();
 
             itemRepository.save(item);
@@ -225,10 +235,12 @@ public class ItemControllerSpringTest {
     @WithMockMember(role = "ROLE_ADMIN")
     void getItemsByMerchant() throws Exception {
         //given
-        Merchant merchant = Merchant.builder().name("merchant").build();
+        Merchant merchant = Merchant.builder().name("merchant").storeName("merchant_store").build();
         merchantRepository.save(merchant);
+        Category category = new Category("category");
+        categoryRepository.save(category);
 
-        Item item = Item.builder().name("1등").merchant(merchant).quantity(100).price(1000).build();
+        Item item = Item.builder().name("1등").merchant(merchant).category(category).quantity(100).price(1000).build();
         itemRepository.save(item);
 
         //when
@@ -239,7 +251,8 @@ public class ItemControllerSpringTest {
         //then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.result.data[0].merchant.name").value("merchant"));
+                .andExpect(jsonPath("$.result.data[0].merchantDto.storeName").value("merchant_store"))
+                .andExpect(jsonPath("$.result.data[0].merchantDto.name").value("merchant"));
     }
 
 }
