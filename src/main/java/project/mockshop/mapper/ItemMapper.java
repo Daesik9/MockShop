@@ -1,5 +1,6 @@
 package project.mockshop.mapper;
 
+import project.mockshop.dto.CategoryDto;
 import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.entity.Item;
@@ -10,7 +11,7 @@ public class ItemMapper {
         return Item.builder()
                 .id(dto.getId())
                 .name(dto.getName())
-                .category(dto.getCategory())
+                .category(CategoryMapper.toEntity(dto.getCategoryDto()))
                 .thumbnail(UploadFile.builder().storeFileName(dto.getThumbnail()).build())
                 .price(dto.getPrice())
                 .quantity(dto.getQuantity())
@@ -18,7 +19,7 @@ public class ItemMapper {
                 .descriptionImg2(UploadFile.builder().storeFileName(dto.getDescriptionImg2()).build())
                 .descriptionImg3(UploadFile.builder().storeFileName(dto.getDescriptionImg3()).build())
                 .percentOff(dto.getPercentOff())
-                .merchant(dto.getMerchant())
+                .merchant(MerchantMapper.toEntity(dto.getMerchantDto()))
                 .build();
     }
 
@@ -43,7 +44,7 @@ public class ItemMapper {
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
-                .category(item.getCategory())
+                .categoryDto(CategoryMapper.toDto(item.getCategory()))
                 .thumbnail(thumbnail == null ? null : thumbnail.getStoreFileName())
                 .price(item.getPrice())
                 .quantity(item.getQuantity())
@@ -51,7 +52,7 @@ public class ItemMapper {
                 .descriptionImg2(descriptionImg2 == null ? null : descriptionImg2.getStoreFileName())
                 .descriptionImg3(descriptionImg3 == null? null : descriptionImg3.getStoreFileName())
                 .percentOff(item.getPercentOff())
-                .merchant(item.getMerchant())
+                .merchantDto(MerchantMapper.toDto(item.getMerchant()))
                 .build();
     }
 }

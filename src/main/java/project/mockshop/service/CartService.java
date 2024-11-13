@@ -1,6 +1,7 @@
 package project.mockshop.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.CartDto;
@@ -19,6 +20,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class CartService {
 
     private final CartRepository cartRepository;
@@ -66,7 +68,8 @@ public class CartService {
                     .findAny();
             //기존 장바구니에 같은 상품이 있는 경우
             if (findSameCartItem.isPresent()) {
-                findSameCartItem.get().changeCount(count);
+                findSameCartItem.get().changeCount(findSameCartItem.get().getCount() + count);
+                findSameCartItem.get().changeCartPrice(findSameCartItem.get().getCount() * findSameCartItem.get().getItem().getPrice());
             } else {
                 CartItem cartItem = CartItem.createCartItem(itemOptional.get(), count);
                 cartItem.changeCart(cartOptional.get());

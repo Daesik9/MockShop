@@ -1,5 +1,6 @@
 package project.mockshop.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,7 +15,9 @@ import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.*;
+import project.mockshop.mapper.CategoryMapper;
 import project.mockshop.mapper.ItemMapper;
+import project.mockshop.mapper.MerchantMapper;
 import project.mockshop.repository.ItemRepository;
 import project.mockshop.repository.MerchantRepository;
 import project.mockshop.repository.OrderRepository;
@@ -51,6 +54,15 @@ public class ItemServiceTest {
     @Mock
     private FileStore fileStore;
 
+    Category category;
+    Merchant merchant;
+
+    @BeforeEach
+    void beforeEach() {
+        category = Category.builder().name("category").build();
+        merchant = Merchant.builder().name("merchant").storeName("merchant_store").build();
+    }
+
     @Test
     void itemServiceAndRepositoryNotNull() throws Exception {
         //given
@@ -74,8 +86,6 @@ public class ItemServiceTest {
                 fileInputStream
         );
 
-        Merchant merchant = Merchant.builder().name("merchant").build();
-        Category category = new Category("category");
         ItemCreationDto itemCreationDto = ItemCreationDto.builder()
                 .name("name")
                 .category(category)
@@ -105,14 +115,13 @@ public class ItemServiceTest {
     @Test
     void findItemsByName() throws Exception {
         //given
-        Merchant merchant = Merchant.builder().name("merchant").build();
-        Category category = new Category("category");
         ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
@@ -120,6 +129,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
@@ -127,6 +137,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
@@ -134,6 +145,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
@@ -141,6 +153,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
 
         itemService.createItem(itemDto1);
@@ -164,8 +177,6 @@ public class ItemServiceTest {
     @Test
     void search() throws Exception {
         //given
-        Merchant merchant = Merchant.builder().name("merchant").build();
-        Category category = new Category("category");
         List<ItemDto> itemDtos = new ArrayList<>();
 
         for (int i = 0; i < 100; i++) {
@@ -175,14 +186,16 @@ public class ItemServiceTest {
                     .price(1000)
                     .quantity(100)
                     .percentOff(10)
+                    .merchant(merchant)
                     .build();
 
             ItemDto itemDto = ItemDto.builder()
                     .name(i + "name" + i)
-                    .category(category)
+                    .categoryDto(CategoryMapper.toDto(category))
                     .price(1000)
                     .quantity(100)
                     .percentOff(10)
+                    .merchantDto(MerchantMapper.toDto(merchant))
                     .build();
 
             itemService.createItem(itemCreationDto);
@@ -211,8 +224,7 @@ public class ItemServiceTest {
     @Test
     void findItemsByMerchant() throws Exception {
         //given
-        Merchant merchant = Merchant.builder().id(1L).name("merchant").build();
-        Category category = new Category("category");
+        Merchant merchant1 = Merchant.builder().id(1L).name("merchant1").storeName("merchant_store1").build();
 
         ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
@@ -220,7 +232,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
-                .merchant(merchant)
+                .merchant(merchant1)
                 .build();
         ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
@@ -228,7 +240,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
-                .merchant(merchant)
+                .merchant(merchant1)
                 .build();
         ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
@@ -236,6 +248,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
@@ -243,6 +256,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
@@ -250,6 +264,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
 
         itemService.createItem(itemDto1);
@@ -268,20 +283,20 @@ public class ItemServiceTest {
 
         //then
         assertThat(findItems.size()).isEqualTo(2);
-        assertThat(findItems.get(0).getMerchant()).isEqualTo(merchant);
+        assertThat(findItems.get(0).getMerchantDto().getName()).isEqualTo("merchant1");
+        assertThat(findItems.get(0).getMerchantDto().getStoreName()).isEqualTo("merchant_store1");
     }
 
     @Test
     void findItemsByCategory() throws Exception {
         //given
-        Merchant merchant = Merchant.builder().name("merchant").build();
-        Category category = new Category("category");
         ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
@@ -289,6 +304,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
@@ -296,18 +312,21 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
 
         itemService.createItem(itemDto1);
@@ -331,14 +350,13 @@ public class ItemServiceTest {
     @Test
     void findItemsByQuantity_0to300() throws Exception {
         //given
-        Merchant merchant = Merchant.builder().name("merchant").build();
-        Category category = new Category("category");
         ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
@@ -346,6 +364,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(200)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
@@ -353,6 +372,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(300)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
@@ -360,6 +380,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(400)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
@@ -367,6 +388,7 @@ public class ItemServiceTest {
                 .price(1000)
                 .quantity(500)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
 
         itemService.createItem(itemDto1);
@@ -398,14 +420,13 @@ public class ItemServiceTest {
     @Test
     void findItemsByPrice() throws Exception {
         //given
-        Merchant merchant = Merchant.builder().name("merchant").build();
-        Category category = new Category("category");
         ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
@@ -413,6 +434,7 @@ public class ItemServiceTest {
                 .price(2000)
                 .quantity(200)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
@@ -420,6 +442,7 @@ public class ItemServiceTest {
                 .price(3000)
                 .quantity(300)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
@@ -427,6 +450,7 @@ public class ItemServiceTest {
                 .price(4000)
                 .quantity(400)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
@@ -434,6 +458,7 @@ public class ItemServiceTest {
                 .price(5000)
                 .quantity(500)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
 
         itemService.createItem(itemDto1);
@@ -464,26 +489,27 @@ public class ItemServiceTest {
     @Test
     void findDiscountItems() throws Exception {
         //given
-        Merchant merchant = Merchant.builder().name("merchant").build();
-        Category category = new Category("category");
         ItemCreationDto itemDto1 = ItemCreationDto.builder()
                 .name("asdfnameasdf")
                 .category(category)
                 .price(1000)
                 .quantity(100)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto2 = ItemCreationDto.builder()
                 .name("asdfname")
                 .category(category)
                 .price(2000)
                 .quantity(200)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto3 = ItemCreationDto.builder()
                 .name("nameasdf")
                 .category(category)
                 .price(3000)
                 .quantity(300)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto4 = ItemCreationDto.builder()
                 .name("name")
@@ -491,6 +517,7 @@ public class ItemServiceTest {
                 .price(4000)
                 .quantity(400)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
         ItemCreationDto itemDto5 = ItemCreationDto.builder()
                 .name("asdfasdf")
@@ -498,6 +525,7 @@ public class ItemServiceTest {
                 .price(5000)
                 .quantity(500)
                 .percentOff(10)
+                .merchant(merchant)
                 .build();
 
         itemService.createItem(itemDto1);
@@ -520,16 +548,16 @@ public class ItemServiceTest {
     @Test
     void getBestFiveItemsThisWeek() throws Exception {
         //given
-        Item item1 = Item.builder().name("1등").quantity(100).price(1000).build();
-        Item item2 = Item.builder().name("2등").quantity(100).price(1000).build();
-        Item item3 = Item.builder().name("3등").quantity(100).price(1000).build();
-        Item item4 = Item.builder().name("4등").quantity(100).price(1000).build();
-        Item item5 = Item.builder().name("5등").quantity(100).price(1000).build();
-        Item item6 = Item.builder().name("6등").quantity(100).price(1000).build();
-        Item item7 = Item.builder().name("7등").quantity(100).price(1000).build();
-        Item item8 = Item.builder().name("8등").quantity(100).price(1000).build();
-        Item item9 = Item.builder().name("9등").quantity(100).price(1000).build();
-        Item item10 = Item.builder().name("10등").quantity(100).price(1000).build();
+        Item item1 = Item.builder().name("1등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item2 = Item.builder().name("2등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item3 = Item.builder().name("3등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item4 = Item.builder().name("4등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item5 = Item.builder().name("5등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item6 = Item.builder().name("6등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item7 = Item.builder().name("7등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item8 = Item.builder().name("8등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item9 = Item.builder().name("9등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item10 = Item.builder().name("10등").quantity(100).price(1000).merchant(merchant).category(category).build();
         itemRepository.saveAll(List.of(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10));
 
         OrderItem orderItem1 = OrderItem.builder().item(item1).count(1).build();

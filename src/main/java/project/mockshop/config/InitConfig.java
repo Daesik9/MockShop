@@ -10,19 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.CouponDto;
 import project.mockshop.dto.EventCreationDto;
 import project.mockshop.dto.EventRewardDto;
-import project.mockshop.entity.AddressInfo;
-import project.mockshop.entity.Customer;
-import project.mockshop.entity.Item;
-import project.mockshop.entity.Merchant;
-import project.mockshop.mapper.CustomerMapper;
-import project.mockshop.repository.MerchantRepository;
 import project.mockshop.service.CouponService;
-import project.mockshop.service.CustomerService;
 import project.mockshop.service.EventService;
-import project.mockshop.service.ItemService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -39,71 +30,26 @@ public class InitConfig {
     @Service
     @RequiredArgsConstructor
     static class InitService {
-        private final ItemService itemService;
-        private final CustomerService customerService;
         private final EventService eventService;
         private final CouponService couponService;
-        private final MerchantRepository merchantRepository;
         private final EntityManager em;
 
-        @Transactional
-        public void saveAll(List<?> entities) {
-            int batchSize = 1000;
-            for (int i = 0; i < entities.size(); i++) {
-                em.persist(entities.get(i));
-                if (i % batchSize == 0 && i > 0) {
-                    em.flush();
-                    em.clear();
-                }
-            }
-            em.flush();
-            em.clear();
-        }
+//        @Transactional
+//        public void saveAll(List<?> entities) {
+//            int batchSize = 1000;
+//            for (int i = 0; i < entities.size(); i++) {
+//                em.persist(entities.get(i));
+//                if (i % batchSize == 0 && i > 0) {
+//                    em.flush();
+//                    em.clear();
+//                }
+//            }
+//            em.flush();
+//            em.clear();
+//        }
 
         @Transactional
         public void init() {
-            List<Item> items = new ArrayList<>();
-            for (int i = 0; i < 10000; i++) {
-                Item item = Item.builder()
-                        .name("사과")
-                        .price(1000 * (i + 1))
-                        .quantity(100)
-                        .percentOff(i % 100 == 0 ? 10 : 0)
-                        .build();
-                items.add(item);
-//            itemService.createItem(itemDto, 1L);
-            }
-
-            saveAll(items);
-
-            Customer customer = Customer.builder()
-                    .name("테스트")
-                    .password("Password1!")
-                    .email("test@gmail.com")
-                    .loginId("test")
-                    .phoneNumber("01011111111")
-                    .addressInfo(new AddressInfo("city", "street", "11111"))
-                    .build();
-            Customer customer2 = Customer.builder()
-                    .name("테스트둘")
-                    .password("Password1!")
-                    .email("test@gmail.com")
-                    .loginId("test2")
-                    .phoneNumber("01011111111")
-                    .addressInfo(new AddressInfo("city", "street", "11111"))
-                    .build();
-            customerService.createAccount(CustomerMapper.toCreationDto(customer));
-            customerService.createAccount(CustomerMapper.toCreationDto(customer2));
-
-            Merchant merchant = Merchant.builder()
-                    .name("판매자")
-                    .password("Password1!")
-                    .email("merchant@email.com")
-                    .loginId("merchant")
-                    .build();
-            merchantRepository.save(merchant);
-
-
             LocalDateTime now = LocalDateTime.now();
 
             CouponDto couponDtoPriceOff = CouponDto.builder()

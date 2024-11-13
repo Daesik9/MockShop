@@ -21,7 +21,9 @@ import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.entity.*;
+import project.mockshop.mapper.CategoryMapper;
 import project.mockshop.mapper.ItemMapper;
+import project.mockshop.mapper.MerchantMapper;
 import project.mockshop.service.ItemService;
 
 import java.io.FileInputStream;
@@ -96,11 +98,14 @@ public class ItemControllerTest {
     @Test
     void getBestFiveItemsThisWeek() throws Exception {
         //given
-        Item item1 = Item.builder().name("1등").quantity(100).price(1000).build();
-        Item item2 = Item.builder().name("2등").quantity(100).price(1000).build();
-        Item item3 = Item.builder().name("3등").quantity(100).price(1000).build();
-        Item item4 = Item.builder().name("4등").quantity(100).price(1000).build();
-        Item item5 = Item.builder().name("5등").quantity(100).price(1000).build();
+        Category category = new Category("category");
+        Merchant merchant = Merchant.builder().name("merchant").storeName("merchant_store").build();
+
+        Item item1 = Item.builder().name("1등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item2 = Item.builder().name("2등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item3 = Item.builder().name("3등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item4 = Item.builder().name("4등").quantity(100).price(1000).merchant(merchant).category(category).build();
+        Item item5 = Item.builder().name("5등").quantity(100).price(1000).merchant(merchant).category(category).build();
         given(itemService.findBestFiveThisWeek())
                 .willReturn(Stream.of(item1, item2, item3, item4, item5).map(ItemMapper::toDto).toList());
 
@@ -140,7 +145,7 @@ public class ItemControllerTest {
 
             ItemDto itemDto = ItemDto.builder()
                     .name(i + "name" + i)
-                    .category(category)
+                    .categoryDto(CategoryMapper.toDto(category))
                     .price(1000 * (i + 1))
                     .quantity(100)
                     .percentOff((i + 1) % 2 == 0 ? 0 : 0.1) // 홀수번째 아이템만 할인.
@@ -188,7 +193,7 @@ public class ItemControllerTest {
     void getItemsByMerchant() throws Exception {
         //given
         Merchant merchant = Merchant.builder().id(1L).name("merchant").build();
-        List<ItemDto> itemDtos = List.of(ItemDto.builder().merchant(merchant).build());
+        List<ItemDto> itemDtos = List.of(ItemDto.builder().merchantDto(MerchantMapper.toDto(merchant)).build());
 
         given(itemService.findItemsByMerchantId(merchant.getId())).willReturn(itemDtos);
 
@@ -200,7 +205,7 @@ public class ItemControllerTest {
         //then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.result.data[0].merchant.name").value("merchant"));
+                .andExpect(jsonPath("$.result.data[0].merchantDto.name").value("merchant"));
     }
 
 

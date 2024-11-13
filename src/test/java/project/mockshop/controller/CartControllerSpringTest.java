@@ -17,9 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.annotation.WithMockMember;
 import project.mockshop.dto.*;
+import project.mockshop.entity.Category;
 import project.mockshop.entity.Customer;
 import project.mockshop.entity.Member;
+import project.mockshop.entity.Merchant;
 import project.mockshop.mapper.CustomerMapper;
+import project.mockshop.repository.CategoryRepository;
+import project.mockshop.repository.MerchantRepository;
 import project.mockshop.service.CartService;
 import project.mockshop.service.CustomerService;
 import project.mockshop.service.ItemService;
@@ -46,6 +50,10 @@ public class CartControllerSpringTest {
     @Autowired
     private CustomerService customerService;
     @Autowired
+    CategoryRepository categoryRepository;
+    @Autowired
+    MerchantRepository merchantRepository;
+    @Autowired
     private MockMvc mockMvc;
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -57,8 +65,18 @@ public class CartControllerSpringTest {
 //        mockMvc = MockMvcBuilders.standaloneSetup(cartController)
 //                .setControllerAdvice(new ExceptionAdvice())
 //                .build();
+        Category category = new Category("category");
+        categoryRepository.save(category);
+        Merchant merchant = Merchant.builder().name("merchant").storeName("merchant_store").build();
+        merchantRepository.save(merchant);
 
-        ItemCreationDto creationDto = ItemCreationDto.builder().name("사과").price(1000).quantity(100).build();
+        ItemCreationDto creationDto = ItemCreationDto.builder()
+                .name("사과")
+                .price(1000)
+                .quantity(100)
+                .merchant(merchant)
+                .category(category)
+                .build();
         try {
             itemId = itemService.createItem(creationDto);
         } catch (IOException e) {
