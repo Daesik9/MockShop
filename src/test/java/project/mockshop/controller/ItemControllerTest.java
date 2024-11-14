@@ -20,6 +20,7 @@ import project.mockshop.advice.ExceptionAdvice;
 import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.ItemSearchCondition;
+import project.mockshop.dto.ItemThumbDto;
 import project.mockshop.entity.*;
 import project.mockshop.mapper.CategoryMapper;
 import project.mockshop.mapper.ItemMapper;
@@ -128,7 +129,7 @@ public class ItemControllerTest {
         //given
         Merchant merchant = Merchant.builder().name("merchant").build();
         Category category = new Category("category");
-        List<ItemDto> itemDtos = new ArrayList<>();
+        List<ItemThumbDto> itemThumbDtos = new ArrayList<>();
 
         for (int i = 0; i < 100; i++) {
             ItemCreationDto itemCreationDto = ItemCreationDto.builder()
@@ -143,23 +144,21 @@ public class ItemControllerTest {
                     .percentOff((i + 1) % 2 == 0 ? 0 : 0.1) // 홀수번째 아이템만 할인.
                     .build();
 
-            ItemDto itemDto = ItemDto.builder()
+            ItemThumbDto itemThumbDto = ItemThumbDto.builder()
                     .name(i + "name" + i)
-                    .categoryDto(CategoryMapper.toDto(category))
                     .price(1000 * (i + 1))
-                    .quantity(100)
                     .percentOff((i + 1) % 2 == 0 ? 0 : 0.1) // 홀수번째 아이템만 할인.
                     .build();
 
             itemService.createItem(itemCreationDto);
-            itemDtos.add(itemDto);
+            itemThumbDtos.add(itemThumbDto);
         }
 
 
         int page = 0;
         int size = 8;
         Pageable pageable = PageRequest.of(page, size);
-        Page<ItemDto> pages = new PageImpl<>(itemDtos.subList(0, 8), pageable, itemDtos.size());
+        Page<ItemThumbDto> pages = new PageImpl<>(itemThumbDtos.subList(0, 8), pageable, itemThumbDtos.size());
         ItemSearchCondition searchCond = ItemSearchCondition.builder()
                 .itemNameLike("name")
                 .priceGoe(1000)

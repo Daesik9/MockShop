@@ -3,6 +3,7 @@ package project.mockshop.mapper;
 import project.mockshop.dto.CategoryDto;
 import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
+import project.mockshop.dto.ItemThumbDto;
 import project.mockshop.entity.Item;
 import project.mockshop.entity.UploadFile;
 
@@ -53,6 +54,18 @@ public class ItemMapper {
                 .descriptionImg3(descriptionImg3 == null? null : descriptionImg3.getStoreFileName())
                 .percentOff(item.getPercentOff())
                 .merchantDto(MerchantMapper.toDto(item.getMerchant()))
+                .build();
+    }
+
+    public static ItemThumbDto toThumbDto(Item item) {
+        UploadFile thumbnail = item.getThumbnail();
+
+        return ItemThumbDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .price(item.getPrice())
+                .percentOff(item.getPercentOff())
+                .thumbnail(thumbnail == null ? null : thumbnail.getStoreFileName())
                 .build();
     }
 }

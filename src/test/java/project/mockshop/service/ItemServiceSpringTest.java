@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.ItemSearchCondition;
+import project.mockshop.dto.ItemThumbDto;
 import project.mockshop.entity.*;
 import project.mockshop.mapper.ItemMapper;
 import project.mockshop.repository.CategoryRepository;
@@ -548,7 +549,7 @@ public class ItemServiceSpringTest {
         //값이 같은 경우는 arbitrary하게 정렬이 됨.
 
         //when
-        Page<ItemDto> findItems = itemService.search(searchCond, pageable);
+        Page<ItemThumbDto> findItems = itemService.search(searchCond, pageable);
         System.out.println("findItems = " + findItems.getContent());
 
         //then
