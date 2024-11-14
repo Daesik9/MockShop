@@ -13,6 +13,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import project.mockshop.dto.AuthCodeDto;
+import project.mockshop.dto.LoginDto;
 import project.mockshop.dto.LoginRequestDto;
 import project.mockshop.entity.*;
 import project.mockshop.repository.AuthCodeRepository;
@@ -61,7 +62,8 @@ public class AuthServiceTest {
                 .build();
 
         //when
-        when(memberRepository.findByLoginId(loginRequestDto.getLoginId())).thenReturn(Optional.of(member));
+        when(memberRepository.findLoginDtoByLoginId(loginRequestDto.getLoginId()))
+                .thenReturn(Optional.of(new LoginDto(member.getId(), member.getPassword(), member.getRole())));
         when(passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())).thenReturn(true);
         String token = authService.login(loginRequestDto);
 
@@ -86,7 +88,8 @@ public class AuthServiceTest {
                 .build();
 
         //when
-        when(memberRepository.findByLoginId(loginRequestDto.getLoginId())).thenReturn(Optional.of(member));
+        when(memberRepository.findLoginDtoByLoginId(loginRequestDto.getLoginId()))
+                .thenReturn(Optional.of(new LoginDto(member.getId(), member.getPassword(), member.getRole())));
         when(passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())).thenReturn(true);
         String token = authService.login(loginRequestDto);
 
@@ -111,7 +114,8 @@ public class AuthServiceTest {
                 .build();
 
         //when
-        when(memberRepository.findByLoginId(loginRequestDto.getLoginId())).thenReturn(Optional.of(member));
+        when(memberRepository.findLoginDtoByLoginId(loginRequestDto.getLoginId()))
+                .thenReturn(Optional.of(new LoginDto(member.getId(), member.getPassword(), member.getRole())));
         when(passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())).thenReturn(true);
         String token = authService.login(loginRequestDto);
 

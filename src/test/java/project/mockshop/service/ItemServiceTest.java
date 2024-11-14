@@ -14,6 +14,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.ItemSearchCondition;
+import project.mockshop.dto.ItemThumbDto;
 import project.mockshop.entity.*;
 import project.mockshop.mapper.CategoryMapper;
 import project.mockshop.mapper.ItemMapper;
@@ -177,7 +178,7 @@ public class ItemServiceTest {
     @Test
     void search() throws Exception {
         //given
-        List<ItemDto> itemDtos = new ArrayList<>();
+        List<ItemThumbDto> itemThumbDtos = new ArrayList<>();
 
         for (int i = 0; i < 100; i++) {
             ItemCreationDto itemCreationDto = ItemCreationDto.builder()
@@ -189,20 +190,17 @@ public class ItemServiceTest {
                     .merchant(merchant)
                     .build();
 
-            ItemDto itemDto = ItemDto.builder()
+            ItemThumbDto itemThumbDto = ItemThumbDto.builder()
                     .name(i + "name" + i)
-                    .categoryDto(CategoryMapper.toDto(category))
                     .price(1000)
-                    .quantity(100)
                     .percentOff(10)
-                    .merchantDto(MerchantMapper.toDto(merchant))
                     .build();
 
             itemService.createItem(itemCreationDto);
-            itemDtos.add(itemDto);
+            itemThumbDtos.add(itemThumbDto);
         }
 
-        Page<Item> pages = new PageImpl<>(itemDtos.subList(0, 8).stream().map(ItemMapper::toEntity).toList());
+        Page<ItemThumbDto> pages = new PageImpl<>(itemThumbDtos.subList(0, 8));
 
         int page = 0;
         int size = 8;
@@ -214,7 +212,7 @@ public class ItemServiceTest {
         given(itemRepository.search(searchCond, pageable)).willReturn(pages);
 
         //when
-        Page<ItemDto> findItems = itemService.search(searchCond, pageable);
+        Page<ItemThumbDto> findItems = itemService.search(searchCond, pageable);
 
         //then
         assertThat(findItems.getSize()).isEqualTo(8);

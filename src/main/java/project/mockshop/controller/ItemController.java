@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.ItemSearchCondition;
+import project.mockshop.dto.ItemThumbDto;
 import project.mockshop.response.Response;
 import project.mockshop.service.ItemService;
 import project.mockshop.util.FileStore;
@@ -48,10 +49,10 @@ public class ItemController {
 
     @GetMapping("/items/search")
     public Response search(ItemSearchCondition searchCondition,
-                           @RequestParam int page,
-                           @RequestParam int size) {
+                           @RequestParam(defaultValue = "0") int page,
+                           @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<ItemDto> result = itemService.search(searchCondition, pageable);
+        Page<ItemThumbDto> result = itemService.search(searchCondition, pageable);
         return Response.success(HttpStatus.OK.value(), result);
     }
 

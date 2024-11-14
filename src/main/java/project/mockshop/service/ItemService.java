@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.ItemCreationDto;
 import project.mockshop.dto.ItemDto;
 import project.mockshop.dto.ItemSearchCondition;
+import project.mockshop.dto.ItemThumbDto;
 import project.mockshop.entity.*;
 import project.mockshop.mapper.ItemMapper;
 import project.mockshop.repository.ItemRepository;
@@ -123,8 +124,8 @@ public class ItemService {
 //        return itemRepository.search(searchCond, pageable).map(ItemMapper::toDto);
 //    }
 
-    public Page<ItemDto> search(ItemSearchCondition searchCond, Pageable pageable) {
+    public Page<ItemThumbDto> search(ItemSearchCondition searchCond, Pageable pageable) {
         log.info("itemService search " + searchCond + " " + pageable);
-        return itemRepository.search(searchCond, pageable).map(ItemMapper::toDto);
+        return itemRepository.search(searchCond, pageable);
     }
 }

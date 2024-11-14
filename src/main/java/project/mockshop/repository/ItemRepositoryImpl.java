@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import project.mockshop.dto.ItemSearchCondition;
+import project.mockshop.dto.ItemThumbDto;
+import project.mockshop.dto.QItemThumbDto;
 import project.mockshop.entity.Item;
 import project.mockshop.entity.QCategory;
 import project.mockshop.entity.QOrder;
@@ -74,10 +76,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public Page<Item> search(ItemSearchCondition searchCondition, Pageable pageable) {
+    public Page<ItemThumbDto> search(ItemSearchCondition searchCondition, Pageable pageable) {
         ///TODO: 필터: 금액대, 할인여부, 정렬: 낮은가격순, 높은가격순, 판매량순, 최신순
-        List<Item> content = queryFactory
-                .selectFrom(item)
+        List<ItemThumbDto> content = queryFactory
+                .select(new QItemThumbDto(item.id, item.name, item.thumbnail.storeFileName, item.price, item.percentOff))
+                .from(item)
                 .leftJoin(orderItem).on(item.id.eq(orderItem.item.id))
                 .where(itemNameLike(searchCondition.getItemNameLike()),
                         priceGoe(searchCondition.getPriceGoe()),
