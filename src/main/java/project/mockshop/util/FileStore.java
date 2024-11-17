@@ -1,24 +1,28 @@
 package project.mockshop.util;
 
+import io.awspring.cloud.s3.S3Template;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import project.mockshop.entity.UploadFile;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class FileStore {
+    private final S3Template s3Template;
+    @Value("${aws.s3.bucketName}")
+    private String bucketName;
 
-    @Value("${file.dir}")
-    private String fileDir;
-
-    public String getFullPath(String filename) {
-        return fileDir + filename;
+    public URL getFullPath(String filename) {
+        return s3Template.createSignedGetURL(bucketName, filename, Duration.ofSeconds(3));
     }
 
     public List<UploadFile> storeFiles(List<MultipartFile> multipartFiles) throws IOException {
@@ -62,7 +66,7 @@ public class FileStore {
     }
 
     public void storeFile(MultipartFile multipartFile, UploadFile uploadFile) throws IOException {
-        multipartFile.transferTo(new File(getFullPath(uploadFile.getStoreFileName())));
+        s3Template.upload(bucketName, uploadFile.getStoreFileName(), multipartFile.getInputStream());
     }
 
 

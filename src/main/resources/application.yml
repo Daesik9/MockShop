@@ -18,6 +18,11 @@ spring:
           starttls:
             enable: true
 
+aws:
+  accessKeyId: ${aws.s3.accessKey}
+  secretAccessKey: ${aws.s3.secretKey}
+  bucketName: ${aws.s3.bucketName}
+
 datasource:
   url: ${mysql.url}
   username: ${mysql.username}
@@ -43,9 +48,6 @@ logging:
     root: warn
     org.hibernate.SQL: warn
     org.hibernate.orm.jdbc.bind: warn
-
-file:
-  dir: ${file.dir}
 
 #springdoc:
 #  swagger-ui:

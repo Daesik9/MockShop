@@ -67,6 +67,7 @@ dependencies {
 	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.2.1")
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store'
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter'
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 }
 
 tasks.named('test') {
