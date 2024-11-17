@@ -2,7 +2,7 @@ spring:
   profiles:
     active: ${profile}
   config:
-    import: optional:file:src/test/resources/test.env[.properties]
+    import: aws-parameterstore:/mockshop/test/
   mail:
     host: smtp.gmail.com
     port: 587
