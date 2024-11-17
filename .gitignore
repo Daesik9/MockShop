@@ -37,8 +37,8 @@ out/
 .vscode/
 
 ### 설정 정보 ###
-/src/main/resources/application.yml
-/src/main/resources/jwt.yml
+#*.yml
+*.env
 /src/main/java/project/mockshop/util/CreateDummyData.java
 
 .DS_Store
