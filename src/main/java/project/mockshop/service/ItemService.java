@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.mockshop.dto.ItemCreationDto;
@@ -13,7 +14,6 @@ import project.mockshop.dto.ItemThumbDto;
 import project.mockshop.entity.*;
 import project.mockshop.mapper.ItemMapper;
 import project.mockshop.repository.ItemRepository;
-import project.mockshop.repository.MemberRepository;
 import project.mockshop.repository.MerchantRepository;
 import project.mockshop.util.FileStore;
 
@@ -127,5 +127,13 @@ public class ItemService {
     public Page<ItemThumbDto> search(ItemSearchCondition searchCond, Pageable pageable) {
         log.info("itemService search " + searchCond + " " + pageable);
         return itemRepository.search(searchCond, pageable);
+    }
+
+    public Slice<ItemThumbDto> searchSlice(ItemSearchCondition searchCondition, Pageable pageable) {
+        if (searchCondition.getSortBy().equals("salesVolume")) {
+            return itemRepository.searchSliceSortBySales(searchCondition, pageable);
+        } else {
+            return itemRepository.searchSlice(searchCondition, pageable);
+        }
     }
 }

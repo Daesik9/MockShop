@@ -22,6 +22,7 @@ import project.mockshop.repository.MerchantRepository;
 import project.mockshop.repository.OrderRepository;
 
 import java.io.FileInputStream;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -474,10 +475,13 @@ public class ItemServiceSpringTest {
                 .orderDate(LocalDateTime.now())
                 .build();
 
+        boolean isMonday = LocalDateTime.now().getDayOfWeek().equals(DayOfWeek.MONDAY);
+        System.out.println("isMonday = " + isMonday);
+
         OrderItem orderItem6 = OrderItem.builder().item(item1).count(10).build();
         Order order2 = Order.builder()
                 .orderItems(List.of(orderItem6))
-                .orderDate(LocalDateTime.now().minusDays(1))
+                .orderDate(isMonday ? LocalDateTime.now() : LocalDateTime.now().minusDays(1))
                 .build();
 
         OrderItem orderItem7 = OrderItem.builder().item(item7).count(50).build();

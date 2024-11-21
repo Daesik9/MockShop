@@ -7,10 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -158,7 +155,7 @@ public class ItemControllerTest {
         int page = 0;
         int size = 8;
         Pageable pageable = PageRequest.of(page, size);
-        Page<ItemThumbDto> pages = new PageImpl<>(itemThumbDtos.subList(0, 8), pageable, itemThumbDtos.size());
+        Slice<ItemThumbDto> pages = new SliceImpl<>(itemThumbDtos.subList(0, 8), pageable, true);
         ItemSearchCondition searchCond = ItemSearchCondition.builder()
                 .itemNameLike("name")
                 .priceGoe(1000)
@@ -167,7 +164,7 @@ public class ItemControllerTest {
                 .sortBy("salesVolume")
                 .build();
 
-        given(itemService.search(any(ItemSearchCondition.class), any(Pageable.class))).willReturn(pages);
+        given(itemService.searchSlice(any(ItemSearchCondition.class), any(Pageable.class))).willReturn(pages);
 
         //when
         ResultActions resultActions = mockMvc.perform(
@@ -185,7 +182,7 @@ public class ItemControllerTest {
         //then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.result.data.content[0].name").value("0name0"));
-        verify(itemService, times(1)).search(any(ItemSearchCondition.class), any(Pageable.class));
+        verify(itemService, times(1)).searchSlice(any(ItemSearchCondition.class), any(Pageable.class));
     }
 
     @Test

@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import project.mockshop.dto.ItemCreationDto;
@@ -36,7 +36,7 @@ public class ItemController {
     }
 
     @GetMapping("/images/{filename}")
-    public Resource downloadImage(@PathVariable String filename) {
+    public Resource downloadImage(@PathVariable String filename) throws MalformedURLException {
         return new UrlResource(fileStore.getFullPath(filename));
     }
 
@@ -52,7 +52,9 @@ public class ItemController {
                            @RequestParam(defaultValue = "0") int page,
                            @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<ItemThumbDto> result = itemService.search(searchCondition, pageable);
+//        Page<ItemThumbDto> result = itemService.search(searchCondition, pageable);
+        Slice<ItemThumbDto> result = itemService.searchSlice(searchCondition, pageable);
+
         return Response.success(HttpStatus.OK.value(), result);
     }
 

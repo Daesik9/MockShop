@@ -4,15 +4,11 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
+import org.springframework.data.domain.*;
 import project.mockshop.dto.ItemSearchCondition;
 import project.mockshop.dto.ItemThumbDto;
 import project.mockshop.dto.QItemThumbDto;
 import project.mockshop.entity.Item;
-import project.mockshop.entity.QCategory;
 import project.mockshop.entity.QOrder;
 
 import java.time.DayOfWeek;
@@ -21,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
-import static project.mockshop.entity.QCategory.category;
 import static project.mockshop.entity.QItem.item;
 import static project.mockshop.entity.QOrderItem.orderItem;
 
@@ -104,6 +99,64 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
 //        return new PagedModel<>(new PageImpl<>(content, pageable, count));
         return new PageImpl<>(content, pageable, count);
+    }
+
+    @Override
+    public Slice<ItemThumbDto> searchSlice(ItemSearchCondition searchCondition, Pageable pageable) {
+//        pageSize = 20
+//        페이지가 0이면 limit은 pageSize * 10
+//        프론트에서 200개의 데이터를 10개로 쪼개서 10개의 페이지처럼 처리
+//        프론트에서 페이지 수가 10까지 가고 '다음'버튼 누르면 페이지 + 1
+//        마지막 페이지에서 200개의 데이터를 못 가져오고 만약에 130개만 가져온다. 그럼 프론트에서 그걸 20씩 쪼개서 페이지 표시
+
+        int fetchSize = pageable.getPageSize() * 10;
+
+        List<ItemThumbDto> content = queryFactory
+                .select(new QItemThumbDto(item.id, item.name, item.thumbnail.storeFileName, item.price, item.percentOff))
+                .from(item)
+                .where(itemNameLike(searchCondition.getItemNameLike()),
+                        priceGoe(searchCondition.getPriceGoe()),
+                        priceLoe(searchCondition.getPriceLoe()),
+                        isOnSale(searchCondition.getIsOnSale()))
+                .orderBy(getOrderSpecifier(searchCondition.getSortBy()), item.id.asc())
+                .offset(pageable.getOffset())
+                .limit(fetchSize + 1)
+                .fetch();
+
+        // 다음 페이지가 있는지 판단
+        boolean hasNext = content.size() > pageable.getPageSize();
+        if (hasNext) {
+            content = content.subList(0, pageable.getPageSize());  // 실제 페이지 데이터만 반환
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    @Override
+    public Slice<ItemThumbDto> searchSliceSortBySales(ItemSearchCondition searchCondition, Pageable pageable) {
+        int fetchSize = pageable.getPageSize() * 10;
+
+        List<ItemThumbDto> content = queryFactory
+                .select(new QItemThumbDto(item.id, item.name, item.thumbnail.storeFileName, item.price, item.percentOff))
+                .from(item)
+                .leftJoin(orderItem).on(item.id.eq(orderItem.item.id))
+                .where(itemNameLike(searchCondition.getItemNameLike()),
+                        priceGoe(searchCondition.getPriceGoe()),
+                        priceLoe(searchCondition.getPriceLoe()),
+                        isOnSale(searchCondition.getIsOnSale()))
+                .groupBy(item.id)
+                .orderBy(getOrderSpecifier(searchCondition.getSortBy()), item.id.asc())
+                .offset(pageable.getOffset())
+                .limit(fetchSize + 1)
+                .fetch();
+
+        // 다음 페이지가 있는지 판단
+        boolean hasNext = content.size() > pageable.getPageSize();
+        if (hasNext) {
+            content = content.subList(0, pageable.getPageSize());  // 실제 페이지 데이터만 반환
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 
     private OrderSpecifier<?> getOrderSpecifier(String sortBy) {
