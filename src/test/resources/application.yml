@@ -2,12 +2,13 @@ spring:
   profiles:
     active: ${profile}
   config:
-    import: aws-parameterstore:/mockshop/test/
+#    import: aws-parameterstore:/mockshop/test/
+    import: optional:file:src/test/resources/test.env[.properties]
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${mail.username}
-    password: ${mail.password}
+    username: ${mail_username}
+    password: ${mail_password}
     properties:
       mail:
         smtp:
@@ -17,4 +18,4 @@ spring:
             enable: true
 
 file:
-  dir: ${file.dir}
+  dir: ${file_dir}
