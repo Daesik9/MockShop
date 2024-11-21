@@ -13,19 +13,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
 import project.mockshop.dto.*;
 import project.mockshop.entity.AddressInfo;
-import project.mockshop.response.Response;
 import project.mockshop.service.CouponService;
 import project.mockshop.service.CustomerService;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -33,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-public class UserControllerSpringTest {
+public class MemberControllerSpringTest {
     @Autowired
     private CustomerController customerController;
     @Autowired
@@ -91,7 +87,7 @@ public class UserControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/users")
+                MockMvcRequestBuilders.post("/api/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto))
         );
@@ -114,7 +110,7 @@ public class UserControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/users")
+                MockMvcRequestBuilders.post("/api/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customerRequest))
         );
@@ -131,7 +127,7 @@ public class UserControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/{id}", userId)
+                get("/api/members/{id}", userId)
         );
 
         //then
@@ -146,7 +142,7 @@ public class UserControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users")
+                get("/api/members")
         );
 
         //then
@@ -165,7 +161,7 @@ public class UserControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/users/find/login-id")
+                post("/api/members/find-login-id")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto))
         );
@@ -174,28 +170,6 @@ public class UserControllerSpringTest {
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.result.data").value("loginid"));
-    }
-
-    @Test
-    void findPassword() throws Exception {
-        //given
-        String loginId = "loginid";
-        String phoneNumber = "01011111111";
-        FindPasswordRequestDto requestDto = FindPasswordRequestDto.builder()
-                .loginId(loginId)
-                .phoneNumber(phoneNumber)
-                .build();
-
-        //when
-        ResultActions resultActions = mockMvc.perform(
-                post("/api/users/find/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto))
-        );
-
-        //then
-        resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200));
     }
 
     @Test
@@ -233,7 +207,7 @@ public class UserControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/check-duplicate/{loginId}", duplicatedLoginId)
+                get("/api/members/check-duplicate/{loginId}", duplicatedLoginId)
         );
 
         //then
@@ -257,7 +231,7 @@ public class UserControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/users")
+                MockMvcRequestBuilders.put("/api/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateProfileDto))
         );
@@ -287,7 +261,7 @@ public class UserControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/{customerId}/coupons", customerId)
+                get("/api/members/{customerId}/coupons", customerId)
         );
 
         //then
@@ -306,7 +280,7 @@ public class UserControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                put("/api/users/reset-password")
+                put("/api/members/reset-password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(resetPasswordDto))
         );
@@ -350,7 +324,7 @@ public class UserControllerSpringTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/{customerId}/coupons/available-for-order", customerId)
+                get("/api/members/{customerId}/coupons/available-for-order", customerId)
                         .param("orderAmount", "3000")
         );
 

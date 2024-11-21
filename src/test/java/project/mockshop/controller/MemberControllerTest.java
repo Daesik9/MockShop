@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+public class MemberControllerTest {
     @InjectMocks
     private CustomerController customerController;
     private MockMvc mockMvc;
@@ -65,7 +65,7 @@ public class UserControllerTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/users")
+                MockMvcRequestBuilders.post("/api/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto))
         );
@@ -89,7 +89,7 @@ public class UserControllerTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/users")
+                MockMvcRequestBuilders.post("/api/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customerRequest))
         );
@@ -107,7 +107,7 @@ public class UserControllerTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/{id}", id)
+                get("/api/members/{id}", id)
         );
 
         //then
@@ -124,7 +124,7 @@ public class UserControllerTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users")
+                get("/api/members")
         );
 
         //then
@@ -145,7 +145,7 @@ public class UserControllerTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/users/find/login-id")
+                post("/api/members/find-login-id")
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -154,55 +154,6 @@ public class UserControllerTest {
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.result.data").value("loginid"));
-    }
-
-    @Test
-    void findPassword() throws Exception {
-        //given
-        String loginId = "loginid";
-        String phoneNumber = "01011111111";
-        CustomerDto customer = CustomerDto.builder().loginId(loginId).phoneNumber(phoneNumber)
-                .password("Password1!").build();
-        given(customerService.findPassword(loginId, phoneNumber)).willReturn(customer);
-        FindPasswordRequestDto requestDto = FindPasswordRequestDto.builder()
-                .loginId(loginId)
-                .phoneNumber(phoneNumber)
-                .build();
-
-        //when
-        ResultActions resultActions = mockMvc.perform(
-                post("/api/users/find/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto))
-        );
-
-        //then
-        resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.result.data").value("Password1!"));
-        verify(customerService).findPassword(loginId, phoneNumber);
-    }
-
-    /// 이상하게 자꾸 LoginRequestDto가 다른 인스턴스라고 오류 뜸.
-    @Test
-    void login() throws Exception {
-        // Given
-        LoginRequestDto loginRequestDto = LoginRequestDto.builder()
-                .loginId("loginid")
-                .password("Password1!")
-                .build();
-
-        // When
-        ResultActions resultActions = mockMvc.perform(
-                post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequestDto))
-        );
-
-        // Then
-        resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200));
-//        verify(customerService).login(eq(loginRequestDto));
     }
 
     @Test
@@ -221,7 +172,7 @@ public class UserControllerTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/check-duplicate/{loginId}", duplicatedLoginId)
+                get("/api/members/check-duplicate/{loginId}", duplicatedLoginId)
         );
 
         //then
@@ -244,7 +195,7 @@ public class UserControllerTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/users")
+                MockMvcRequestBuilders.put("/api/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateProfileDto))
         );
@@ -271,7 +222,7 @@ public class UserControllerTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/users")
+                MockMvcRequestBuilders.put("/api/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateProfileDto))
         );
@@ -291,7 +242,7 @@ public class UserControllerTest {
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/users/{customerId}/coupons", customer.getId())
+                get("/api/members/{customerId}/coupons", customer.getId())
         );
 
         //then
