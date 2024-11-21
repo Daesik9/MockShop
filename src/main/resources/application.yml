@@ -2,14 +2,25 @@ spring:
   profiles:
     active: ${profile}
 
-  config:
-    import: aws-parameterstore:/mockshop/prod/
+#  config:
+#    import: optional:file:src/test/resources/local.env[.properties]
+#    import: aws-parameterstore:/mockshop/prod/
+
+  cloud:
+    aws:
+#      credentials:
+#        instance-profile: true
+      region:
+        static: ap-northeast-2
+      paramstore:
+        enabled: true
+      bucketName: ${aws_s3_bucketName}
 
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${mail.username}
-    password: ${mail.password}
+    username: ${mail_username}
+    password: ${mail_password}
     properties:
       mail:
         smtp:
@@ -18,30 +29,36 @@ spring:
           starttls:
             enable: true
 
-aws:
-  accessKeyId: ${aws.s3.accessKey}
-  secretAccessKey: ${aws.s3.secretKey}
-  bucketName: ${aws.s3.bucketName}
+  datasource:
+    url: ${mysql_url}
+    username: ${mysql_username}
+    password: ${mysql_password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-datasource:
-  url: ${mysql.url}
-  username: ${mysql.username}
-  password: ${mysql.password}
-  driver-class-name: com.mysql.cj.jdbc.Driver
+#  datasource:
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:tcp://localhost/~/mockshop
+#    username: sa
+#    password:
 
-thymeleaf:
-  prefix: classpath:/templates/
-  suffix: .html
+#  h2:
+#    console:
+#      enabled: true
+#      path: /h2-console
 
-jpa:
-  hibernate:
-    #      ddl-auto: create
-    ddl-auto: validate
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
 
-  properties:
+  jpa:
     hibernate:
-      #        show_sql: true
-      format_sql: true
+      #      ddl-auto: create
+      ddl-auto: validate
+
+    properties:
+      hibernate:
+        #        show_sql: true
+        format_sql: true
 
 logging:
   level:

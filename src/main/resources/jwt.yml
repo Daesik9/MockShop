@@ -1,2 +1,2 @@
-jwt-secret: ${jwt.secret}
-expiration-minutes: ${jwt.expiration-minutes}
+jwt-secret: ${jwt_secret}
+jwt-expiration-minutes: ${jwt_expiration_minutes}
